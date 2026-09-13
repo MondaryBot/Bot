@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Рецепты</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1410;
+      --card: #1a211b;
+      --card-hover: #1f2820;
+      --border: #2a352c;
+      --slot: #222b23;
+      --slot-empty: #1c241d;
+      --text: #e6ede6;
+      --text-dim: #8a9a8c;
+      --text-muted: #5f6d61;
+      --accent: #6fbf73;
+      --shadow: rgba(0, 0, 0, 0.4);
+      --icon: 26px;
+      --gap: 5px;
+      --row-h: 44px;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 32px 16px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 28px;
+      font-size: 1.8rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: transform 0.12s, background 0.12s, border-color 0.12s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      background: var(--card-hover);
+      border-color: #3a473c;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-icon {
+      position: relative;
+      font-size: 1.6rem;
+      line-height: 1;
+      min-width: 48px;
+      height: 48px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      background: var(--slot);
+      border-radius: 12px;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .lv-badge {
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      background: #2b3a2d;
+      color: var(--accent);
+      font-size: 0.65rem;
+      font-weight: 700;
+      line-height: 1;
+      padding: 3px 6px;
+      border-radius: 6px;
+      border: 1px solid #3a4d3c;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .card-meta {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 2px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .card-meta span { white-space: nowrap; }
+
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: -6px;
+    }
+
+    .craft {
+      display: grid;
+      gap: var(--gap);
+      grid-auto-rows: var(--row-h);
+      justify-content: start;
+    }
+
+    .slot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--slot);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      line-height: 1;
+      overflow: hidden;
+      height: var(--row-h);
+      padding: 0 4px;
+      font-size: 1.35rem;
+      white-space: nowrap;
+      letter-spacing: -1px;
+    }
+
+    .slot.empty {
+      background: var(--slot-empty);
+      border-color: transparent;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍳 Рецепты</h1>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const farmCrafts = [
+      { "id": 101, "name": "Салат", "icon": "🥗", "craft": [[1, 2], [0, 0]], "exp": 10, "childExp": 14, "time": 60 },
+      { "id": 102, "name": "Микс", "icon": "🥤", "craft": [[1, 0], [0, 2]], "exp": 11, "childExp": 14, "time": 70 },
+      { "id": 103, "name": "Нарезка", "icon": "🥙", "craft": [[1, 1], [2, 0]], "exp": 13, "childExp": 18, "time": 80 },
+      { "id": 104, "name": "Перекус", "icon": "🍽️", "craft": [[2, 2], [1, 0]], "exp": 16, "childExp": 24, "time": 90 },
+      { "id": 105, "name": "Комбо", "icon": "🥗🥤", "craft": [[101, 102]], "exp": 6, "childExp": 21, "time": 100 },
+      { "id": 106, "name": "Большой салат", "icon": "🥗✨", "craft": [[101, 103], [102, 0]], "exp": 8, "childExp": 34, "time": 130 },
+
+      { "id": 201, "name": "Рагу", "icon": "🍲", "craft": [[3, 1], [4, 2]], "exp": 30, "childExp": 67, "time": 210 },
+      { "id": 202, "name": "Томатный суп", "icon": "🍅🍜", "craft": [[4, 4], [1, 2]], "exp": 34, "childExp": 78, "time": 240 },
+      { "id": 203, "name": "Икра", "icon": "🍆🥣", "craft": [[3, 3], [4, 1]], "exp": 31, "childExp": 78, "time": 180 },
+      { "id": 204, "name": "Обед", "icon": "🍲🥗", "craft": [[101, 102], [201, 0]], "exp": 10, "childExp": 54, "time": 270 },
+      { "id": 205, "name": "Сытный суп", "icon": "🍲🥤", "craft": [[105, 106], [202, 0]], "exp": 12, "childExp": 50, "time": 300 },
+      { "id": 206, "name": "Фермерский набор", "icon": "🍽️🥗", "craft": [[203, 203], [101, 0]], "exp": 13, "childExp": 76, "time": 285 },
+
+      { "id": 301, "name": "Кукурузная похлёбка", "icon": "🍲🌽", "craft": [[5, 1, 5], [0, 4, 0], [0, 3, 0]], "exp": 55, "childExp": 150, "time": 300 },
+      { "id": 302, "name": "Овощная пицца", "icon": "🍕", "craft": [[4, 5, 4], [0, 3, 0], [0, 2, 0]], "exp": 52, "childExp": 140, "time": 360 },
+      { "id": 303, "name": "Рататуй", "icon": "🥘", "craft": [[3, 4, 3], [0, 5, 0]], "exp": 50, "childExp": 120, "time": 390 },
+      { "id": 304, "name": "Кукурузные котлеты", "icon": "🍔", "craft": [[5, 5, 1], [3, 0, 0], [0, 0, 4]], "exp": 58, "childExp": 150, "time": 330 },
+      { "id": 305, "name": "Похлёбка-микс", "icon": "🍲🥤", "craft": [[101, 201], [301, 0]], "exp": 15, "childExp": 110, "time": 420 },
+      { "id": 306, "name": "Пицца-сет", "icon": "🍕🥗", "craft": [[102, 202], [302, 0]], "exp": 16, "childExp": 110, "time": 450 },
+
+      { "id": 401, "name": "Клубничный десерт", "icon": "🍰", "craft": [[6, 6, 0], [0, 5, 6]], "exp": 75, "childExp": 250, "time": 420 },
+      { "id": 402, "name": "Ягодный пирог", "icon": "🥧", "craft": [[6, 7, 6], [0, 6, 0], [0, 6, 0]], "exp": 85, "childExp": 390, "time": 540 },
+      { "id": 403, "name": "Фруктово-овощной салат", "icon": "🥗🍓", "craft": [[0, 7, 6], [6, 4, 0]], "exp": 80, "childExp": 290, "time": 480 },
+      { "id": 404, "name": "Завтрак гурмана", "icon": "🍽️👑", "craft": [[101, 201, 301], [401, 0, 0]], "exp": 22, "childExp": 200, "time": 570 },
+      { "id": 405, "name": "Сладкий сет", "icon": "🍰🥧", "craft": [[102, 202, 302], [0, 0, 402]], "exp": 24, "childExp": 210, "time": 600 },
+      { "id": 406, "name": "Десерт-обед", "icon": "🥧🥘", "craft": [[203, 303], [403, 0]], "exp": 25, "childExp": 190, "time": 570 },
+
+      { "id": 501, "name": "Авокадо-тост Люкс", "icon": "🥑🍞", "craft": [[7, 4, 7, 0], [0, 3, 0, 0], [0, 5, 0, 0], [0, 0, 0, 7]], "exp": 140, "childExp": 470, "time": 720 },
+      { "id": 502, "name": "Гурман-плато", "icon": "🍽️🥑", "craft": [[7, 6, 7, 0], [0, 5, 0, 3], [0, 4, 0, 1], [0, 0, 7, 0]], "exp": 150, "childExp": 550, "time": 840 },
+      { "id": 503, "name": "Огненное рагу", "icon": "🔥🍲", "craft": [[8, 0, 8, 0], [0, 7, 0, 3], [0, 4, 0, 5], [0, 8, 0, 8]], "exp": 190, "childExp": 950, "time": 900 },
+      { "id": 504, "name": "Королевский ужин", "icon": "👑🍽️", "craft": [[101, 201, 301], [401, 0, 0]], "exp": 35, "childExp": 200, "time": 1080 },
+      { "id": 505, "name": "Тост-сет", "icon": "🥑🍽️", "craft": [[102, 202, 302], [402, 0, 0]], "exp": 38, "childExp": 220, "time": 480 },
+      { "id": 506, "name": "Пламя-сет", "icon": "🔥🍽️", "craft": [[203, 303, 403], [503, 0, 0]], "exp": 42, "childExp": 420, "time": 720 }
+    ];
+
+    const resourceList = [
+      ["🥕", 30, 20, 30],
+      ["🥒", 60, 30, 60],
+      ["🍆", 90, 45, 90],
+      ["🍅", 120, 60, 120],
+      ["🌽", 180, 60, 150],
+      ["🍓", 240, 90, 220],
+      ["🥑", 300, 90, 340],
+      ["🌶", 360, 90, 400]
+    ];
+
+    const resources = {};
+    resourceList.forEach((r, i) => { resources[i + 1] = r[0]; });
+
+    const craftsById = {};
+    farmCrafts.forEach(c => { craftsById[c.id] = c; });
+
+    const escapeHtml = (s) =>
+      String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    function getLevel(id) {
+      return Math.floor(id / 100);
+    }
+
+    function getEmoji(id) {
+      if (id === 0) return '';
+      if (resources[id]) return resources[id];
+      if (craftsById[id]) return craftsById[id].icon;
+      return '❓';
+    }
+
+    function getName(id) {
+      if (id === 0) return '';
+      if (resources[id]) return `Ресурс #${id}`;
+      if (craftsById[id]) return craftsById[id].name;
+      return `#${id}`;
+    }
+
+    function iconCount(str) {
+      return [...String(str)].length;
+    }
+
+    function renderCard(recipe) {
+      const cols = Math.max(...recipe.craft.map(r => r.length));
+      const level = getLevel(recipe.id);
+
+      const colWidths = new Array(cols).fill(1);
+      for (let c = 0; c < cols; c++) {
+        for (const row of recipe.craft) {
+          const id = row[c] ?? 0;
+          if (!id) continue;
+          const w = iconCount(getEmoji(id));
+          if (w > colWidths[c]) colWidths[c] = w;
+        }
+      }
+
+      const iconPx = 26;
+      const innerPx = 6;
+      const colPx = colWidths.map(w => w * iconPx + innerPx);
+
+      const slots = [];
+      for (const row of recipe.craft) {
+        for (let c = 0; c < cols; c++) {
+          const id = row[c] ?? 0;
+          if (id === 0) {
+            slots.push(`<div class="slot empty"></div>`);
+          } else {
+            const emoji = getEmoji(id);
+            const name = getName(id);
+            slots.push(
+              `<div class="slot" title="${escapeHtml(name)}">${escapeHtml(emoji)}</div>`
+            );
+          }
+        }
+      }
+
+      const gridStyle =
+        `grid-template-columns: ${colPx.map(p => p + 'px').join(' ')};`;
+
+      return `
+        <div class="card">
+          <div class="card-head">
+            <div class="card-icon">
+              <span class="lv-badge">Lv.${level}</span>
+              ${escapeHtml(recipe.icon)}
+            </div>
+            <div>
+              <div class="card-title">${escapeHtml(recipe.name)}</div>
+              <div class="card-meta">
+                <span>⭐ ${recipe.exp} / 👶 ${recipe.childExp}</span>
+                <span>⏱ ${recipe.time}с</span>
+              </div>
+            </div>
+          </div>
+          <div class="section-label">Крафт</div>
+          <div class="craft" style="${gridStyle}">${slots.join('')}</div>
+        </div>
+      `;
+    }
+
+    document.getElementById('grid').innerHTML =
+      farmCrafts.map(renderCard).join('');
+  </script>
+</body>
+</html>
