@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<meta name="color-scheme" content="dark light">
+<title>Руководство · Мандарин Бот</title>
+<style>
+  :root {
+    --bg-1: #0f1419;
+    --bg-2: #0a0d12;
+    --card: #161d27;
+    --card-2: #131a23;
+    --border: #263140;
+    --text: #e8eef6;
+    --text-dim: #93a3b8;
+    --text-mut: #5f7086;
+    --accent: #d99a5c;
+    --accent-2: #c98850;
+    --accent-glow: rgba(217, 154, 92, 0.12);
+    --accent-glow-strong: rgba(217, 154, 92, 0.25);
+    --grad: linear-gradient(135deg, #d99a5c 0%, #c98850 100%);
+    --grad-soft: linear-gradient(135deg, rgba(217,154,92,0.10), rgba(201,136,80,0.03));
+    --shadow: rgba(0, 0, 0, 0.45);
+    --radius: 16px;
+    --divider: #2a3644;
+    --toggle-bg: #1f2a36;
+    --toggle-border: #2f3d4f;
+    --glow-1: rgba(217, 154, 92, 0.06);
+    --glow-2: rgba(201, 136, 80, 0.03);
+    --inset: rgba(255, 255, 255, 0.04);
+    --pill-bg: rgba(255, 255, 255, 0.04);
+  }
+  /* СВЕТЛАЯ — затемнённый фон, тот же оранжевый */
+    html.light {
+    --bg-1: #e8dfd1;
+    --bg-2: #d9cdb9;
+    --card: #ffffff;
+    --card-2: #fdfaf4;
+    --border: #c1a880;
+    --text: #120c04;
+    --text-dim: #3f3122;
+    --text-mut: #6e5b41;
+    --accent: #c98850;
+    --accent-2: #a35d28;
+    --accent-glow: rgba(201, 136, 80, 0.28);
+    --accent-glow-strong: rgba(201, 136, 80, 0.5);
+    --grad: linear-gradient(135deg, #d99a5c 0%, #c98850 55%, #b07340 100%);
+    --grad-soft: linear-gradient(135deg, rgba(201,136,80,0.18), rgba(176,115,64,0.06));
+    --shadow: rgba(70, 45, 15, 0.22);
+    --shadow-soft: rgba(70, 45, 15, 0.12);
+    --divider: #c9b189;
+    --toggle-bg: #d6c3a5;
+    --toggle-border: #a58a60;
+    --glow-1: rgba(201, 136, 80, 0.16);
+    --glow-2: rgba(176, 115, 64, 0.09);
+    --inset: rgba(255, 255, 255, 1);
+    --pill-bg: rgba(201, 136, 80, 0.10);
+    --slot: #f5ebdc;
+    --slot-2: #ecdfc9;
+    --slot-empty: #e5d7bd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 50% -10%, var(--glow-1), transparent 60%),
+      radial-gradient(700px 400px at 90% 110%, var(--glow-2), transparent 70%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    background-attachment: fixed;
+    color: var(--text);
+    padding: 32px 16px calc(40px + env(safe-area-inset-bottom));
+    padding-top: calc(28px + env(safe-area-inset-top));
+    min-height: 100vh; min-height: 100dvh;
+    line-height: 1.6;
+    transition: background 0.5s ease, color 0.35s ease;
+  }
+  .progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000; }
+  .progress-fill { height: 100%; width: 0%; background: var(--grad); transition: width 0.1s linear; }
+
+  .header {
+    position: relative; max-width: 1200px; margin: 0 auto 24px;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 60px;
+  }
+  h1.title {
+    font-size: clamp(1.4rem, 4vw, 1.9rem);
+    font-weight: 800; letter-spacing: -0.025em;
+    background: var(--grad);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-align: center;
+    animation: titleIn 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+  @keyframes titleIn {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .back-link {
+    position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text-dim); text-decoration: none;
+    font-size: 0.85rem; font-weight: 700;
+    transition: all 0.25s ease;
+  }
+  .back-link:hover {
+    border-color: var(--accent); color: var(--accent);
+    transform: translateY(-50%) translateX(-3px);
+  }
+  .theme-toggle {
+    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    width: 54px; height: 30px; border-radius: 30px;
+    background: var(--toggle-bg); border: 1px solid var(--toggle-border);
+    cursor: pointer; transition: all 0.35s ease;
+  }
+  .theme-toggle:hover { border-color: var(--accent); }
+  .toggle-knob {
+    position: absolute; top: 2px; left: 2px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--grad);
+    box-shadow: 0 2px 6px var(--accent-glow-strong);
+    transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.78rem;
+  }
+  html.light .toggle-knob { left: calc(100% - 26px); }
+  .toggle-knob .k-ico { position: absolute; transition: opacity 0.3s, transform 0.4s; }
+  .k-ico.moon { opacity: 1; }
+  .k-ico.sun { opacity: 0; transform: rotate(-90deg); }
+  html.light .k-ico.moon { opacity: 0; transform: rotate(90deg); }
+  html.light .k-ico.sun { opacity: 1; transform: rotate(0deg); }
+
+  .container {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 260px 1fr; gap: 28px;
+  }
+
+  /* ===== ОГЛАВЛЕНИЕ ===== */
+  .toc {
+    position: sticky; top: 20px; align-self: start;
+    max-height: calc(100vh - 40px); overflow-y: auto;
+    background: linear-gradient(160deg, var(--card), var(--card-2));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: 0 3px 14px var(--shadow), inset 0 1px 0 var(--inset);
+  }
+  .toc-title {
+    font-size: 0.72rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-mut);
+    font-weight: 800; margin-bottom: 12px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--divider);
+  }
+  .toc-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+  .toc-list a {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 11px; border-radius: 9px;
+    color: var(--text-dim); text-decoration: none;
+    font-size: 0.85rem; font-weight: 600;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+    line-height: 1.35;
+  }
+  .toc-list a:hover { background: var(--grad-soft); color: var(--accent); }
+  .toc-list a.active {
+    background: var(--grad-soft);
+    color: var(--accent);
+    border-left-color: var(--accent);
+    font-weight: 700;
+  }
+  .toc-list a .toc-ico { font-size: 0.95rem; flex-shrink: 0; }
+
+  /* ===== КОНТЕНТ ===== */
+  .content { min-width: 0; }
+  .section { margin-bottom: 36px; scroll-margin-top: 20px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .section-header .s-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 42px; height: 42px; border-radius: 12px;
+    background: var(--grad-soft); border: 1px solid var(--border);
+    font-size: 1.2rem; flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 1.35rem; font-weight: 800;
+    letter-spacing: -0.015em; color: var(--text);
+  }
+
+  .guide-card {
+    background: linear-gradient(160deg, var(--card), var(--card-2));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 3px 14px var(--shadow), inset 0 1px 0 var(--inset);
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.25s ease;
+  }
+  .guide-card:hover { border-color: var(--accent); }
+  .guide-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 18px 20px;
+    cursor: pointer; user-select: none;
+    transition: background 0.25s ease;
+  }
+  .guide-card-header:hover { background: var(--grad-soft); }
+  .guide-card-header h3 {
+    font-size: 1.02rem; font-weight: 700;
+    color: var(--text); letter-spacing: -0.008em;
+    display: flex; align-items: center; gap: 8px; flex: 1;
+  }
+  .guide-card-header .caret {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: var(--grad-soft);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent); font-weight: 900;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    flex-shrink: 0; font-size: 0.75rem;
+  }
+  .guide-card.open .caret { transform: rotate(180deg); }
+  .guide-card-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.2, 0.8, 0.3, 1),
+                padding 0.3s ease, opacity 0.3s ease;
+    padding: 0 20px; opacity: 0;
+  }
+  .guide-card.open .guide-card-body {
+    max-height: 3500px;
+    padding: 2px 20px 20px;
+    opacity: 1;
+  }
+  .guide-card-body p {
+    color: var(--text-dim); line-height: 1.75;
+    margin-bottom: 10px; font-size: 0.93rem;
+  }
+  .guide-card-body p:last-child { margin-bottom: 0; }
+  .guide-card-body strong { color: var(--text); font-weight: 700; }
+  .guide-card-body ul, .guide-card-body ol {
+    color: var(--text-dim); padding-left: 20px;
+    margin-bottom: 10px;
+  }
+  .guide-card-body li { margin-bottom: 6px; line-height: 1.65; }
+  .guide-card-body code {
+    font-family: ui-monospace, monospace;
+    background: var(--pill-bg);
+    padding: 2px 7px; border-radius: 5px;
+    color: var(--accent); font-size: 0.86rem;
+    border: 1px solid var(--border);
+  }
+  .guide-card-body .tip-box {
+    background: var(--grad-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 9px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.65;
+  }
+  .guide-card-body .tip-box strong { color: var(--accent); }
+
+  /* ===== ФУТЕР ===== */
+  .footer {
+    max-width: 1200px; margin: 60px auto 0;
+    padding: 36px 16px 20px;
+    border-top: 1px solid var(--divider);
+    text-align: center; color: var(--text-mut); font-size: 0.86rem;
+  }
+  .footer-links {
+    display: flex; flex-wrap: wrap; gap: 20px;
+    justify-content: center; margin-bottom: 18px;
+  }
+  .footer-links a {
+    color: var(--text-dim); text-decoration: none;
+    font-weight: 600; transition: color 0.2s ease;
+  }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-dev {
+    margin-top: 12px; padding-top: 16px;
+    border-top: 1px dashed var(--divider); font-size: 0.83rem;
+  }
+  .footer-dev a { color: var(--accent); text-decoration: none; font-weight: 700; }
+  .footer-dev a:hover { text-decoration: underline; }
+
+  /* ===== АДАПТАЦИЯ ===== */
+  @media (max-width: 900px) {
+    .container { grid-template-columns: 1fr; gap: 16px; }
+    .toc { position: static; max-height: none; padding: 14px; }
+    .toc-list { flex-direction: row; flex-wrap: wrap; gap: 5px; }
+    .toc-list a {
+      border-left: none;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      border-radius: 7px;
+      background: var(--pill-bg);
+    }
+    .toc-list a.active {
+      border-left: none;
+      background: var(--accent);
+      color: #fff;
+    }
+  }
+  @media (max-width: 560px) {
+    body { padding: 18px 12px calc(28px + env(safe-area-inset-bottom)); }
+    .header { min-height: 48px; margin-bottom: 16px; }
+    .theme-toggle { width: 48px; height: 28px; }
+    .toggle-knob { width: 22px; height: 22px; font-size: 0.72rem; }
+    html.light .toggle-knob { left: calc(100% - 24px); }
+    .back-link { padding: 6px 10px; font-size: 0.75rem; }
+    .section-header h2 { font-size: 1.1rem; }
+    .section-header .s-icon { width: 36px; height: 36px; font-size: 1rem; }
+    .guide-card-header { padding: 14px 16px; }
+    .guide-card-header h3 { font-size: 0.95rem; }
+    .guide-card.open .guide-card-body { padding: 2px 16px 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  html.light body {
+    background:
+      radial-gradient(1000px 500px at 50% -10%, var(--glow-1), transparent 60%),
+      radial-gradient(700px 400px at 90% 110%, var(--glow-2), transparent 70%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  }
+
+  html.light .card,
+  html.light .nav-card,
+  html.light .info-block,
+  html.light .dev-card,
+  html.light .guide-card,
+  html.light .recipe-card,
+  html.light .person-card,
+  html.light .search-panel,
+  html.light .wall-hero,
+  html.light .hero {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 6px 20px var(--shadow-soft),
+      0 2px 6px rgba(70, 45, 15, 0.08);
+  }
+
+  html.light .btn-primary {
+    background: linear-gradient(135deg, #d99a5c 0%, #c98850 50%, #a35d28 100%);
+    box-shadow:
+      0 4px 14px var(--accent-glow-strong),
+      0 1px 0 rgba(255, 255, 255, 0.4) inset;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(80, 45, 10, 0.25);
+  }
+  html.light .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 26px var(--accent-glow-strong),
+      0 1px 0 rgba(255, 255, 255, 0.5) inset;
+    filter: brightness(1.06);
+  }
+
+  html.light .btn-secondary {
+    background: linear-gradient(160deg, #fffaf2, #fbf3e5);
+    border-color: var(--border);
+    color: var(--text);
+  }
+  html.light .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent-2);
+    box-shadow: 0 8px 22px var(--accent-glow);
+  }
+
+  html.light .nav-card:hover,
+  html.light .person-card:hover,
+  html.light .recipe-card:hover {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 20px 40px var(--shadow),
+      0 8px 22px var(--accent-glow);
+  }
+
+  html.light .guide-card:hover { border-color: var(--accent); }
+
+  html.light .level-badge {
+    background: linear-gradient(135deg, #d99a5c 0%, #c98850 55%, #a35d28 100%);
+    box-shadow:
+      0 4px 14px var(--accent-glow-strong),
+      0 1px 0 rgba(255, 255, 255, 0.4) inset;
+    color: #fff;
+  }
+
+  html.light .chip {
+    background: linear-gradient(160deg, #fffaf2, #fbf3e5);
+  }
+  html.light .chip.active {
+    background: linear-gradient(135deg, #d99a5c 0%, #c98850 55%, #a35d28 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px var(--accent-glow-strong);
+  }
+
+  html.light .slot {
+    background: linear-gradient(160deg, #fbf3e5, #f0e2c9);
+    border-color: var(--border);
+    box-shadow: 0 1px 0 #fff inset, 0 1px 3px rgba(70, 45, 15, 0.08);
+  }
+
+  html.light .theme-toggle {
+    background: linear-gradient(135deg, #d9c7a7, #c8b28d);
+    border-color: #a58a60;
+    box-shadow: 0 2px 6px rgba(70, 45, 15, 0.2) inset;
+  }
+</style>
+</head>
+<body>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="header">
+    <a href="index.html" class="back-link">← На главную</a>
+    <h1 class="title">📖 Руководство</h1>
+    <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему" type="button">
+      <span class="toggle-knob">
+        <span class="k-ico moon">🌙</span>
+        <span class="k-ico sun">☀️</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="container">
+
+    <aside class="toc">
+      <div class="toc-title">Разделы</div>
+      <ul class="toc-list" id="tocList">
+        <li><a href="#start" data-target="start"><span class="toc-ico">🚀</span> Начало</a></li>
+        <li><a href="#farm" data-target="farm"><span class="toc-ico">🌱</span> Ферма и готовка</a></li>
+        <li><a href="#waifu" data-target="waifu"><span class="toc-ico">💞</span> Вайфу</a></li>
+        <li><a href="#family" data-target="family"><span class="toc-ico">💖</span> Дети</a></li>
+        <li><a href="#company" data-target="company"><span class="toc-ico">🖥</span> Компания</a></li>
+        <li><a href="#house" data-target="house"><span class="toc-ico">🏠</span> Дом</a></li>
+        <li><a href="#rent" data-target="rent"><span class="toc-ico">🏘</span> Аренда и контракты</a></li>
+        <li><a href="#bank" data-target="bank"><span class="toc-ico">🏦</span> Банк</a></li>
+        <li><a href="#teams" data-target="teams"><span class="toc-ico">🔰</span> Отряды</a></li>
+        <li><a href="#equip" data-target="equip"><span class="toc-ico">🛡</span> Снаряжение</a></li>
+        <li><a href="#books" data-target="books"><span class="toc-ico">📚</span> Книги и карточки</a></li>
+        <li><a href="#season" data-target="season"><span class="toc-ico">🔥</span> Сезон</a></li>
+        <li><a href="#clan" data-target="clan"><span class="toc-ico">⚔️</span> Клан и рейды</a></li>
+        <li><a href="#cars" data-target="cars"><span class="toc-ico">🏁</span> Гонки</a></li>
+        <li><a href="#taxi" data-target="taxi"><span class="toc-ico">🚖</span> Такси</a></li>
+        <li><a href="#campany" data-target="campany"><span class="toc-ico">🌍</span> Кампания</a></li>
+        <li><a href="#church" data-target="church"><span class="toc-ico">⛪</span> Церковь</a></li>
+        <li><a href="#minigames" data-target="minigames"><span class="toc-ico">🎮</span> Мини-игры</a></li>
+        <li><a href="#events" data-target="events"><span class="toc-ico">🎉</span> События</a></li>
+        <li><a href="#faq" data-target="faq"><span class="toc-ico">❓</span> Частые вопросы</a></li>
+      </ul>
+    </aside>
+
+    <main class="content">
+
+      <!-- ============ НАЧАЛО ============ -->
+      <section class="section" id="start">
+        <div class="section-header">
+          <span class="s-icon">🚀</span>
+          <h2>Начало игры</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>👋 Первые шаги</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              При первом запуске бота вы регистрируетесь и попадаете в мир как
+              начинающий фермер. С самого начала у вас есть небольшой запас
+              саженцев и мандаринов, чтобы было с чего начать.
+            </p>
+            <p>
+              Дальше вас ведёт <strong>сюжет</strong> — короткие задания, которые
+              знакомят с интерфейсом и постепенно открывают новые разделы: вайфу,
+              детей, компанию, клан, гонки, кампанию и остальное.
+            </p>
+            <div class="tip-box">
+              <strong>Совет:</strong> не пропускайте сюжетные задания — именно они
+              открывают доступ к большинству механик. За них также дают ценные
+              награды.
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎮 Две платформы — один мир</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Бот работает одновременно в <strong>Телеграме</strong> и
+              <strong>ВКонтакте</strong>. Это два разных аккаунта, но игровое
+              пространство одно на всех.
+            </p>
+            <p>
+              Вы можете играть в Телеграме и при этом взаимодействовать с
+              игроками из ВКонтакте, и наоборот. В клане, рейдах, рудниках,
+              гонках, контрактах, рейтингах — все участники общие, независимо
+              от платформы.
+            </p>
+            <p>
+              Выбирайте платформу, которая вам удобнее, или играйте сразу с двух
+              устройств — прогресс на каждом аккаунте свой, но мир и игроки общие.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>⌨️ Как управлять ботом</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Всё управление происходит через <strong>текстовые команды</strong> и
+              <strong>кнопки меню</strong>. Кнопки появляются под сообщениями и
+              меняются в зависимости от того, в каком разделе вы находитесь.
+            </p>
+            <p>Основные команды, которые работают всегда:</p>
+            <ul>
+              <li><code>Меню</code> — вернуться в главное меню.</li>
+              <li><code>Профиль</code> — ваш профиль и характеристики.</li>
+              <li><code>Мандарины</code> — раздел ресурсов.</li>
+              <li><code>Саженцы</code> — работа с саженцами.</li>
+              <li><code>Ферма</code> — раздел фермы и готовки.</li>
+              <li><code>Вайфу</code> — раздел вайфу.</li>
+              <li><code>Дети</code> — управление детьми.</li>
+              <li><code>Клан</code> — раздел клана.</li>
+              <li><code>Отряды</code> — боевые отряды.</li>
+            </ul>
+            <p>
+              Каждое сообщение в боте обычно содержит подсказку, что можно ввести
+              дальше — читайте их внимательно, там обычно указано нужное действие.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💡 Опыт и уровни</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Опыт (<strong>💡</strong>) начисляется почти за всё: сбор урожая,
+              еду, ускорения, свидания, гонки, готовку, работу компании и другие
+              действия. Когда опыта хватает — вы повышаете уровень.
+            </p>
+            <p>Каждый новый уровень:</p>
+            <ul>
+              <li>Даёт <strong>🎖очко</strong> для общего древа талантов.</li>
+              <li>Открывает новые механики и разделы.</li>
+              <li>Увеличивает лимит саженцев.</li>
+              <li>Иногда повышает лимит еды и опыта фермы.</li>
+            </ul>
+            <p>
+              На отдельных уровнях, чтобы повыситься, нужно пройти определённый
+              сюжетный квест — если сюжет не пройден, опыт не идёт в уровень,
+              пока не разберётесь с заданием.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ФЕРМА И ГОТОВКА ============ -->
+      <section class="section" id="farm">
+        <div class="section-header">
+          <span class="s-icon">🌱</span>
+          <h2>Ферма, еда и готовка</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🌾 Как выращивать мандарины</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Саженцы — основа всей экономики. Игровой цикл простой:
+              посадили семена → подождали → собрали мандарины.
+            </p>
+            <ul>
+              <li><strong>🥜Посадить</strong> — тратит семена, увеличивает количество саженцев.</li>
+              <li><strong>🍊Сбор</strong> — собирает все созревшие мандарины. Часть урожая может сгнить.</li>
+              <li><strong>⏳Ускорение</strong> — ускоряет рост за 🌳благородность.</li>
+            </ul>
+            <p>
+              Чем больше саженцев, тем дольше их собирать и тем больше может
+              пропасть. Максимальное количество саженцев растёт с уровнем.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🌳 Благородность</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              <strong>Благородность (🌳)</strong> — параметр от низкого значения
+              до почти 100%. Чем она выше, тем:
+            </p>
+            <ul>
+              <li>Меньше мандаринов сгнивает при сборе.</li>
+              <li>Эффективнее работает ускорение.</li>
+            </ul>
+            <p>Как её поднять:</p>
+            <ul>
+              <li>Сажать семена (сильнее всего, когда саженцев мало).</li>
+              <li>Съедать дольки 🍉.</li>
+              <li>Ходить на свидания с вайфу 💕.</li>
+              <li>Использовать удобрения 🧪.</li>
+            </ul>
+            <p>
+              Благородность тратится при сборе урожая — чем больше саженцев,
+              тем больше её уйдёт. Поэтому её нужно поддерживать постоянно.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🐛 Вредители и удобрения</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Время от времени на поле появляются вредители: <strong>🐌, 🐛, 🐝,
+              ☘, 🦗, 🐞, 🐦</strong>. Пока они на грядке — <strong>урожай собрать
+              нельзя</strong>. Нужно нажать кнопку <code>Избавиться</code>.
+            </p>
+            <p>
+              <strong>Удобрения 🧪</strong> ускоряют рост саженцев и повышают
+              благородность. Бывают разных уровней — от простых до премиальных.
+              Требуют определённое минимальное количество саженцев.
+            </p>
+            <div class="tip-box">
+              <strong>Совет:</strong> бонусы от детей-🌾Фермеров повышают шанс
+              избавиться от вредителей.
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🍉 Еда и сытость</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              <strong>Дольки (🍉)</strong> — ресурс, который получается при
+              разлущивании мандаринов. Их можно съесть, чтобы получить семена
+              и опыт, а также повысить 🌳благородность.
+            </p>
+            <p>
+              В разделе <code>Мандарины</code> есть команда <strong>Разлущить</strong>.
+              Она превращает мандарины в дольки с шансом найти 🥝киви. Чем
+              больше партия, тем больше долек и потенциальных киви.
+            </p>
+            <p>
+              У еды есть <strong>лимит сытости</strong>, который зависит от
+              уровня. Пока вы не «проголодались», есть нельзя. Сытость
+              восстанавливается со временем, а при повышении уровня лимит растёт.
+            </p>
+            <div class="tip-box">
+              <strong>Совет:</strong> шанс найти 🥝 можно повысить бонусами
+              и вайфу.
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🍳 Готовка на ферме</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              В разделе <code>🌾Ферма</code> есть подраздел
+              <strong>🍖Готовка</strong>. Там из выращенных на полях
+              ингредиентов готовятся блюда. Блюда дают опыт готовки и опыт
+              детям, а ещё их можно продавать или использовать в компании.
+            </p>
+            <p>Как готовить:</p>
+            <ol>
+              <li>Зайдите в <code>🌾Ферма</code> → <code>🍖Готовка</code>.</li>
+              <li>Выберите стол (со временем открываются дополнительные).</li>
+              <li>Выложите ингредиенты в сетку в правильном порядке.</li>
+              <li>Нажмите <code>✅Начать</code> — блюдо готовится нужное время.</li>
+            </ol>
+            <p>
+              Готовка имеет <strong>собственный уровень (🍖)</strong>, который
+              открывает новые столы, рецепты и разделы. Ежедневно появляются
+              <strong>заказы 🛒</strong> — их выполнение даёт дополнительный
+              опыт.
+            </p>
+            <p>
+              Полный список рецептов смотрите на странице              <a href="recipes.html">Рецепты крафта</a>.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🌾 Поля и грядки</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              На ферме есть <strong>🌱Поля</strong> — сетка грядок, где вы
+              сажаете овощи и ягоды. Ингредиенты для готовки: морковь, огурец,
+              баклажан, помидор, кукуруза, клубника, авокадо, перец чили.
+            </p>
+            <p>
+              Для посадки нужны <strong>семена фермы</strong> — они отличаются
+              от обычных семян для саженцев. У полей есть два режима роста:
+              <strong>быстрый</strong> и <strong>долгий</strong>. В долгом
+              режиме овощи растут дольше, но реже страдают от вредителей.
+            </p>
+            <p>
+              Удобрения для полей сокращают время роста. Некоторые редкие
+              рецепты требуют, чтобы поля были в определённом режиме.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ВАЙФУ ============ -->
+      <section class="section" id="waifu">
+        <div class="section-header">
+          <span class="s-icon">💞</span>
+          <h2>Вайфу</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>👩 Что такое вайфу</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Вайфу — девушки-компаньоны. Каждая даёт <strong>пассивный
+              бонус</strong> к какой-то сфере игры: скорость роста саженцев,
+              шанс найти золотой мандарин, дополнительный опыт, восстановление
+              сытости и т.д.
+            </p>
+            <p>
+              Разблокировать вайфу можно двумя способами: по сюжету (первая
+              открывается автоматически) или за <strong>🧩фрагменты</strong>
+              нужного типа. Фрагменты выпадают из коробок, событий и наград.
+            </p>
+            <p>
+              Бонус вайфу растёт вместе с её <strong>уровнем (🔥)</strong> —
+              от 1 до 5.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💕 Отношения и уровни</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              У каждой вайфу есть шкала <strong>отношений (❤)</strong>. Она
+              заполняется через свидания, подарки и другие действия. Когда
+              шкала заполнена — вайфу можно <strong>пробудить</strong>
+              (повысить уровень) за фрагменты.
+            </p>
+            <p>На каждом новом уровне:</p>
+            <ul>
+              <li>Открывается более сильная способность вайфу.</li>
+              <li>Появляются новые уровни древа талантов.</li>
+              <li>На последнем уровне дополнительная ❤ превращается в бонус.</li>
+            </ul>
+            <p>
+              Пробуждение требует фрагменты соответствующего типа. Чем выше
+              уровень — тем больше нужно.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🌸 Свидания</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Свидание — основной способ поднять отношения. Проводится с
+              ограничением по времени, которое можно сократить с помощью
+              🩸зелья выносливости.
+            </p>
+            <p>
+              На свидании вам задают вопрос с вариантами ответа. Правильный
+              ответ даёт больше любви, неправильный — меньше. С некоторой
+              вероятностью также может выпасть набор 📚 с фотографиями вайфу.
+            </p>
+            <div class="tip-box">
+              <strong>Совет:</strong> бонусы от детей-💘Романтиков повышают
+              шанс получить двойную любовь за свидание.
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎁 Подарки и украшения</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Помимо свиданий, отношения можно повышать через <strong>подарки
+              🎁</strong>. Идеальные подарки для конкретной вайфу дают усиленную
+              любовь.
+            </p>
+            <p>
+              Также у вайфу есть слот под <strong>украшение 💍</strong>.
+              Украшения дают бонусы к характеристикам, их можно улучшать
+              с шансом успеха и передавать по контрактам.
+            </p>
+            <p>
+              <strong>Наборы 📚</strong> открывают фотографии вайфу. Они
+              собираются постепенно — за достижение очередных порогов ❤ или
+              из коробок.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🌳 Древо талантов вайфу</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              У каждой вайфу — отдельное <strong>древо талантов</strong>. Узлы
+              открываются за 🩷очки, которые начисляются при получении любви.
+            </p>
+            <p>Узлы бывают трёх типов:</p>
+            <ul>
+              <li><strong>Бонусы</strong> — усиливают атаку, защиту, крит и т.д.</li>
+              <li><strong>Усиление способности</strong> — повышает основной бонус вайфу.</li>
+              <li><strong>Скиллы</strong> — активные боевые способности.</li>
+            </ul>
+            <p>
+              Также есть особый предмет <strong>🔷️Ядро маны</strong> — он
+              улучшает случайный скилл вайфу. Древо можно сбросить за
+              🍒черешню, чтобы перераспределить очки.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ДЕТИ ============ -->
+      <section class="section" id="family">
+        <div class="section-header">
+          <span class="s-icon">💖</span>
+          <h2>Дети и семья</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>👶 Как завести ребёнка</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Для рождения ребёнка нужна <strong>вайфу минимум 2🔥</strong> и
+              свободные 🩸силы. Силы восстанавливаются со временем, ограниченное
+              количество в день.
+            </p>
+            <p>
+              Через раздел вайфу запускается попытка зачатия. Шанс успеха
+              зависит от дома (атмосфера ❤) и ваших бонусов. Если получилось —
+              вайфу «беременна» несколько дней, после чего рождается ребёнок.
+            </p>
+            <p>
+              Количество детей ограничено вместимостью вашего 🏠дома.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎓 Развитие ребёнка</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>У каждого ребёнка есть характеристики:</p>
+            <ul>
+              <li><strong>🧠 Ум</strong> — для работы в компании.</li>
+              <li><strong>💪 Сила</strong> — для боевых задач.</li>
+              <li><strong>🌀 Ловкость</strong> — универсальный параметр.</li>
+            </ul>
+            <p>Что можно делать с ребёнком:</p>
+            <ul>
+              <li><strong>📖 Учиться</strong> — даёт опыт ребёнку и вам.</li>
+              <li><strong>💼 Работать</strong> — используется в компании.</li>
+              <li><strong>💤 Отдыхать</strong> — восстанавливает энергию.</li>
+              <li><strong>💊 Лечиться</strong> — избавляет от болезни.</li>
+              <li><strong>🍼 Кормить</strong> — даёт опыт (молоко с дойки вайфу).</li>
+            </ul>
+            <p>
+              С определённого уровня у ребёнка появляется
+              <strong>профессия</strong> — она даёт пассивный бонус владельцу:
+              скидки, усиление отрядов, дополнительные ресурсы с фермы и так
+              далее.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>📚 Улучшения семьи</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Детей можно развивать и повышать уровень, но на некоторых порогах
+              для дальнейшего роста нужны специальные предметы — 📚книги и
+              🧩фрагменты. Их можно добыть в компании, событиях и за коробки.
+            </p>
+            <p>
+              Есть удобная функция «разделить»: одну книгу старшего уровня
+              можно превратить в несколько книг младшего. Это полезно, когда
+              не хватает именно базовых книг.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ КОМПАНИЯ ============ -->
+      <section class="section" id="company">
+        <div class="section-header">
+          <span class="s-icon">🖥</span>
+          <h2>Компания</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💼 Как работает компания</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Компания — это бизнес, где работают ваши дети. Вы берёте
+              <strong>📋заказы</strong>, назначаете на них детей, и они
+              постепенно выполняют работу.
+            </p>
+            <p>
+              За успешный заказ вы получаете <strong>опыт компании (💡)</strong>,
+              а также награды — фрагменты, книги, коробки и другие предметы.
+            </p>
+            <p>
+              Чем выше характеристики ребёнка (🧠/💪/🌀) и его уровень — тем
+              быстрее выполняется заказ и тем сложнее задания можно брать.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>📋 Заказы и уровни</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>Компания имеет <strong>несколько уровней</strong>. На каждом:</p>
+            <ul>
+              <li>Становится доступно больше слотов для заказов.</li>
+              <li>Появляются более редкие заказы.</li>
+              <li>Растут награды.</li>
+            </ul>
+            <p>
+              У каждого заказа есть сложность, время и стоимость. Часть заказов
+              может быть «провалена», если вы не набрали достаточно силы.
+              Некоторые заказы можно ускорить предметами 🔖скипа.
+            </p>
+            <div class="tip-box">
+              <strong>Совет:</strong> обновляйте список заказов каждый день —
+              так вы чаще будете находить лёгкие и выгодные.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ДОМ ============ -->
+      <section class="section" id="house">
+        <div class="section-header">
+          <span class="s-icon">🏠</span>
+          <h2>Дом</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💰 Что даёт дом</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Дом нужен для размещения детей — без дома часть механик
+              недоступна. Дом даёт <strong>места</strong> для семьи и
+              <strong>атмосферу ❤</strong>, которая влияет на шанс зачатия
+              и на получаемую любовь от свиданий.
+            </p>
+            <p>Дома отличаются:</p>
+            <ul>
+              <li><strong>Вместимостью</strong> — сколько детей можно разместить.</li>
+              <li><strong>Атмосферой ❤</strong> — чем выше, тем лучше для семьи.</li>
+              <li><strong>Стоимостью</strong> — от дешёвых палаток до дворцов.</li>
+            </ul>
+            <p>
+              Всего есть несколько уровней жилья — от простой палатки до дворца.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💤 Отдых в доме</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Через дом дети могут <strong>💤отдыхать</strong> — это
+              восстанавливает их ⚡энергию со временем. Чем больше атмосферы
+              в доме, тем быстрее восстанавливается энергия.
+            </p>
+            <p>
+              Когда ребёнок отдыхает, его нельзя использовать в других
+              механиках (компания, такси, учёба). Как только энергия
+              восстановится — ребёнок автоматически «встанет».
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ АРЕНДА И КОНТРАКТЫ ============ -->
+      <section class="section" id="rent">
+        <div class="section-header">
+          <span class="s-icon">🏘</span>
+          <h2>Аренда, покупка домов и контракты</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💰 Аренда дома</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Через раздел <code>🏠Дом</code> доступна <strong>💰Аренда</strong>.
+              В списке — разные варианты жилья (палатка, домик, отель, мотель,
+              пентхауз, дворец). Аренда стоит ежедневную плату, которая
+              списывается из 🏦Банка.
+            </p>
+            <p>
+              Аренда действует, пока у вас есть деньги на счёте. Если денег
+              не хватит — вас выгонят, все дети выселятся, а дом освободится.
+            </p>
+            <p>
+              Аренда удобна, когда вам нужно временное жильё под конкретную
+              задачу: например, поднять атмосферу для рождения ребёнка.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💼 Агенство домов</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              В разделе <code>🏠Дом</code> есть <strong>💼Агенство</strong> —
+              место, где игроки выставляют свои дома на продажу. У каждого
+              дома своя цена, район и характеристики.
+            </p>
+            <p>
+              Купленный дом попадает в <strong>🔐Имущество</strong> — там
+              хранятся все ваши дома. В любой момент можно
+              <strong>➡️Переехать</strong> в купленный дом, и он станет
+              основным.
+            </p>
+            <p>
+              Если у вас уже есть дом, а вы хотите другой — можно продать
+              старый через контракт или просто переехать в новый, оставив
+              старый в имуществе.
+            </p>
+            <div class="tip-box">
+              <strong>Совет:</strong> покупайте дом, когда уверены, что
+              планируете завести много детей. Аренда дешевле в моменте,
+              но покупка окупается со временем.
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🔐 Имущество</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              В разделе <strong>🔐Имущество</strong> хранятся все дома,
+              которые вы купили. Здесь можно:
+            </p>
+            <ul>
+              <li>Посмотреть список всех домов.</li>
+              <li>Выбрать дом для переезда.</li>
+              <li>Выставить дом на продажу через контракт.</li>
+            </ul>
+            <p>
+              Если вы живёте в арендованном доме, то переехать в имущество
+              можно только после того, как вы освободите текущее жильё
+              (кнопка <code>❌Выехать</code> или <code>❌Остановить</code>).
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>📜 Контракты</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Контракты — это механизм торговли между игроками. Через контракт
+              можно продать или купить:
+            </p>
+            <ul>
+              <li><strong>🏷Титулы</strong> — редкие звания из коробок.</li>
+              <li><strong>🚘Машины</strong> — со всей историей улучшений.</li>
+              <li><strong>👥Рабов</strong> — игроков, которые стали рабами.</li>
+              <li><strong>💍Украшения</strong> — редкие декорации.</li>
+              <li><strong>🏠Дома</strong> — купленные в агенстве.</li>
+            </ul>
+            <p>
+              У каждого контракта есть цена, покупатель (или общий доступ)
+              и срок. Если контракт никто не подпишет за это время — он
+              отменяется, а предмет возвращается владельцу.
+            </p>
+            <p>
+              Чтобы выставить контракт, зайдите в раздел
+              <code>📜Контракты</code> → <code>Создать</code>, выберите тип,
+              укажите ID или ссылку покупателя и цену.
+            </p>
+            <div class="tip-box">
+              <strong>Совет:</strong> ставьте контракты на общий доступ
+              (🔓Общий), если хотите продать предмет публично — тогда любой
+              игрок сможет его купить.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ БАНК ============ -->
+      <section class="section" id="bank">
+        <div class="section-header">
+          <span class="s-icon">🏦</span>
+          <h2>Банк</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💵 Что даёт банк</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              В банке деньги <strong>защищены</strong> — их нельзя потерять,
+              обменять или отобрать. Также банк даёт <strong>рейтинг (📊)</strong>,
+              от которого зависит лимит операций вне банка.
+            </p>
+            <p>
+              <strong>Лимит операций (⚡)</strong> — это сколько мандаринов
+              вы можете хранить «на руках». Он восстанавливается со временем
+              и увеличивается, когда растёт ваш рейтинг.
+            </p>
+            <p>Из банка также доступны:</p>
+            <ul>
+              <li><strong>📦 Магазин</strong> — покупки за 🍒черешню.</li>
+              <li><strong>👥 Рабы / рефералы</strong> — приглашённые игроки.</li>
+              <li><strong>📜 Контракты</strong> — торговля титулами, машинами, домами.</li>
+              <li><strong>📈 Акции</strong> — покупка акций за 🍒.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>👥 Рабы и рефералы</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              В разделе <code>👥Рабы</code> есть ссылка для приглашения новых
+              игроков. Они становятся вашими <strong>рефералами</strong>, и
+              вы получаете процент от их сбора мандаринов.
+            </p>
+            <p>
+              Также игроки могут сами стать вашими рабами — через контракт.
+              Раба можно освободить, передать другому игроку или выставить
+              на выкуп.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ОТРЯДЫ ============ -->
+      <section class="section" id="teams">
+        <div class="section-header">
+          <span class="s-icon">🔰</span>
+          <h2>Отряды и бои</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>⚔️ Что такое отряды</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Отряд — ваша боевая единица. Он используется в кампании,
+              рейдах, рудниках, обороне и на арене. Каждый отряд состоит из:
+            </p>
+            <ul>
+              <li><strong>Вайфу-лидера</strong> (со своим деревом талантов).</li>
+              <li><strong>Снаряжения</strong> — 4 слота.</li>
+              <li><strong>Книг</strong> — 3 слота.</li>
+              <li><strong>Карточек</strong> — до 4 штук.</li>
+            </ul>
+            <p>
+              Отряды можно переключать. Часть отрядов может отправляться
+              на «🤝подработку» — они будут приносить ресурсы другим игрокам.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎯 Действия в бою</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>В бою у вас есть несколько вариантов действий:</p>
+            <ul>
+              <li><strong>🗡Атака</strong> — обычный удар (тратит мало энергии).</li>
+              <li><strong>⚔️Сильная атака</strong> — усиленный удар (тратит больше энергии).</li>
+              <li><strong>🛡Защита</strong> — блокирует большую часть следующего урона.</li>
+              <li><strong>💫Скиллы</strong> — активные способности вайфу (тратят 💙ману).</li>
+              <li><strong>👣Убежать</strong> — попытка выйти из боя.</li>
+            </ul>
+            <p>
+              Энергия восстанавливается со временем. Если отряд гибнет — он
+              отдыхает некоторое время и потом снова готов к бою.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ СНАРЯЖЕНИЕ ============ -->
+      <section class="section" id="equip">
+        <div class="section-header">
+          <span class="s-icon">🛡</span>
+          <h2>Снаряжение</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>⚔️ Что даёт снаряжение</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Снаряжение усиливает отряд. У него есть 4 слота, в которые
+              надевается разное снаряжение:
+            </p>
+            <ul>
+              <li><strong>🗡Орудие</strong> — повышает урон, может иметь бонус против типа врага.</li>
+              <li><strong>🧢Шлем</strong> — защита от физического урона.</li>
+              <li><strong>👕Нагрудник</strong> — защита от магии.</li>
+              <li><strong>👟Сапоги</strong> — универсальная защита.</li>
+            </ul>
+            <p>Со снаряжением можно делать следующее:</p>
+            <ul>
+              <li><strong>Улучшать</strong> — повышать уровень.</li>
+              <li><strong>Продвигать</strong> — увеличивать редкость.</li>
+              <li><strong>Синтезировать</strong> — объединять копии.</li>
+              <li><strong>Разбирать</strong> — получать осколки.</li>
+              <li><strong>Вставлять руны 💠</strong> — дают элементальные эффекты.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💠 Руны</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Руны — дополнительные эффекты, которые вставляются в снаряжение.
+              Бывают элементальных типов (🔥огонь, 💧вода, 🌱природа, ⚡свет,
+              🌑тьма) и дают сопротивление либо конвертацию урона.
+            </p>
+            <p>
+              Руну можно улучшать, вкладывая в неё 💠элементы того же типа.
+              При максимальном уровне эффект становится особенно сильным.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ КНИГИ И КАРТОЧКИ ============ -->
+      <section class="section" id="books">
+        <div class="section-header">
+          <span class="s-icon">📚</span>
+          <h2>Книги и карточки</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>📖 Книги</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Книги усиливают отряд в бою. У отряда есть <strong>3 слота</strong>
+              под книги. Книги различаются по редкости и типу:
+            </p>
+            <ul>
+              <li><strong>Активные магии</strong> — наносят урон в бою.</li>
+              <li><strong>Атакующие</strong> — пассивно повышают атаку.</li>
+              <li><strong>Условные</strong> — работают при определённых ситуациях
+              (полный HP, мало HP и т.п.).</li>
+            </ul>
+            <p>
+              Книги улучшаются за 🥝киви. Можно «сливать» несколько одинаковых
+              книг в одну более редкую.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎁 Карточки</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Карточки дают <strong>пассивные бонусы</strong> отряду —
+              усиливают разные параметры. У каждой карточки есть редкость,
+              уровень и дополнительные статы.
+            </p>
+            <p>Карточку можно:</p>
+            <ul>
+              <li>Улучшать и продвигать.</li>
+              <li>Синтезировать с копией (объединять).</li>
+              <li>Ставить в отряд или ребёнку.</li>
+              <li>Продавать за 🍒черешню.</li>
+            </ul>
+            <p>
+              Также у карточек бывают <strong>комплекты</strong> — если
+              собрать несколько карточек одного набора в одном отряде,
+              они дают бонус всей команде.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ СЕЗОН ============ -->
+      <section class="section" id="season">
+        <div class="section-header">
+          <span class="s-icon">🔥</span>
+          <h2>Сезон и задания</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🏮 Сезонный прогресс</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Сезон — глобальный прогресс сервера, который периодически
+              обновляется. Выполняя разные действия, вы получаете
+              <strong>сезонный опыт (🏮)</strong> и повышаете свой этап (⭐).
+            </p>
+            <p>Что даёт сезон:</p>
+            <ul>
+              <li><strong>📋 Ежедневные квесты</strong> — задания на сбор, победы, ресурсы.</li>
+              <li><strong>🧡 Награды</strong> — открываются по мере роста этапа.</li>
+              <li><strong>🀄 Очки умений</strong> — открывают узлы общего древа.</li>
+              <li><strong>💎 Подписка</strong> — премиум-награды и ускорение сезона.</li>
+            </ul>
+            <p>
+              Также существует <strong>🏆Сезон лиги</strong> — отдельный
+              прогресс на основе очков лиги (〽️), который даёт свои награды.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ КЛАН И РЕЙДЫ ============ -->
+      <section class="section" id="clan">
+        <div class="section-header">
+          <span class="s-icon">⚔️</span>
+          <h2>Клан и рейды</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>👥 Что такое клан</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Клан — объединение игроков. Вступить можно по ID клана или
+              создать свой. У клана есть <strong>уровень</strong>,
+              <strong>звёзды (⭐)</strong> и <strong>лига</strong>.
+            </p>
+            <p>Что даёт клан:</p>
+            <ul>
+              <li><strong>Рейды 🔰</strong> — совместные сражения с боссами.</li>
+              <li><strong>Рудники 🏞</strong> — захват и удержание точек для дохода.</li>
+              <li><strong>Сопротивление ⚔️</strong> — PvE-сражения для всего клана.</li>
+              <li><strong>Усиления ⬆️</strong> — клан покупает баффы, действующие на всех.</li>
+              <li><strong>Клановая лига</strong> — соревнование между кланами.</li>
+            </ul>
+            <p>
+              У клана есть <strong>казна 🕋</strong>, в которую идут налоги
+              и взносы. Из неё же выдаётся зарплата участникам.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🔰 Рейды</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Рейды проводятся периодически (не всё время). Клан сражается
+              с боссами за награды и очки лиги. В рейдах участвуют только
+              специально назначенные участники — <strong>рейдеры</strong>.
+            </p>
+            <p>Типы боссов:</p>
+            <ul>
+              <li><strong>Локальные</strong> — только для клана.</li>
+              <li><strong>Лиговые</strong> — для кланов одной лиги.</li>
+              <li><strong>Мировые</strong> — самые мощные, для всех.</li>
+            </ul>
+            <p>
+              По итогам рейдов клан получает очки, может повыситься в лиге,
+              а игроки получают награды и звёзды.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🏞 Рудники</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Рудники — карта, на которой кланы сражаются за контроль над
+              точками. Каждый рудник приносит клану доход и звёзды, а игрокам —
+              личные награды.
+            </p>
+            <p>Действия на рудниках:</p>
+            <ul>
+              <li><strong>Захват</strong> — клан может занять свободный рудник.</li>
+              <li><strong>Атака</strong> — отнять рудник у другого клана.</li>
+              <li><strong>Защита</strong> — укрепить свой рудник.</li>
+              <li><strong>Переход</strong> — переместиться всей группой к другому руднику.</li>
+            </ul>
+            <p>
+              Рудники имеют элементы (🔥/💧/🌱 и т.д.) и редкость. Чем выше
+              редкость — тем больше награда.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ГОНКИ ============ -->
+      <section class="section" id="cars">
+        <div class="section-header">
+          <span class="s-icon">🏁</span>
+          <h2>Гонки и машины</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🚘 Что такое гонки</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              В разделе машин можно покупать автомобили, улучшать их и
+              участвовать в гонках и испытаниях. За победы и участие вы
+              получаете <strong>🏅славу</strong>, которая повышает ваш ранг
+              гонщика.
+            </p>
+            <p>
+              Ранг гонщика открывает новые лиги — более сложные трассы и
+              более ценные машины в магазине.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🔧 Машина и улучшения</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>У каждой машины есть три основных узла:</p>
+            <ul>
+              <li><strong>🦾 Мотор</strong> — ускорение и мощность.</li>
+              <li><strong>🛞 Колёса</strong> — сцепление и управляемость.</li>
+              <li><strong>🔩 Корпус</strong> — устойчивость к урону.</li>
+            </ul>
+            <p>С машиной можно:</p>
+            <ul>
+              <li><strong>Улучшать</strong> — повышать уровень узлов.</li>
+              <li><strong>Прокачивать</strong> — вывести в специальный «плюс-класс».</li>
+              <li><strong>Устанавливать скины</strong> — уникальный внешний вид.</li>
+              <li><strong>Ставить детали</strong> — дополнительный тюнинг.</li>
+              <li><strong>Заправлять</strong> — машины требуют топливо.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>⏱️ Гонки и испытания</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              <strong>Гонки</strong> — заезды с другими игроками и ботами.
+              Каждая гонка начинается с этапа регистрации: вы выбираете машину
+              и участвуете. Через некоторое время объявляются результаты.
+            </p>
+            <p>
+              <strong>Испытания</strong> — одиночные заезды по трассе с точками.
+              В них вы управляете передачами, уклоняетесь от препятствий и
+              стараетесь уложиться во время.
+            </p>
+            <p>
+              За места в гонках и результаты испытаний вы получаете славу,
+              ресурсы и открываете новые ранги.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ТАКСИ ============ -->
+      <section class="section" id="taxi">
+        <div class="section-header">
+          <span class="s-icon">🚖</span>
+          <h2>Такси</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🚖 Что такое такси</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Такси — отдельная механика работы, куда вы отправляете своих
+              детей и машины. Со временем они выполняют заказы и приносят
+              вам награды: черешню, звёзды и другие ресурсы.
+            </p>
+            <p>
+              Заказ относится к определённому классу: чем выше класс, тем
+              сложнее заказ, но и больше награда. У каждого ребёнка и машины
+              есть уровень, который влияет на успех в заказе.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎯 Как отправлять в такси</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>Чтобы начать работу в такси, нужно:</p>
+            <ul>
+              <li>Иметь свободного ребёнка (не занятого компанией, учёбой и т.д.).</li>
+              <li>Иметь свободную машину без улучшений и с достаточным топливом.</li>
+              <li>Зайти в раздел <code>🚖Такси</code> и выбрать класс заказа.</li>
+              <li>Выбрать машину, а затем — ребёнка.</li>
+              <li>Подтвердить участие.</li>
+            </ul>
+            <p>
+              Пока ребёнок и машина в такси, их нельзя использовать в других
+              механиках. Через некоторое время заказ завершится и вам придёт
+              уведомление о результате.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>📊 Результаты заказов</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              За каждый заказ начисляются <strong>⭐звёзды класса</strong>.
+              По мере накопления звёзд в классе открываются новые награды
+              за определённые пороги.
+            </p>
+            <p>
+              Если у ребёнка заканчивается ⚡энергия или у машины —
+              🔋топливо, они автоматически возвращаются. Иногда ребёнок может
+              заболеть — тогда потребуется лечение 💊.
+            </p>
+            <div class="tip-box">
+              <strong>Совет:</strong> прокачивайте характеристики ребёнка и
+              мощность машины — это повышает шанс на более высокий результат
+              заказа.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ КАМПАНИЯ ============ -->
+      <section class="section" id="campany">
+        <div class="section-header">
+          <span class="s-icon">🌍</span>
+          <h2>Кампания</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🗺 Что такое кампания</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Кампания — это карта мира, по которой вы перемещаетесь. На карте
+              есть:
+            </p>
+            <ul>
+              <li><strong>Мобы</strong> — обычные враги для сражений.</li>
+              <li><strong>Боссы</strong> — сильные противники с ценными наградами.</li>
+              <li><strong>Храмы</strong> — места для молитвы, дают награды.</li>
+              <li><strong>Горные препятствия ⛰</strong> — их нельзя пройти.</li>
+            </ul>
+            <p>
+              Перемещение тратит ⚡энергию. Энергия восстанавливается со временем.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>⚔️ Сражения и цели</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Сражаясь с врагами, вы получаете <strong>💀очки лиги</strong> и
+              <strong>💡опыт</strong>. Лига растёт с очками и открывает новые
+              карты мира.
+            </p>
+            <p>
+              Также в кампании есть <strong>✨Цели</strong> — ежедневные
+              задания от гильдии: убить мобов, помолиться в храмах, победить
+              боссов. За их выполнение — награды.
+            </p>
+            <p>
+              На каждой карте есть свой <strong>лимит по рангу</strong> — если
+              вы повысились, переходите на следующую карту.
+            </p>
+            <div class="tip-box">
+              <strong>Совет:</strong> не бегите сразу к боссам — сначала
+              прокачайтесь на обычных мобах, чтобы отряд был готов.
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🏆 Соревнование и сезон лиги</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              В кампании есть <strong>💀Соревнование</strong> — рейтинг
+              игроков по очкам лиги. Топ получает награды в конце сезона.
+            </p>
+            <p>
+              <strong>🏆Сезон лиги</strong> — общий прогресс, за который
+              даются дополнительные награды.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ЦЕРКОВЬ ============ -->
+      <section class="section" id="church">
+        <div class="section-header">
+          <span class="s-icon">⛪</span>
+          <h2>Церковь</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>⛪ Что такое церковь</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Церковь — отдельная система, где игроки занимают должности
+              (монахи, апостолы, боги). Должности дают пассивные бонусы:
+              скидки, дополнительный опыт, усиление отряда и т.д.
+            </p>
+            <p>
+              Должность получается за очки трофеев, репутацию в банке и других
+              параметров. Часть должностей открывается автоматически, часть —
+              нужно «заслужить».
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎖 Трофеи и должности</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Трофеи (🏆) начисляются за высокие места в разных соревнованиях:
+              лига, гонки, рейды. Они дают <strong>очки трофеев</strong>, по
+              которым определяются лучшие.
+            </p>
+            <p>
+              Очки трофеев нужны для получения церковных должностей. Чем выше
+              должность — тем сильнее её бонусы.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>😈 Культ</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Помимо церкви, есть <strong>культ</strong> — альтернативный путь.
+              Можно отдать ребёнка культу и получить особые бонусы (например,
+              к атаке), но с минусами (выше комиссии, меньше контрактов).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ МИНИ-ИГРЫ ============ -->
+      <section class="section" id="minigames">
+        <div class="section-header">
+          <span class="s-icon">🎮</span>
+          <h2>Мини-игры</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎲 Что такое мини-игры</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Мини-игры — раздел, где можно потратить 🎟билеты и получить
+              награды. Билеты даются за ежедневные задания, коробки и другие
+              активности.
+            </p>
+            <p>Доступны такие игры:</p>
+            <ul>
+              <li><strong>💣 Бомбы</strong> — открывать клетки, не попадая на бомбы.</li>
+              <li><strong>🎟 Лотерея</strong> — открывать клетки за наградой.</li>
+              <li><strong>🎰 Слоты</strong> — классический автомат.</li>
+              <li><strong>🃏 Блэкджек</strong> — карточная игра с дилером.</li>
+              <li><strong>🎲 Приключение</strong> — сезонная игра с кубиками.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎟 Привилегии и лимиты</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              В мини-играх есть <strong>💼лимит</strong> на ставки — сколько
+              билетов в день можно поставить. Он обновляется раз в неделю.
+            </p>
+            <p>
+              Можно купить <strong>привилегии</strong> за 🥝киви: они
+              увеличивают лимит и максимальную ставку.
+            </p>
+            <p>
+              Также есть <strong>🎭путь азарта</strong> — сезонный прогресс,
+              дающий дополнительные награды.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ СОБЫТИЯ ============ -->
+      <section class="section" id="events">
+        <div class="section-header">
+          <span class="s-icon">🎉</span>
+          <h2>События</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎉 Какие бывают события</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              События — временные активности, которые проводятся на сервере
+              периодически. Они открывают особые разделы и награды.
+            </p>
+            <p>Примеры событий:</p>
+            <ul>
+              <li><strong>😈Босс</strong> — общий босс, которого бьёт весь сервер.</li>
+              <li><strong>👊🏻Испытание</strong> — общее или личное задание на время.</li>
+              <li><strong>🗓Вход</strong> — особые награды за ежедневный вход.</li>
+              <li><strong>🐷Чемпионат</strong> — ставки на свинок.</li>
+              <li><strong>💤Idle-игра</strong> — отдельная мини-игра на время события.</li>
+              <li><strong>🎃Сезонные события</strong> — приуроченные к праздникам.</li>
+            </ul>
+            <p>
+              Все события анонсируются в канале
+              <a href="https://t.me/mondary_news" target="_blank" rel="noopener">Новости</a>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ FAQ ============ -->
+      <section class="section" id="faq">
+        <div class="section-header">
+          <span class="s-icon">❓</span>
+          <h2>Частые вопросы</h2>
+        </div>
+
+        <div class="guide-card open">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>❓ Где смотреть числа и точные значения?</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Этот гайд описывает <strong>как работают механики</strong>, но
+              конкретные числа (сколько любви даёт свидание, сколько саженцев
+              максимум на вашем уровне, сколько опыта нужно для повышения)
+              всегда смотрите прямо в боте. Они зависят от вашего уровня и
+              меняются при обновлениях.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎮 Можно ли играть с двух платформ?</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Да. Бот работает и в Телеграме, и во ВКонтакте. Это два разных
+              аккаунта, но игровое пространство одно. Вы можете играть в одной
+              платформе и общаться с игроками из другой — они находятся в тех
+              же кланах, рейдах, гонках и рейтингах.
+            </p>
+            <p>
+              Выбирайте удобную платформу или играйте сразу с двух — мир общий
+              для всех.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>🎁 Как получать черешню 🍒?</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>🍒черешня — премиум-валюта. Её можно получить за:</p>
+            <ul>
+              <li>Участие в соревнованиях и лигах.</li>
+              <li>События и розыгрыши.</li>
+              <li>Донат (в разделе <code>🍒донат</code>).</li>
+              <li>Разные достижения и награды.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>📦 Откуда брать коробки?</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Коробки выпадают почти за всё: за сбор урожая, гонки, рейды,
+              миссии, события, ежедневные задания. Их можно открывать в
+              разделе <code>📦Ящики</code> (в инвентаре).
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💞 Какую вайфу брать первой?</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Первая вайфу открывается по сюжету. Дальше открывайте по мере
+              накопления 🧩фрагментов. Каждая вайфу полезна в своём
+              направлении — бонусы не пересекаются, так что берите те, что
+              больше нужны под ваш стиль игры.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>⚔️ Что делать, если отряд проигрывает?</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Прокачивайте снаряжение, докупайте книги и карточки, развивайте
+              дерево талантов вайфу и скиллы. Также полезно использовать
+              💥зелья силы и 💙зелья маны перед сложными боями.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>📢 Где узнавать об обновлениях?</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>
+              Все обновления, ивенты и изменения публикуются в официальном
+              канале новостей:
+              <a href="https://t.me/mondary_news" target="_blank" rel="noopener">@mondary_news</a>.
+              Рекомендуется подписаться, чтобы не пропускать важное.
+            </p>
+          </div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-card-header" onclick="toggleCard(this)">
+            <h3>💬 Куда обращаться с вопросами и багами?</h3>
+            <span class="caret">▼</span>
+          </div>
+          <div class="guide-card-body">
+            <p>По любым вопросам, багам и предложениям — к разработчику:</p>
+            <ul>
+              <li>Телеграм: <a href="https://t.me/eltyss" target="_blank" rel="noopener">@eltyss</a></li>
+              <li>ВКонтакте: <a href="https://vk.com/eltys" target="_blank" rel="noopener">@eltys</a></li>
+            </ul>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="index.html">Главная</a>
+      <a href="recipes.html">Рецепты</a>
+      <a href="guide.html">Руководство</a>
+      <a href="wall.html">Стена славы</a>
+    </div>
+    <div>© 2026 Мандарин Бот</div>
+    <div class="footer-dev">
+      Разработчик: <a href="https://t.me/eltyss" target="_blank" rel="noopener">@eltyss</a>
+      ·
+      <a href="https://vk.com/eltys" target="_blank" rel="noopener">@eltys</a>
+    </div>
+  </div>
+
+<script>
+function toggleCard(header) {
+  const card = header.parentElement;
+  card.classList.toggle('open');
+}
+
+const sections = document.querySelectorAll('.section');
+const tocLinks = document.querySelectorAll('.toc-list a');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      tocLinks.forEach(l => l.classList.toggle('active', l.dataset.target === id));
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px', threshold: 0 });
+
+sections.forEach(s => observer.observe(s));
+
+tocLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState(null, '', link.getAttribute('href'));
+    }
+  });
+});
+
+const progressFill = document.getElementById('progressFill');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  progressFill.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+}, { passive: true });
+
+const themeToggle = document.getElementById('themeToggle');
+const root = document.documentElement;
+const mql = window.matchMedia('(prefers-color-scheme: light)');
+function getStoredTheme() { try { return localStorage.getItem('theme'); } catch(e) { return null; } }
+function storeTheme(t) { try { localStorage.setItem('theme', t); } catch(e) {} }
+function applyTheme(t) {
+  if (t === 'light') {
+    root.classList.add('light'); root.style.colorScheme = 'light';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#ebe4d8');
+  } else {
+    root.classList.remove('light'); root.style.colorScheme = 'dark';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0d1117');
+  }
+}
+function initTheme() {
+  const s = getStoredTheme();
+  if (s === 'light' || s === 'dark') applyTheme(s);
+  else applyTheme(mql.matches ? 'light' : 'dark');
+}
+function toggleTheme() {
+  const isLight = root.classList.contains('light');
+  applyTheme(isLight ? 'dark' : 'light');
+  storeTheme(isLight ? 'dark' : 'light');
+}
+themeToggle.addEventListener('click', toggleTheme);
+themeToggle.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTheme(); }
+});
+mql.addEventListener('change', (e) => { if (!getStoredTheme()) applyTheme(e.matches ? 'light' : 'dark'); });
+initTheme();
+</script>
+</body>
+</html>
