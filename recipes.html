@@ -71,6 +71,18 @@
     line-height: 1.5;
     transition: background 0.5s ease, color 0.35s ease;
   }
+  .mandarins-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .mandarin-float {
+    position: absolute; font-size: 1.5rem; opacity: 0;
+    animation: mandarinFloat linear infinite;
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+  }
+  @keyframes mandarinFloat {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.16; }
+    90% { opacity: 0.16; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
   .progress-bar {
     position: fixed; top: 0; left: 0; right: 0; height: 3px;
     z-index: 1000;
@@ -604,6 +616,7 @@
 <body>
 
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="mandarins-bg" id="mandarinsBg"></div>
 
   <div class="header">
     <a href="index.html" class="back-link">← На главную</a>
@@ -654,12 +667,12 @@
 
   <div class="footer">
     <div class="footer-links">
-            <a href="index.html">🏠 Главная</a>
+      <a href="index.html">🏠 Главная</a>
       <a href="recipes.html">🍳 Рецепты</a>
       <a href="guide.html">📖 Гайды</a>
       <a href="wall.html">🏆 Стена славы</a>
     </div>
-    <div>© 2026 Мандарин Бот · Все права защищены</div>
+    <div>© 2020-2026 Мандарин Бот · Все права защищены</div>
     <div class="footer-dev">
       Разработчик: <a href="https://t.me/eltyss" target="_blank" rel="noopener">@eltyss</a>
       ·
@@ -978,6 +991,21 @@ mql.addEventListener('change', (e) => { if (!getStoredTheme()) applyTheme(e.matc
 
 /* ============ ЗАПУСК ============ */
 initTheme();
+
+(function() {
+  const bg = document.getElementById('mandarinsBg');
+  const count = window.innerWidth < 600 ? 12 : 20;
+  for (let i = 0; i < count; i++) {
+    const m = document.createElement('span');
+    m.className = 'mandarin-float';
+    m.textContent = '🍊';
+    m.style.left = Math.random() * 100 + '%';
+    m.style.fontSize = (1 + Math.random() * 1.4) + 'rem';
+    m.style.animationDuration = (18 + Math.random() * 14) + 's';
+    m.style.animationDelay = (Math.random() * 22) + 's';
+    bg.appendChild(m);
+  }
+})();
 render();
 </script>
 </body>
