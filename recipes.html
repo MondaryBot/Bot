@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<meta name="color-scheme" content="dark light">
+<title>Рецепты · Мандарин Бот</title>
+<style>
+  :root {
+    --bg-1: #0f1419; --bg-2: #0a0d12;
+    --card: #161d27; --card-2: #131a23;
+    --border: #263140; --border-hi: #ff9f3d;
+    --text: #e8eef6; --text-dim: #93a3b8; --text-mut: #5f7086;
+    --accent: #ffa94d; --accent-2: #ff8c42;
+    --accent-glow: rgba(255,169,77,0.16);
+    --accent-glow-strong: rgba(255,140,66,0.4);
+    --grad: linear-gradient(135deg, #ffa94d 0%, #ff8c42 50%, #ff6b35 100%);
+    --grad-soft: linear-gradient(135deg, rgba(255,169,77,0.15), rgba(255,140,66,0.05));
+    --shadow: rgba(0,0,0,0.5);
+    --radius: 18px;
+    --divider: #2a3644;
+    --toggle-bg: #1f2a36; --toggle-border: #2f3d4f;
+    --glow-1: rgba(255,169,77,0.12);
+    --glow-2: rgba(255,140,66,0.06);
+    --inset: rgba(255,255,255,0.05);
+    --slot: #1c2530; --slot-2: #18202a; --slot-empty: #12181f;
+    --row-h: 48px;
+    --pill-bg: rgba(255,255,255,0.04);
+  }
+    html.light {
+    --bg-1: #e8dfd1;
+    --bg-2: #d9cdb9;
+    --card: #ffffff;
+    --card-2: #fdfaf4;
+    --border: #c1a880;
+    --text: #120c04;
+    --text-dim: #3f3122;
+    --text-mut: #6e5b41;
+    --accent: #c98850;
+    --accent-2: #a35d28;
+    --accent-glow: rgba(201, 136, 80, 0.28);
+    --accent-glow-strong: rgba(201, 136, 80, 0.5);
+    --grad: linear-gradient(135deg, #d99a5c 0%, #c98850 55%, #b07340 100%);
+    --grad-soft: linear-gradient(135deg, rgba(201,136,80,0.18), rgba(176,115,64,0.06));
+    --shadow: rgba(70, 45, 15, 0.22);
+    --shadow-soft: rgba(70, 45, 15, 0.12);
+    --divider: #c9b189;
+    --toggle-bg: #d6c3a5;
+    --toggle-border: #a58a60;
+    --glow-1: rgba(201, 136, 80, 0.16);
+    --glow-2: rgba(176, 115, 64, 0.09);
+    --inset: rgba(255, 255, 255, 1);
+    --pill-bg: rgba(201, 136, 80, 0.10);
+    --slot: #f5ebdc;
+    --slot-2: #ecdfc9;
+    --slot-empty: #e5d7bd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, var(--glow-1), transparent 60%),
+      radial-gradient(800px 500px at 90% 110%, var(--glow-2), transparent 70%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    background-attachment: fixed; color: var(--text);
+    padding: 32px 16px calc(40px + env(safe-area-inset-bottom));
+    padding-top: calc(28px + env(safe-area-inset-top));
+    min-height: 100vh; min-height: 100dvh;
+    line-height: 1.5;
+    transition: background 0.5s ease, color 0.35s ease;
+  }
+  .progress-bar {
+    position: fixed; top: 0; left: 0; right: 0; height: 3px;
+    z-index: 1000;
+  }
+  .progress-fill {
+    height: 100%; width: 0%; background: var(--grad);
+    box-shadow: 0 0 14px var(--accent-glow-strong);
+    transition: width 0.1s linear;
+  }
+  .header {
+    position: relative; max-width: 1280px; margin: 0 auto 24px;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 60px;
+  }
+  h1.title {
+    font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+    font-weight: 900; letter-spacing: -0.04em;
+    background: var(--grad);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-align: center;
+    animation: titleIn 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+  @keyframes titleIn {
+    from { opacity: 0; transform: translateY(-18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .back-link {
+    position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text-dim); text-decoration: none;
+    font-size: 0.85rem; font-weight: 700;
+    transition: all 0.25s ease;
+  }
+  .back-link:hover {
+    border-color: var(--accent); color: var(--accent);
+    transform: translateY(-50%) translateX(-3px);
+  }
+  .theme-toggle {
+    position: absolute; right: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 60px; height: 32px; border-radius: 30px;
+    background: var(--toggle-bg); border: 1px solid var(--toggle-border);
+    cursor: pointer; transition: all 0.35s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.08), 0 0 28px var(--accent-glow-strong);
+  }
+  .toggle-knob {
+    position: absolute; top: 2px; left: 2px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--grad);
+    box-shadow: 0 2px 8px var(--accent-glow-strong);
+    transition: left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+  }
+  html.light .toggle-knob { left: calc(100% - 28px); }
+  .toggle-knob .k-ico { position: absolute; transition: opacity 0.3s, transform 0.4s; }
+  .k-ico.moon { opacity: 1; } .k-ico.sun { opacity: 0; transform: rotate(-90deg); }
+  html.light .k-ico.moon { opacity: 0; transform: rotate(90deg); }
+  html.light .k-ico.sun { opacity: 1; transform: rotate(0deg); }
+
+  .container { max-width: 1280px; margin: 0 auto; }
+
+  /* ============ ПАНЕЛЬ ПОИСКА ============ */
+  .search-panel {
+    background: linear-gradient(160deg, var(--card), var(--card-2));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: 0 6px 20px var(--shadow), inset 0 1px 0 var(--inset);
+    margin-bottom: 24px;
+    animation: cardIn 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .search-row {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-input-wrap {
+    flex: 1; min-width: 200px;
+    position: relative;
+  }
+  .search-input {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    border-radius: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.25s ease;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .search-input::placeholder { color: var(--text-mut); }
+  .search-ico {
+    position: absolute; left: 14px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem; opacity: 0.6;
+    pointer-events: none;
+  }
+  .search-clear {
+    position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%);
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--pill-bg); border: none;
+    color: var(--text-dim); cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    font-size: 1rem; transition: all 0.2s ease;
+  }
+  .search-clear.visible { display: flex; }
+  .search-clear:hover {
+    background: var(--accent-glow); color: var(--accent);
+  }
+  .filter-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 14px;
+  }
+  .chip {
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.85rem; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.3, 1);
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.active {
+    background: var(--grad);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px var(--accent-glow-strong);
+  }
+  .results-info {
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: var(--text-mut);
+    display: flex; justify-content: space-between;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .results-info strong { color: var(--accent); font-weight: 800; }
+
+  /* ============ СЕТКА РЕЦЕПТОВ ============ */
+  .grid {
+    display: flex; flex-direction: column; gap: 32px;
+  }
+  .level-block {
+    animation: cardIn 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+  .level-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 18px;
+  }
+  .level-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: var(--grad);
+    color: #fff;
+    font-weight: 900; font-size: 1rem;
+    letter-spacing: 0.02em;
+    box-shadow: 0 8px 24px var(--accent-glow-strong);
+    white-space: nowrap;
+    position: relative; overflow: hidden;
+  }
+  .level-badge::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transform: translateX(-100%);
+    animation: shine 3.5s ease-in-out infinite;
+  }
+  @keyframes shine {
+    0%, 60% { transform: translateX(-100%); }
+    100% { transform: translateX(220%); }
+  }
+  .level-line {
+    flex: 1; height: 3px;
+    background: var(--divider); border-radius: 3px;
+    position: relative; overflow: hidden;
+  }
+  .level-line::after {
+    content: ''; position: absolute; inset: 0;
+    background: var(--grad);
+    transform: scaleX(0); transform-origin: left;
+    animation: lineGrow 1s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  }
+  @keyframes lineGrow { to { transform: scaleX(1); } }
+  .level-count {
+    font-size: 0.8rem; font-weight: 800;
+    color: var(--text-mut);
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 9px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .level-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+  }
+
+  /* ============ КАРТОЧКА РЕЦЕПТА ============ */
+  .recipe-card {
+    position: relative;
+    background: linear-gradient(160deg, var(--card), var(--card-2));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+    box-shadow: 0 3px 14px var(--shadow), inset 0 1px 0 var(--inset);
+    transition: all 0.28s cubic-bezier(0.2, 0.8, 0.3, 1);
+    /* БЫЛО: overflow: hidden;  — УБРАЛИ, чтобы hover слотов не обрезался */
+  }
+  .recipe-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(400px 140px at 50% 0%, var(--accent-glow), transparent 70%);
+    opacity: 0; transition: opacity 0.35s ease;
+    pointer-events: none;
+  }
+  .recipe-card:hover::before { opacity: 1; }
+  @media (hover: hover) {
+    .recipe-card:hover {
+      transform: translateY(-6px) scale(1.015);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px var(--shadow), 0 6px 20px var(--accent-glow);
+    }
+    .recipe-card:hover .recipe-icon {
+      transform: scale(1.1) rotate(-5deg);
+      border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow-strong);
+    }
+  }
+  .recipe-head {
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+  .recipe-icon {
+    position: relative;
+    font-size: 1.7rem; min-width: 54px; height: 54px;
+    padding: 0 10px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 3px;
+    background: var(--grad-soft);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .lv-tag {
+    position: absolute; top: -8px; left: -8px;
+    background: var(--grad);
+    color: #fff; font-size: 0.62rem; font-weight: 900;
+    line-height: 1; padding: 4px 7px;
+    border-radius: 6px;
+    border: 1.5px solid var(--card);
+    letter-spacing: 0.03em;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  }
+  .recipe-info { min-width: 0; flex: 1; }
+  .recipe-name {
+    font-size: 1.05rem; font-weight: 800;
+    color: var(--text); line-height: 1.25;
+    overflow-wrap: anywhere;
+    margin-bottom: 6px;
+  }
+  .recipe-meta {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.74rem; font-weight: 700;
+    color: var(--text-dim);
+    background: var(--pill-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 9px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .pill b { color: var(--text); }
+  .pill.time {
+    color: var(--accent); border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .pill.time b { color: var(--accent); }
+
+  .craft-label {
+    font-size: 0.68rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-mut);
+    font-weight: 800; margin-bottom: -4px;
+  }
+  .craft-grid {
+    display: grid; gap: 5px;
+    grid-auto-rows: var(--row-h);
+    justify-content: start;
+    overflow-x: auto;
+    overflow-y: visible;         /* ← добавили */
+    padding: 8px 4px 10px;       /* ← добавили паддинги, чтобы увеличенный слот не обрезался краем */
+    margin: -8px -4px -10px;     /* ← компенсируем паддинги, чтобы визуально всё было на месте */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .craft-grid::-webkit-scrollbar { height: 6px; }
+  .craft-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .slot {
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, var(--slot), var(--slot-2));
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    line-height: 1; overflow: hidden;
+    height: var(--row-h);
+    padding: 0 5px;
+    font-size: 1.45rem;
+    white-space: nowrap; letter-spacing: -1px;
+    box-shadow: inset 0 1px 0 var(--inset);
+    transition: all 0.22s ease;
+    cursor: pointer;
+  }
+   @media (hover: hover) {
+    .slot:not(.empty):hover {
+      border-color: var(--accent);
+      transform: translateY(-2px) scale(1.04);
+      z-index: 3;
+      box-shadow:
+        0 6px 16px var(--accent-glow-strong),
+        0 0 0 2px var(--card);
+    }
+  }
+  .slot.empty {
+    background: repeating-linear-gradient(45deg,
+      var(--pill-bg), var(--pill-bg) 4px,
+      transparent 4px, transparent 8px),
+      var(--slot-empty);
+    border: 1px dashed var(--border);
+    box-shadow: none;
+    cursor: default;
+    position: relative;
+  }
+  .slot.empty::after {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-mut);
+    opacity: 0.5;
+  }
+
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    color: var(--text-mut); font-size: 1.05rem;
+    background: var(--card);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    margin: 20px 0;
+  }
+  .empty-state .emo { font-size: 3rem; display: block; margin-bottom: 12px; opacity: 0.5; }
+
+  /* ============ TOOLTIP ============ */
+  .tip {
+    position: fixed;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    box-shadow: 0 8px 24px var(--shadow), 0 0 20px var(--accent-glow);
+    z-index: 9999;
+    white-space: nowrap;
+    transform: translate(-50%, -140%);
+  }
+  .tip.visible { opacity: 1; }
+
+  /* ============ ФУТЕР ============ */
+  .footer {
+    max-width: 1280px; margin: 72px auto 0;
+    padding: 40px 16px 24px;
+    border-top: 1px solid var(--divider);
+    text-align: center; color: var(--text-mut); font-size: 0.88rem;
+  }
+  .footer-links {
+    display: flex; flex-wrap: wrap; gap: 22px;
+    justify-content: center; margin-bottom: 22px;
+  }
+  .footer-links a {
+    color: var(--text-dim); text-decoration: none;
+    font-weight: 600; transition: color 0.2s ease;
+  }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-dev {
+    margin-top: 14px; padding-top: 18px;
+    border-top: 1px dashed var(--divider); font-size: 0.85rem;
+  }
+  .footer-dev a { color: var(--accent); text-decoration: none; font-weight: 700; }
+
+  @media (max-width: 560px) {
+    :root { --row-h: 44px; }
+    body { padding: 18px 12px calc(28px + env(safe-area-inset-bottom)); }
+    .header { min-height: 48px; margin-bottom: 18px; }
+    .theme-toggle { width: 52px; height: 30px; }
+    .toggle-knob { width: 24px; height: 24px; font-size: 0.78rem; }
+    html.light .toggle-knob { left: calc(100% - 26px); }
+    .back-link { padding: 6px 10px; font-size: 0.75rem; }
+    .search-panel { padding: 16px; }
+    .level-grid { grid-template-columns: 1fr; gap: 14px; }
+    .recipe-card { padding: 14px; gap: 12px; }
+    .recipe-icon { min-width: 48px; height: 48px; font-size: 1.5rem; }
+    .recipe-name { font-size: 0.98rem; }
+    .pill { font-size: 0.7rem; padding: 3px 8px; }
+    .slot { font-size: 1.3rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  html.light body {
+    background:
+      radial-gradient(1000px 500px at 50% -10%, var(--glow-1), transparent 60%),
+      radial-gradient(700px 400px at 90% 110%, var(--glow-2), transparent 70%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  }
+
+  html.light .card,
+  html.light .nav-card,
+  html.light .info-block,
+  html.light .dev-card,
+  html.light .guide-card,
+  html.light .recipe-card,
+  html.light .person-card,
+  html.light .search-panel,
+  html.light .wall-hero,
+  html.light .hero {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 6px 20px var(--shadow-soft),
+      0 2px 6px rgba(70, 45, 15, 0.08);
+  }
+
+  html.light .btn-primary {
+    background: linear-gradient(135deg, #d99a5c 0%, #c98850 50%, #a35d28 100%);
+    box-shadow:
+      0 4px 14px var(--accent-glow-strong),
+      0 1px 0 rgba(255, 255, 255, 0.4) inset;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(80, 45, 10, 0.25);
+  }
+  html.light .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 26px var(--accent-glow-strong),
+      0 1px 0 rgba(255, 255, 255, 0.5) inset;
+    filter: brightness(1.06);
+  }
+
+  html.light .btn-secondary {
+    background: linear-gradient(160deg, #fffaf2, #fbf3e5);
+    border-color: var(--border);
+    color: var(--text);
+  }
+  html.light .btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent-2);
+    box-shadow: 0 8px 22px var(--accent-glow);
+  }
+
+  html.light .nav-card:hover,
+  html.light .person-card:hover,
+  html.light .recipe-card:hover {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 20px 40px var(--shadow),
+      0 8px 22px var(--accent-glow);
+  }
+
+  html.light .guide-card:hover { border-color: var(--accent); }
+
+  html.light .level-badge {
+    background: linear-gradient(135deg, #d99a5c 0%, #c98850 55%, #a35d28 100%);
+    box-shadow:
+      0 4px 14px var(--accent-glow-strong),
+      0 1px 0 rgba(255, 255, 255, 0.4) inset;
+    color: #fff;
+  }
+
+  html.light .chip {
+    background: linear-gradient(160deg, #fffaf2, #fbf3e5);
+  }
+  html.light .chip.active {
+    background: linear-gradient(135deg, #d99a5c 0%, #c98850 55%, #a35d28 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px var(--accent-glow-strong);
+  }
+
+  html.light .slot {
+    background: linear-gradient(160deg, #fbf3e5, #f0e2c9);
+    border-color: var(--border);
+    box-shadow: 0 1px 0 #fff inset, 0 1px 3px rgba(70, 45, 15, 0.08);
+  }
+
+  html.light .theme-toggle {
+    background: linear-gradient(135deg, #d9c7a7, #c8b28d);
+    border-color: #a58a60;
+    box-shadow: 0 2px 6px rgba(70, 45, 15, 0.2) inset;
+  }
+</style>
+</head>
+<body>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="header">
+    <a href="index.html" class="back-link">← На главную</a>
+    <h1 class="title">🍳 Рецепты крафта</h1>
+    <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему" type="button">
+      <span class="toggle-knob">
+        <span class="k-ico moon">🌙</span>
+        <span class="k-ico sun">☀️</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="container">
+
+    <div class="search-panel">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <span class="search-ico">🔍</span>
+          <input
+            type="text"
+            class="search-input"
+            id="searchInput"
+            placeholder="Поиск по названию или ингредиенту…"
+            autocomplete="off"
+          >
+          <button class="search-clear" id="searchClear" aria-label="Очистить">✕</button>
+        </div>
+      </div>
+      <div class="filter-chips" id="filterChips">
+        <button class="chip active" data-filter="all">Все</button>
+        <button class="chip" data-filter="1">Уровень 1</button>
+        <button class="chip" data-filter="2">Уровень 2</button>
+        <button class="chip" data-filter="3">Уровень 3</button>
+        <button class="chip" data-filter="4">Уровень 4</button>
+        <button class="chip" data-filter="5">Уровень 5</button>
+      </div>
+      <div class="results-info">
+        <span>Найдено: <strong id="resultsCount">0</strong> рецептов</span>
+        <span id="searchHint"></span>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+  </div>
+
+  <div class="tip" id="tooltip"></div>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="index.html">🏠 Главная</a>
+      <a href="recipes.html">🍳 Рецепты</a>
+      <a href="guide.html">📖 Гайды</a>
+    </div>
+    <div>© 2026 Мандарин Бот · Все права защищены</div>
+    <div class="footer-dev">
+      Разработчик: <a href="https://t.me/eltyss" target="_blank" rel="noopener">@eltyss</a>
+      ·
+      <a href="https://vk.com/eltys" target="_blank" rel="noopener">@eltys</a>
+    </div>
+  </div>
+
+<script>
+/* =========================================================
+   ДАННЫЕ
+   ========================================================= */
+const farmPlants = [
+  { id: 1, name: "Морковь",   icon: "🥕", level: 1 },
+  { id: 2, name: "Огурец",    icon: "🥒", level: 1 },
+  { id: 3, name: "Баклажан",  icon: "🍆", level: 1 },
+  { id: 4, name: "Помидор",   icon: "🍅", level: 1 },
+  { id: 5, name: "Кукуруза",  icon: "🌽", level: 2 },
+  { id: 6, name: "Клубника",  icon: "🍓", level: 2 },
+  { id: 7, name: "Авокадо",   icon: "🥑", level: 3 },
+  { id: 8, name: "Перец чили", icon: "🌶️", level: 3 }
+];
+const farmCrafts = [
+  { "id": 101, "name": "Салат", "icon": "🥗", "craft": [[1, 2]], "exp": 10, "childExp": 10, "time": 180 },
+  { "id": 102, "name": "Микс", "icon": "🥤", "craft": [[1, 0], [0, 2]], "exp": 11, "childExp": 11, "time": 210 },
+  { "id": 103, "name": "Нарезка", "icon": "🥙", "craft": [[1, 1], [2, 0]], "exp": 13, "childExp": 13, "time": 240 },
+  { "id": 104, "name": "Перекус", "icon": "🍽️", "craft": [[2, 2], [1, 0]], "exp": 16, "childExp": 16, "time": 270 },
+  { "id": 105, "name": "Комбо", "icon": "🥗🥤", "craft": [[101, 102]], "exp": 6, "childExp": 27, "time": 300 },
+  { "id": 106, "name": "Большой салат", "icon": "🥗✨", "craft": [[101, 103], [102, 0]], "exp": 8, "childExp": 44, "time": 390 },
+  { "id": 201, "name": "Рагу", "icon": "🍲", "craft": [[3, 1], [4, 2]], "exp": 30, "childExp": 30, "time": 630 },
+  { "id": 202, "name": "Томатный суп", "icon": "🍅🍜", "craft": [[4, 4], [1, 2]], "exp": 34, "childExp": 34, "time": 720 },
+  { "id": 203, "name": "Икра", "icon": "🍆🥣", "craft": [[3, 3], [4, 1]], "exp": 31, "childExp": 31, "time": 540 },
+  { "id": 204, "name": "Обед", "icon": "🍲🥗", "craft": [[101, 102], [201, 0]], "exp": 10, "childExp": 64, "time": 810 },
+  { "id": 205, "name": "Сытный суп", "icon": "🍲🥤", "craft": [[105, 106], [202, 0]], "exp": 12, "childExp": 62, "time": 900 },
+  { "id": 206, "name": "Фермерский набор", "icon": "🍽️🥗", "craft": [[203, 0], [101, 203]], "exp": 13, "childExp": 89, "time": 855 },
+  { "id": 301, "name": "Кукурузная похлёбка", "icon": "🍲🌽", "craft": [[0, 1, 0], [0, 4, 5], [5, 3, 0]], "exp": 55, "childExp": 55, "time": 900 },
+  { "id": 302, "name": "Овощная пицца", "icon": "🍕", "craft": [[0, 5, 4], [0, 3, 0], [4, 2, 0]], "exp": 52, "childExp": 52, "time": 1080 },
+  { "id": 303, "name": "Рататуй", "icon": "🥘", "craft": [[3, 4, 0], [0, 5, 3]], "exp": 50, "childExp": 50, "time": 1170 },
+  { "id": 304, "name": "Кукурузные котлеты", "icon": "🍔", "craft": [[5, 0, 1], [3, 0, 0], [0, 5, 4]], "exp": 58, "childExp": 58, "time": 990 },
+  { "id": 305, "name": "Похлёбка-микс", "icon": "🍲🥤", "craft": [[101, 201], [301, 0]], "exp": 15, "childExp": 115, "time": 1260 },
+  { "id": 306, "name": "Пицца-сет", "icon": "🍕🥗", "craft": [[102, 202], [0, 302]], "exp": 16, "childExp": 125, "time": 1350 },
+  { "id": 401, "name": "Клубничный десерт", "icon": "🍰", "craft": [[6, 6, 6], [0, 5, 0]], "exp": 75, "childExp": 75, "time": 1260 },
+  { "id": 402, "name": "Ягодный пирог", "icon": "🥧", "craft": [[6, 7, 0], [0, 6, 6], [0, 6, 0]], "exp": 85, "childExp": 85, "time": 1620 },
+  { "id": 403, "name": "Фруктово-овощной салат", "icon": "🥗🍓", "craft": [[0, 7, 6], [6, 4, 0]], "exp": 80, "childExp": 80, "time": 1440 },
+  { "id": 404, "name": "Завтрак гурмана", "icon": "🍽️👑", "craft": [[101, 0, 301], [401, 201, 0]], "exp": 22, "childExp": 220, "time": 1710 },
+  { "id": 405, "name": "Сладкий сет", "icon": "🍰🥧", "craft": [[0, 202, 302], [102, 0, 402]], "exp": 24, "childExp": 234, "time": 1800 },
+  { "id": 406, "name": "Десерт-обед", "icon": "🥧🥘", "craft": [[203, 303], [403, 0]], "exp": 25, "childExp": 215, "time": 1710 },
+  { "id": 501, "name": "Авокадо-тост Люкс", "icon": "🥑🍞", "craft": [[7, 4, 0, 0], [0, 3, 0, 0], [0, 5, 7, 0], [0, 0, 0, 7]], "exp": 140, "childExp": 140, "time": 2160 },
+  { "id": 502, "name": "Гурман-плато", "icon": "🍽️🥑", "craft": [[7, 6, 7, 0], [0, 5, 0, 3], [0, 4, 0, 0], [0, 0, 7, 1]], "exp": 150, "childExp": 150, "time": 2520 },
+  { "id": 503, "name": "Огненное рагу", "icon": "🔥🍲", "craft": [[8, 0, 0, 3], [0, 7, 0, 0], [0, 4, 8, 5], [0, 8, 0, 8]], "exp": 190, "childExp": 190, "time": 2700 },
+  { "id": 504, "name": "Королевский ужин", "icon": "👑🍽️", "craft": [[101, 0, 301], [401, 201, 0]], "exp": 35, "childExp": 235, "time": 3240 },
+  { "id": 505, "name": "Тост-сет", "icon": "🥑🍽️", "craft": [[0, 202, 302], [402, 0, 102]], "exp": 38, "childExp": 260, "time": 1440 },
+  { "id": 506, "name": "Пламя-сет", "icon": "🔥🍽️", "craft": [[203, 0, 403], [503, 0, 303]], "exp": 42, "childExp": 460, "time": 2160 }
+];
+
+const plantsById = {}; farmPlants.forEach(p => plantsById[p.id] = p);
+const craftsById = {}; farmCrafts.forEach(c => craftsById[c.id] = c);
+
+/* =========================================================
+   ХЕЛПЕРЫ
+   ========================================================= */
+const escapeHtml = (s) =>
+  String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const getLevel = (id) => Math.floor(id / 100);
+const getEmoji = (id) => {
+  if (id === 0) return '';
+  if (plantsById[id]) return plantsById[id].icon;
+  if (craftsById[id]) return craftsById[id].icon;
+  return '❓';
+};
+const getName = (id) => {
+  if (id === 0) return '';
+  if (plantsById[id]) return plantsById[id].name;
+  if (craftsById[id]) return craftsById[id].name;
+  return `#${id}`;
+};
+const iconCount = (str) => [...String(str)].length;
+const formatTime = (sec) => {
+  if (sec < 60) return sec + 'с';
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (s === 0) return m + 'м';
+  return `${m}м ${s}с`;
+};
+
+/* =========================================================
+   РЕНДЕР КАРТОЧКИ
+   ========================================================= */
+function renderCard(recipe) {
+  const cols = Math.max(...recipe.craft.map(r => r.length));
+  const level = getLevel(recipe.id);
+
+  const colWidths = new Array(cols).fill(1);
+  for (let c = 0; c < cols; c++) {
+    for (const row of recipe.craft) {
+      const id = row[c] ?? 0;
+      if (!id) continue;
+      const w = iconCount(getEmoji(id));
+      if (w > colWidths[c]) colWidths[c] = w;
+    }
+  }
+  const iconPx = 28;
+  const innerPx = 10;
+  const colPx = colWidths.map(w => w * iconPx + innerPx);
+
+  const slots = [];
+  for (const row of recipe.craft) {
+    for (let c = 0; c < cols; c++) {
+      const id = row[c] ?? 0;
+      if (id === 0) {
+        slots.push(`<div class="slot empty"></div>`);
+      } else {
+        const emoji = getEmoji(id);
+        const name = getName(id);
+        slots.push(
+          `<div class="slot" data-name="${escapeHtml(name)}">${escapeHtml(emoji)}</div>`
+        );
+      }
+    }
+  }
+
+  const gridStyle = `grid-template-columns: ${colPx.map(p => p + 'px').join(' ')};`;
+
+  return `
+    <div class="recipe-card">
+      <div class="recipe-head">
+        <div class="recipe-icon">
+          <span class="lv-tag">Lv.${level}</span>
+          ${escapeHtml(recipe.icon)}
+        </div>
+        <div class="recipe-info">
+          <div class="recipe-name">${escapeHtml(recipe.name)}</div>
+          <div class="recipe-meta">
+            <span class="pill">💡 <b>${recipe.exp}</b></span>
+            <span class="pill">👶 <b>${recipe.childExp}</b></span>
+            <span class="pill time">⏱ <b>${formatTime(recipe.time)}</b></span>
+          </div>
+        </div>
+      </div>
+      <div class="craft-label">Крафт</div>
+      <div class="craft-grid" style="${gridStyle}">${slots.join('')}</div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   ФИЛЬТРАЦИЯ И ПОИСК
+   ========================================================= */
+let currentFilter = 'all';
+let currentSearch = '';
+
+function recipeMatches(recipe, filter, query) {
+  if (filter !== 'all' && getLevel(recipe.id) !== Number(filter)) return false;
+  if (!query) return true;
+
+  const q = query.toLowerCase().trim();
+  if (recipe.name.toLowerCase().includes(q)) return true;
+
+  // Поиск по ингредиентам
+  const ingredients = [];
+  recipe.craft.forEach(row => row.forEach(id => {
+    if (id) ingredients.push(getName(id).toLowerCase());
+  }));
+  return ingredients.some(name => name.includes(q));
+}
+
+/* =========================================================
+   ГРУППИРОВКА И ОТРИСОВКА
+   ========================================================= */
+function render(filter = 'all', query = '') {
+  const grid = document.getElementById('grid');
+  const filtered = farmCrafts.filter(r => recipeMatches(r, filter, query));
+
+  document.getElementById('resultsCount').textContent = filtered.length;
+  document.getElementById('searchHint').textContent =
+    query ? `по запросу «${query}»` : (filter !== 'all' ? `уровень ${filter}` : '');
+
+  if (!filtered.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <span class="emo">🔍</span>
+        <div>Ничего не найдено</div>
+        <div style="font-size:0.85rem; margin-top:8px; opacity:0.7;">
+          Попробуйте изменить запрос или сбросить фильтры
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const groups = {};
+  filtered.forEach(r => {
+    const lv = getLevel(r.id);
+    if (!groups[lv]) groups[lv] = [];
+    groups[lv].push(r);
+  });
+
+  const levels = Object.keys(groups).map(Number).sort((a, b) => a - b);
+
+  let html = '';
+  levels.forEach((lv, li) => {
+    const recipes = groups[lv];
+    html += `
+      <section class="level-block" style="animation-delay:${li * 0.05}s">
+        <div class="level-header">
+          <span class="level-badge">✨ Lv.${lv}</span>
+          <span class="level-line"></span>
+          <span class="level-count">${recipes.length} ${pluralRecipes(recipes.length)}</span>
+        </div>
+        <div class="level-grid">
+    `;
+    recipes.forEach(recipe => { html += renderCard(recipe); });
+    html += `</div></section>`;
+  });
+
+  grid.innerHTML = html;
+  attachTooltips();
+}
+
+function pluralRecipes(n) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m100 >= 11 && m100 <= 14) return 'рецептов';
+  if (m10 === 1) return 'рецепт';
+  if (m10 >= 2 && m10 <= 4) return 'рецепта';
+  return 'рецептов';
+}
+
+/* =========================================================
+   TOOLTIP ПО ИНГРЕДИЕНТАМ
+   ========================================================= */
+function attachTooltips() {
+  const tip = document.getElementById('tooltip');
+  document.querySelectorAll('.slot:not(.empty)').forEach(slot => {
+    slot.addEventListener('mouseenter', (e) => {
+      const name = slot.dataset.name;
+      if (!name) return;
+      tip.textContent = name;
+      const rect = slot.getBoundingClientRect();
+      tip.style.left = (rect.left + rect.width / 2) + 'px';
+      tip.style.top = rect.top + 'px';
+      tip.classList.add('visible');
+    });
+    slot.addEventListener('mouseleave', () => {
+      tip.classList.remove('visible');
+    });
+  });
+}
+
+/* =========================================================
+   СОБЫТИЯ
+   ========================================================= */
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+const filterChips = document.getElementById('filterChips');
+
+searchInput.addEventListener('input', (e) => {
+  currentSearch = e.target.value;
+  searchClear.classList.toggle('visible', currentSearch.length > 0);
+  render(currentFilter, currentSearch);
+});
+
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  currentSearch = '';
+  searchClear.classList.remove('visible');
+  render(currentFilter, currentSearch);
+  searchInput.focus();
+});
+
+filterChips.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  filterChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  currentFilter = chip.dataset.filter;
+  render(currentFilter, currentSearch);
+});
+
+/* ============ ПРОГРЕСС-БАР ============ */
+const progressFill = document.getElementById('progressFill');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  progressFill.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+}, { passive: true });
+
+/* ============ ТЕМА ============ */
+const themeToggle = document.getElementById('themeToggle');
+const root = document.documentElement;
+const mql = window.matchMedia('(prefers-color-scheme: light)');
+function getStoredTheme() { try { return localStorage.getItem('theme'); } catch(e) { return null; } }
+function storeTheme(t) { try { localStorage.setItem('theme', t); } catch(e) {} }
+function applyTheme(t) {
+  if (t === 'light') {
+    root.classList.add('light'); root.style.colorScheme = 'light';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#fff8f0');
+  } else {
+    root.classList.remove('light'); root.style.colorScheme = 'dark';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0d1117');
+  }
+}
+function initTheme() {
+  const s = getStoredTheme();
+  if (s === 'light' || s === 'dark') applyTheme(s);
+  else applyTheme(mql.matches ? 'light' : 'dark');
+}
+function toggleTheme() {
+  const isLight = root.classList.contains('light');
+  applyTheme(isLight ? 'dark' : 'light');
+  storeTheme(isLight ? 'dark' : 'light');
+}
+themeToggle.addEventListener('click', toggleTheme);
+themeToggle.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTheme(); }
+});
+mql.addEventListener('change', (e) => { if (!getStoredTheme()) applyTheme(e.matches ? 'light' : 'dark'); });
+
+/* ============ ЗАПУСК ============ */
+initTheme();
+render();
+</script>
+</body>
+</html>
