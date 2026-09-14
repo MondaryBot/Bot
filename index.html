@@ -1,358 +1,651 @@
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0f1410">
-  <meta name="color-scheme" content="dark">
-  <meta name="supported-color-schemes" content="dark">
-  <title>Рецепты</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<meta name="color-scheme" content="dark light">
+<title>Рецепты · крафт</title>
+<style>
+  /* ============ ТЁМНАЯ ТЕМА (по умолчанию) ============ */
+  :root {
+    --bg-grad-1: #121821;
+    --bg-grad-2: #0a0e14;
+    --card: #161d27;
+    --card-grad: #131a23;
+    --border: #263140;
+    --border-hover: #3d4f66;
+    --slot: #1c2530;
+    --slot-grad: #18202a;
+    --slot-empty: #12181f;
+    --text: #e8eef6;
+    --text-dim: #93a3b8;
+    --text-muted: #5f7086;
+    --accent: #8ab4f8;
+    --accent-2: #a78bfa;
+    --accent-glow: rgba(138, 180, 248, 0.14);
+    --shadow: rgba(0, 0, 0, 0.5);
+    --shadow-soft: rgba(0, 0, 0, 0.25);
+    --row-h: 44px;
+    --radius: 16px;
+    --toggle-bg: #1f2a36;
+    --toggle-border: #2f3d4f;
+    --divider: #2a3644;
+    --glow-1: rgba(138, 180, 248, 0.10);
+    --glow-2: rgba(167, 139, 250, 0.05);
+    --pill-bg: rgba(255, 255, 255, 0.04);
+    --icon-bg-1: #1c2530;
+    --icon-bg-2: #18202a;
+    --inset-light: rgba(255, 255, 255, 0.04);
+  }
 
-    :root {
-      --bg: #0d1117;
-      --bg-grad-1: #121821;
-      --bg-grad-2: #0a0e14;
-      --card: #161d27;
-      --card-hover: #1c2530;
-      --border: #263140;
-      --border-hover: #35455a;
-      --slot: #1c2530;
-      --slot-empty: #12181f;
-      --text: #e8eef6;
-      --text-dim: #93a3b8;
-      --text-muted: #5f7086;
-      --accent: #8ab4f8;
-      --accent-dim: #5b82c4;
-      --accent-glow: rgba(138, 180, 248, 0.12);
-      --shadow: rgba(0, 0, 0, 0.5);
-      --icon: 26px;
-      --gap: 5px;
-      --row-h: 44px;
-      --radius: 16px;
+  /* ============ СВЕТЛАЯ ТЕМА — контрастная и тёплая ============ */
+  html.light {
+    --bg-grad-1: #eef2f8;
+    --bg-grad-2: #e2e8f2;
+    --card: #ffffff;
+    --card-grad: #f7f9fc;
+    --border: #b8c4d4;
+    --border-hover: #7a8ba3;
+    --slot: #edf1f7;
+    --slot-grad: #e3e9f1;
+    --slot-empty: #dde4ed;
+    --text: #17222f;
+    --text-dim: #4a5b6e;
+    --text-muted: #6b7c91;
+    --accent: #2c5d8f;
+    --accent-2: #6d47b3;
+    --accent-glow: rgba(44, 93, 143, 0.14);
+    --shadow: rgba(30, 50, 80, 0.12);
+    --shadow-soft: rgba(30, 50, 80, 0.08);
+    --toggle-bg: #d0d9e6;
+    --toggle-border: #a8b6c8;
+    --divider: #b8c4d4;
+    --glow-1: rgba(44, 93, 143, 0.07);
+    --glow-2: rgba(109, 71, 179, 0.04);
+    --pill-bg: rgba(30, 50, 80, 0.05);
+    --icon-bg-1: #edf1f7;
+    --icon-bg-2: #e3e9f1;
+    --inset-light: rgba(255, 255, 255, 0.6);
+  }
+
+  /* ============ БАЗА ============ */
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, var(--glow-1), transparent 60%),
+      radial-gradient(800px 500px at 90% 110%, var(--glow-2), transparent 70%),
+      linear-gradient(180deg, var(--bg-grad-1), var(--bg-grad-2));
+    background-attachment: fixed;
+    color: var(--text);
+    padding: 32px 16px calc(40px + env(safe-area-inset-bottom));
+    padding-top: calc(28px + env(safe-area-inset-top));
+    min-height: 100vh;
+    min-height: 100dvh;
+    line-height: 1.4;
+    transition: background 0.5s ease, color 0.35s ease;
+  }
+
+  /* ============ ШАПКА ============ */
+  .header {
+    position: relative;
+    max-width: 1240px;
+    margin: 0 auto 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 4.5vw, 2.1rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-align: center;
+    animation: titleIn 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+
+  @keyframes titleIn {
+    from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ============ ТОГЛ ТЕМЫ ============ */
+  .theme-toggle {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 56px;
+    height: 30px;
+    border-radius: 30px;
+    background: var(--toggle-bg);
+    border: 1px solid var(--toggle-border);
+    cursor: pointer;
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
+    z-index: 10;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--border-hover);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.08), 0 0 20px var(--accent-glow);
+  }
+
+  .theme-toggle:active { transform: translateY(-50%) scale(0.96); }
+
+  .toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    line-height: 1;
+  }
+
+  html.light .toggle-knob { left: calc(100% - 26px); }
+
+  .toggle-knob .knob-icon {
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.4s ease;
+  }
+
+  .knob-icon.moon { opacity: 1; transform: rotate(0deg); }
+  .knob-icon.sun { opacity: 0; transform: rotate(-90deg); }
+
+  html.light .knob-icon.moon { opacity: 0; transform: rotate(90deg); }
+  html.light .knob-icon.sun { opacity: 1; transform: rotate(0deg); }
+
+  /* ============ СЕТКА ============ */
+  .grid {
+    max-width: 1240px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  /* ============ БАР УРОВНЯ ============ */
+  .level-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+    animation: barIn 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+
+  @keyframes barIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .level-badge-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    box-shadow: 0 6px 20px var(--accent-glow);
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .level-badge-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    transform: translateX(-100%);
+    animation: shine 3.5s ease-in-out infinite;
+  }
+
+  @keyframes shine {
+    0%, 60% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+
+  .level-badge-bar .lv-num {
+    font-size: 1.15rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  .level-line {
+    flex: 1;
+    height: 2px;
+    background: var(--divider);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .level-line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: lineGrow 0.9s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+    animation-delay: 0.2s;
+  }
+
+  @keyframes lineGrow {
+    to { transform: scaleX(1); }
+  }
+
+  .level-count {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 1px 3px var(--shadow-soft);
+  }
+
+  /* ============ ГРУППА КАРТОЧЕК ============ */
+  .level-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+  }
+
+  /* ============ КАРТОЧКА ============ */
+  .card {
+    position: relative;
+    background: linear-gradient(160deg, var(--card), var(--card-grad));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 4px 16px var(--shadow), inset 0 1px 0 var(--inset-light);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.3, 1),
+                border-color 0.25s ease,
+                box-shadow 0.25s ease,
+                background 0.4s ease;
+    overflow: hidden;
+    animation: cardIn 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+    will-change: transform;
+  }
+
+  html.light .card {
+    box-shadow: 0 2px 10px var(--shadow), 0 1px 3px var(--shadow-soft);
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    background: radial-gradient(400px 140px at 50% 0%, var(--accent-glow), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  @media (hover: hover) {
+    .card:hover {
+      transform: translateY(-5px) scale(1.015);
+      border-color: var(--border-hover);
+      box-shadow: 0 16px 36px var(--shadow), 0 4px 12px var(--shadow-soft), inset 0 1px 0 var(--inset-light);
+    }
+  }
+
+  .card:active {
+    transform: scale(0.995);
+    transition: transform 0.08s ease;
+  }
+
+  /* ============ ШАПКА КАРТОЧКИ ============ */
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .card-icon {
+    position: relative;
+    font-size: 1.6rem;
+    line-height: 1;
+    min-width: 48px;
+    height: 48px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: linear-gradient(160deg, var(--icon-bg-1), var(--icon-bg-2));
+    border-radius: 12px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    box-shadow: inset 0 1px 0 var(--inset-light);
+    transition: border-color 0.25s ease, transform 0.3s ease, box-shadow 0.25s ease;
+  }
+
+  .card:hover .card-icon {
+    border-color: var(--border-hover);
+    transform: scale(1.06) rotate(-2deg);
+    box-shadow: inset 0 1px 0 var(--inset-light), 0 6px 16px var(--accent-glow);
+  }
+
+  .lv-badge {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    font-size: 0.63rem;
+    font-weight: 800;
+    line-height: 1;
+    padding: 4px 7px;
+    border-radius: 6px;
+    border: 1.5px solid var(--card);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  }
+
+  .card-info {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+    transition: color 0.35s ease;
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    line-height: 1;
+    color: var(--text-dim);
+    background: var(--pill-bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 4px 8px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  }
+
+  .meta-pill:hover {
+    transform: translateY(-1.5px);
+    border-color: var(--border-hover);
+  }
+
+  .meta-pill b { color: var(--text); font-weight: 700; }
+
+  .meta-pill.time {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  .meta-pill.time b { color: var(--accent); }
+
+  .section-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 800;
+    margin-bottom: -6px;
+    transition: color 0.35s ease;
+  }
+
+  /* ============ КРАФТ-СЕТКА ============ */
+  .craft {
+    display: grid;
+    gap: 5px;
+    grid-auto-rows: var(--row-h);
+    justify-content: start;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .craft::-webkit-scrollbar { height: 6px; }
+  .craft::-webkit-scrollbar-track { background: transparent; }
+  .craft::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+
+  .slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, var(--slot), var(--slot-grad));
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    line-height: 1;
+    overflow: hidden;
+    height: var(--row-h);
+    padding: 0 4px;
+    font-size: 1.35rem;
+    white-space: nowrap;
+    letter-spacing: -1px;
+    box-shadow: inset 0 1px 0 var(--inset-light);
+    transition: border-color 0.2s ease, transform 0.2s ease, background 0.4s ease;
+    animation: slotPop 0.35s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+
+  @keyframes slotPop {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @media (hover: hover) {
+    .slot:not(.empty):hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px) scale(1.04);
+      z-index: 2;
+      box-shadow: inset 0 1px 0 var(--inset-light), 0 5px 14px var(--accent-glow);
+    }
+  }
+
+  .slot.empty {
+    background:
+      repeating-linear-gradient(45deg,
+        var(--pill-bg),
+        var(--pill-bg) 4px,
+        transparent 4px, transparent 8px),
+      var(--slot-empty);
+    border: 1px dashed var(--border);
+    box-shadow: none;
+    position: relative;
+  }
+
+  .slot.empty::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    opacity: 0.5;
+  }
+
+  /* ============ ПУСТО ============ */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  /* ============ АДАПТАЦИЯ ============ */
+  @media (max-width: 560px) {
+    :root { --row-h: 42px; }
+
+    body { padding: 18px 12px calc(28px + env(safe-area-inset-bottom)); }
+
+    .header {
+      margin-bottom: 26px;
+      min-height: 48px;
     }
 
-    html {
-      -webkit-text-size-adjust: 100%;
-      forced-color-adjust: none;
+    .theme-toggle {
+      width: 50px;
+      height: 28px;
     }
 
-    body {
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background:
-        radial-gradient(1200px 600px at 50% -10%, rgba(138, 180, 248, 0.06), transparent 60%),
-        linear-gradient(180deg, var(--bg-grad-1), var(--bg-grad-2));
-      background-attachment: fixed;
-      color: var(--text);
-      padding: 32px 16px calc(32px + env(safe-area-inset-bottom));
-      padding-top: calc(32px + env(safe-area-inset-top));
-      min-height: 100vh;
-      min-height: 100dvh;
-      line-height: 1.4;
+    .toggle-knob {
+      width: 22px;
+      height: 22px;
+      font-size: 0.72rem;
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 32px;
-      font-size: clamp(1.4rem, 4vw, 1.9rem);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      background: linear-gradient(180deg, #ffffff, #b8ccea);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 2px 20px rgba(138, 180, 248, 0.15);
-    }
+    html.light .toggle-knob { left: calc(100% - 24px); }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 18px;
-      max-width: 1240px;
-      margin: 0 auto;
-    }
+    .level-badge-bar { padding: 7px 13px; font-size: 0.88rem; }
+    .level-badge-bar .lv-num { font-size: 1.05rem; }
 
-    .card {
-      position: relative;
-      background: linear-gradient(160deg, var(--card), #131a23);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
+    .level-group {
+      grid-template-columns: 1fr;
       gap: 14px;
-      box-shadow: 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-      transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.3, 1),
-                  border-color 0.18s ease,
-                  box-shadow 0.18s ease;
-      overflow: hidden;
     }
 
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: var(--radius);
-      background: radial-gradient(400px 120px at 50% 0%, var(--accent-glow), transparent 70%);
-      opacity: 0;
-      transition: opacity 0.25s ease;
-      pointer-events: none;
-    }
-
-    .card:hover::before { opacity: 1; }
-
-    @media (hover: hover) {
-      .card:hover {
-        transform: translateY(-3px);
-        border-color: var(--border-hover);
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      }
-    }
-
-    .card:active {
-      transform: scale(0.995);
-      transition: transform 0.08s ease;
-    }
-
-    .card-head {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      min-width: 0;
-    }
+    .card { padding: 14px; gap: 12px; }
 
     .card-icon {
-      position: relative;
-      font-size: 1.6rem;
-      line-height: 1;
-      min-width: 48px;
-      height: 48px;
-      padding: 0 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      background: linear-gradient(160deg, var(--slot), #18202a);
-      border-radius: 12px;
-      flex-shrink: 0;
-      border: 1px solid var(--border);
-      white-space: nowrap;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      min-width: 44px;
+      height: 44px;
+      font-size: 1.45rem;
+      border-radius: 11px;
     }
 
-    .lv-badge {
-      position: absolute;
-      top: -8px;
-      left: -8px;
-      background: linear-gradient(160deg, #2b3a4d, #1f2b3a);
-      color: var(--accent);
-      font-size: 0.65rem;
-      font-weight: 700;
-      line-height: 1;
-      padding: 3px 6px;
-      border-radius: 6px;
-      border: 1px solid #3a4d63;
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    .card-title { font-size: 1rem; }
+
+    .meta-pill { font-size: 0.72rem; padding: 3px 7px; }
+
+    .slot { font-size: 1.25rem; }
+  }
+
+  @media (max-width: 360px) {
+    .card-meta { gap: 5px; }
+    .meta-pill { font-size: 0.68rem; padding: 3px 6px; }
+    .level-count { display: none; }
+  }
+
+  @media (hover: none) {
+    .card:hover {
+      transform: none;
+      border-color: var(--border);
+      box-shadow: 0 4px 16px var(--shadow), inset 0 1px 0 var(--inset-light);
     }
-
-    .card-info {
-      min-width: 0;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+    html.light .card:hover {
+      box-shadow: 0 2px 10px var(--shadow), 0 1px 3px var(--shadow-soft);
     }
-
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.25;
-      overflow-wrap: anywhere;
+    .card:hover::before { opacity: 0; }
+    .card:hover .card-icon { transform: none; }
+    .slot:not(.empty):hover {
+      transform: none;
+      border-color: var(--border);
+      box-shadow: inset 0 1px 0 var(--inset-light);
     }
+  }
 
-    .card-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 2px;
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
     }
-
-    .meta-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.75rem;
-      line-height: 1;
-      color: var(--text-dim);
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 4px 7px;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .meta-pill b {
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .meta-pill.time {
-      color: var(--accent);
-      border-color: rgba(138, 180, 248, 0.22);
-      background: rgba(138, 180, 248, 0.06);
-    }
-
-    .meta-pill.time b { color: var(--accent); }
-
-    .section-label {
-      font-size: 0.7rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      font-weight: 700;
-      margin-bottom: -6px;
-    }
-
-    .craft {
-      display: grid;
-      gap: var(--gap);
-      grid-auto-rows: var(--row-h);
-      justify-content: start;
-      overflow-x: auto;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border) transparent;
-      padding-bottom: 2px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .craft::-webkit-scrollbar { height: 6px; }
-    .craft::-webkit-scrollbar-track { background: transparent; }
-    .craft::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 3px;
-    }
-
-    .slot {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(160deg, var(--slot), #18202a);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      line-height: 1;
-      overflow: hidden;
-      height: var(--row-h);
-      padding: 0 4px;
-      font-size: 1.35rem;
-      white-space: nowrap;
-      letter-spacing: -1px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-      transition: border-color 0.15s ease, transform 0.15s ease;
-    }
-
-    @media (hover: hover) {
-      .slot:not(.empty):hover {
-        border-color: var(--border-hover);
-        transform: translateY(-1px);
-      }
-    }
-
-    .slot.empty {
-      background:
-        repeating-linear-gradient(
-          45deg,
-          rgba(255, 255, 255, 0.015),
-          rgba(255, 255, 255, 0.015) 4px,
-          transparent 4px,
-          transparent 8px
-        ),
-        var(--slot-empty);
-      border: 1px dashed #2a3441;
-      box-shadow: none;
-      position: relative;
-    }
-
-    .slot.empty::after {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #2f3b4a;
-      opacity: 0.7;
-    }
-
-    /* ===== Мобильная адаптация ===== */
-    @media (max-width: 560px) {
-      :root {
-        --row-h: 42px;
-        --icon: 24px;
-      }
-
-      body {
-        padding: 20px 12px calc(20px + env(safe-area-inset-bottom));
-        padding-top: calc(20px + env(safe-area-inset-top));
-      }
-
-      h1 { margin-bottom: 22px; }
-
-      .grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-      }
-
-      .card {
-        padding: 14px;
-        gap: 12px;
-      }
-
-      .card-icon {
-        min-width: 44px;
-        height: 44px;
-        font-size: 1.45rem;
-        border-radius: 11px;
-      }
-
-      .card-title { font-size: 1rem; }
-
-      .meta-pill {
-        font-size: 0.72rem;
-        padding: 3px 6px;
-      }
-
-      .slot {
-        font-size: 1.25rem;
-      }
-    }
-
-    @media (max-width: 360px) {
-      .card-meta { gap: 5px; }
-      .meta-pill { font-size: 0.68rem; }
-    }
-
-    @media (hover: none) {
-      .card:hover {
-        transform: none;
-        border-color: var(--border);
-        box-shadow: 0 4px 16px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-      }
-      .card:hover::before { opacity: 0; }
-      .slot:not(.empty):hover {
-        transform: none;
-        border-color: var(--border);
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <h1>Рецепты</h1>
+
+  <div class="header">
+    <h1>Рецепты</h1>
+    <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему" type="button">
+      <span class="toggle-knob">
+        <span class="knob-icon moon">🌙</span>
+        <span class="knob-icon sun">☀️</span>
+      </span>
+    </button>
+  </div>
+
   <div class="grid" id="grid"></div>
 
-  <script>
- const farmCrafts = [
-  // ===== УРОВЕНЬ 1 (id 100) — ×1.00 =====
+<script>
+/* =========================================================
+   1) ДАННЫЕ
+   ========================================================= */
+
+/* farmPlants — список растений. Меняй/добавляй/удаляй — количество
+   карточек и содержимое пересчитается автоматически. */
+const farmPlants = [
+  { id: 1, name: "Морковь",   icon: "🥕", level: 1 },
+  { id: 2, name: "Огурец",    icon: "🥒", level: 1 },
+  { id: 3, name: "Баклажан",  icon: "🍆", level: 1 },
+  { id: 4, name: "Помидор",   icon: "🍅", level: 1 },
+  { id: 5, name: "Кукуруза",  icon: "🌽", level: 2 },
+  { id: 6, name: "Клубника",  icon: "🍓", level: 2 },
+  { id: 7, name: "Авокадо",   icon: "🥑", level: 3 },
+  { id: 8, name: "Перец чили", icon: "🌶️", level: 3 }
+];
+
+/* farmCrafts — рецепты крафта. ID рецептов 100+, 200+, 300+... — уровни. */
+const farmCrafts = [
+  // ===== УРОВЕНЬ 1 =====
   { "id": 101, "name": "Салат", "icon": "🥗", "craft": [[1, 2]], "exp": 10, "childExp": 10, "time": 180 },
   { "id": 102, "name": "Микс", "icon": "🥤", "craft": [[1, 0], [0, 2]], "exp": 11, "childExp": 11, "time": 210 },
   { "id": 103, "name": "Нарезка", "icon": "🥙", "craft": [[1, 1], [2, 0]], "exp": 13, "childExp": 13, "time": 240 },
@@ -360,7 +653,7 @@
   { "id": 105, "name": "Комбо", "icon": "🥗🥤", "craft": [[101, 102]], "exp": 6, "childExp": 27, "time": 300 },
   { "id": 106, "name": "Большой салат", "icon": "🥗✨", "craft": [[101, 103], [102, 0]], "exp": 8, "childExp": 44, "time": 390 },
 
-  // ===== УРОВЕНЬ 2 (id 200) — ×1.05 =====
+  // ===== УРОВЕНЬ 2 =====
   { "id": 201, "name": "Рагу", "icon": "🍲", "craft": [[3, 1], [4, 2]], "exp": 30, "childExp": 30, "time": 630 },
   { "id": 202, "name": "Томатный суп", "icon": "🍅🍜", "craft": [[4, 4], [1, 2]], "exp": 34, "childExp": 34, "time": 720 },
   { "id": 203, "name": "Икра", "icon": "🍆🥣", "craft": [[3, 3], [4, 1]], "exp": 31, "childExp": 31, "time": 540 },
@@ -368,7 +661,7 @@
   { "id": 205, "name": "Сытный суп", "icon": "🍲🥤", "craft": [[105, 106], [202, 0]], "exp": 12, "childExp": 62, "time": 900 },
   { "id": 206, "name": "Фермерский набор", "icon": "🍽️🥗", "craft": [[203, 0], [101, 203]], "exp": 13, "childExp": 89, "time": 855 },
 
-  // ===== УРОВЕНЬ 3 (id 300) — ×1.10 =====
+  // ===== УРОВЕНЬ 3 =====
   { "id": 301, "name": "Кукурузная похлёбка", "icon": "🍲🌽", "craft": [[0, 1, 0], [0, 4, 5], [5, 3, 0]], "exp": 55, "childExp": 55, "time": 900 },
   { "id": 302, "name": "Овощная пицца", "icon": "🍕", "craft": [[0, 5, 4], [0, 3, 0], [4, 2, 0]], "exp": 52, "childExp": 52, "time": 1080 },
   { "id": 303, "name": "Рататуй", "icon": "🥘", "craft": [[3, 4, 0], [0, 5, 3]], "exp": 50, "childExp": 50, "time": 1170 },
@@ -376,128 +669,261 @@
   { "id": 305, "name": "Похлёбка-микс", "icon": "🍲🥤", "craft": [[101, 201], [301, 0]], "exp": 15, "childExp": 115, "time": 1260 },
   { "id": 306, "name": "Пицца-сет", "icon": "🍕🥗", "craft": [[102, 202], [0, 302]], "exp": 16, "childExp": 125, "time": 1350 },
 
-  // ===== УРОВЕНЬ 4 (id 400) — ×1.15 =====
-  { "id": 401, "name": "Клубничный десерт", "icon": "🍰", "craft": [[6, 6, 6],[0, 5, 0]], "exp": 75, "childExp": 75, "time": 1260 },
+  // ===== УРОВЕНЬ 4 =====
+  { "id": 401, "name": "Клубничный десерт", "icon": "🍰", "craft": [[6, 6, 6], [0, 5, 0]], "exp": 75, "childExp": 75, "time": 1260 },
   { "id": 402, "name": "Ягодный пирог", "icon": "🥧", "craft": [[6, 7, 0], [0, 6, 6], [0, 6, 0]], "exp": 85, "childExp": 85, "time": 1620 },
   { "id": 403, "name": "Фруктово-овощной салат", "icon": "🥗🍓", "craft": [[0, 7, 6], [6, 4, 0]], "exp": 80, "childExp": 80, "time": 1440 },
   { "id": 404, "name": "Завтрак гурмана", "icon": "🍽️👑", "craft": [[101, 0, 301], [401, 201, 0]], "exp": 22, "childExp": 220, "time": 1710 },
   { "id": 405, "name": "Сладкий сет", "icon": "🍰🥧", "craft": [[0, 202, 302], [102, 0, 402]], "exp": 24, "childExp": 234, "time": 1800 },
   { "id": 406, "name": "Десерт-обед", "icon": "🥧🥘", "craft": [[203, 303], [403, 0]], "exp": 25, "childExp": 215, "time": 1710 },
 
-  // ===== УРОВЕНЬ 5 (id 500) — ×1.20 =====
+  // ===== УРОВЕНЬ 5 =====
   { "id": 501, "name": "Авокадо-тост Люкс", "icon": "🥑🍞", "craft": [[7, 4, 0, 0], [0, 3, 0, 0], [0, 5, 7, 0], [0, 0, 0, 7]], "exp": 140, "childExp": 140, "time": 2160 },
   { "id": 502, "name": "Гурман-плато", "icon": "🍽️🥑", "craft": [[7, 6, 7, 0], [0, 5, 0, 3], [0, 4, 0, 0], [0, 0, 7, 1]], "exp": 150, "childExp": 150, "time": 2520 },
   { "id": 503, "name": "Огненное рагу", "icon": "🔥🍲", "craft": [[8, 0, 0, 3], [0, 7, 0, 0], [0, 4, 8, 5], [0, 8, 0, 8]], "exp": 190, "childExp": 190, "time": 2700 },
   { "id": 504, "name": "Королевский ужин", "icon": "👑🍽️", "craft": [[101, 0, 301], [401, 201, 0]], "exp": 35, "childExp": 235, "time": 3240 },
   { "id": 505, "name": "Тост-сет", "icon": "🥑🍽️", "craft": [[0, 202, 302], [402, 0, 102]], "exp": 38, "childExp": 260, "time": 1440 },
   { "id": 506, "name": "Пламя-сет", "icon": "🔥🍽️", "craft": [[203, 0, 403], [503, 0, 303]], "exp": 42, "childExp": 460, "time": 2160 }
-]
+];
 
-    const resourceList = [
-      ["🥕"], ["🥒"], ["🍆"], ["🍅"],
-      ["🌽"], ["🍓"], ["🥑"], ["🌶"]
-    ];
+/* =========================================================
+   2) ИНДЕКСЫ
+   ========================================================= */
 
-    const resources = {};
-    resourceList.forEach((r, i) => { resources[i + 1] = r[0]; });
+const plantsById = {};
+farmPlants.forEach(p => { plantsById[p.id] = p; });
 
-    const craftsById = {};
-    farmCrafts.forEach(c => { craftsById[c.id] = c; });
+const craftsById = {};
+farmCrafts.forEach(c => { craftsById[c.id] = c; });
 
-    const escapeHtml = (s) =>
-      String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/* =========================================================
+   3) ХЕЛПЕРЫ
+   ========================================================= */
 
-    function getLevel(id) {
-      return Math.floor(id / 100);
+const escapeHtml = (s) =>
+  String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function getLevel(id) { return Math.floor(id / 100); }
+
+function getEmoji(id) {
+  if (id === 0) return '';
+  if (plantsById[id]) return plantsById[id].icon;
+  if (craftsById[id]) return craftsById[id].icon;
+  return '❓';
+}
+
+function getName(id) {
+  if (id === 0) return '';
+  if (plantsById[id]) return plantsById[id].name;
+  if (craftsById[id]) return craftsById[id].name;
+  return `#${id}`;
+}
+
+function iconCount(str) { return [...String(str)].length; }
+
+function formatTime(sec) {
+  if (sec < 60) return sec + 'с';
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (s === 0) return m + 'м';
+  return `${m}м ${s}с`;
+}
+
+/* =========================================================
+   4) РЕНДЕР КАРТОЧКИ
+   ========================================================= */
+
+function renderCard(recipe) {
+  const cols = Math.max(...recipe.craft.map(r => r.length));
+  const level = getLevel(recipe.id);
+
+  const colWidths = new Array(cols).fill(1);
+  for (let c = 0; c < cols; c++) {
+    for (const row of recipe.craft) {
+      const id = row[c] ?? 0;
+      if (!id) continue;
+      const w = iconCount(getEmoji(id));
+      if (w > colWidths[c]) colWidths[c] = w;
     }
+  }
 
-    function getEmoji(id) {
-      if (id === 0) return '';
-      if (resources[id]) return resources[id];
-      if (craftsById[id]) return craftsById[id].icon;
-      return '❓';
-    }
+  const iconPx = 26;
+  const innerPx = 6;
+  const colPx = colWidths.map(w => w * iconPx + innerPx);
 
-    function getName(id) {
-      if (id === 0) return '';
-      if (resources[id]) return `Ресурс #${id}`;
-      if (craftsById[id]) return craftsById[id].name;
-      return `#${id}`;
-    }
-
-    function iconCount(str) {
-      return [...String(str)].length;
-    }
-
-    function formatTime(sec) {
-      if (sec < 60) return sec + 'с';
-      const m = Math.floor(sec / 60);
-      const s = sec % 60;
-      if (s === 0) return m + 'м';
-      return `${m}м ${s}с`;
-    }
-
-    function renderCard(recipe) {
-      const cols = Math.max(...recipe.craft.map(r => r.length));
-      const level = getLevel(recipe.id);
-
-      const colWidths = new Array(cols).fill(1);
-      for (let c = 0; c < cols; c++) {
-        for (const row of recipe.craft) {
-          const id = row[c] ?? 0;
-          if (!id) continue;
-          const w = iconCount(getEmoji(id));
-          if (w > colWidths[c]) colWidths[c] = w;
-        }
+  const slots = [];
+  for (const row of recipe.craft) {
+    for (let c = 0; c < cols; c++) {
+      const id = row[c] ?? 0;
+      if (id === 0) {
+        slots.push(`<div class="slot empty"></div>`);
+      } else {
+        const emoji = getEmoji(id);
+        const name = getName(id);
+        slots.push(
+          `<div class="slot" title="${escapeHtml(name)}">${escapeHtml(emoji)}</div>`
+        );
       }
+    }
+  }
 
-      const iconPx = 26;
-      const innerPx = 6;
-      const colPx = colWidths.map(w => w * iconPx + innerPx);
+  const gridStyle = `grid-template-columns: ${colPx.map(p => p + 'px').join(' ')};`;
 
-      const slots = [];
-      for (const row of recipe.craft) {
-        for (let c = 0; c < cols; c++) {
-          const id = row[c] ?? 0;
-          if (id === 0) {
-            slots.push(`<div class="slot empty"></div>`);
-          } else {
-            const emoji = getEmoji(id);
-            const name = getName(id);
-            slots.push(
-              `<div class="slot" title="${escapeHtml(name)}">${escapeHtml(emoji)}</div>`
-            );
-          }
-        }
-      }
-
-      const gridStyle =
-        `grid-template-columns: ${colPx.map(p => p + 'px').join(' ')};`;
-
-      return `
-        <div class="card">
-          <div class="card-head">
-            <div class="card-icon">
-              <span class="lv-badge">Lv.${level}</span>
-              ${escapeHtml(recipe.icon)}
-            </div>
-            <div class="card-info">
-              <div class="card-title">${escapeHtml(recipe.name)}</div>
-              <div class="card-meta">
-                <span class="meta-pill">💡 <b>${recipe.exp}</b></span>
-                <span class="meta-pill">👶 <b>${recipe.childExp}</b></span>
-                <span class="meta-pill time">⏱ <b>${formatTime(recipe.time)}</b></span>
-              </div>
-            </div>
-          </div>
-          <div class="section-label">Крафт</div>
-          <div class="craft" style="${gridStyle}">${slots.join('')}</div>
+  return `
+    <div class="card">
+      <div class="card-head">
+        <div class="card-icon">
+          <span class="lv-badge">Lv.${level}</span>
+          ${escapeHtml(recipe.icon)}
         </div>
-      `;
-    }
+        <div class="card-info">
+          <div class="card-title">${escapeHtml(recipe.name)}</div>
+          <div class="card-meta">
+            <span class="meta-pill">💡 <b>${recipe.exp}</b></span>
+            <span class="meta-pill">👶 <b>${recipe.childExp}</b></span>
+            <span class="meta-pill time">⏱ <b>${formatTime(recipe.time)}</b></span>
+          </div>
+        </div>
+      </div>
+      <div class="section-label">Крафт</div>
+      <div class="craft" style="${gridStyle}">${slots.join('')}</div>
+    </div>
+  `;
+}
 
-    document.getElementById('grid').innerHTML =
-      farmCrafts.map(renderCard).join('');
-  </script>
+/* =========================================================
+   5) ГРУППИРОВКА ПО УРОВНЯМ И ОТРИСОВКА
+   ========================================================= */
+
+function render() {
+  const grid = document.getElementById('grid');
+
+  if (!farmCrafts.length) {
+    grid.innerHTML = `<div class="empty-state">Нет рецептов</div>`;
+    return;
+  }
+
+  const groups = {};
+  farmCrafts.forEach(r => {
+    const lv = getLevel(r.id);
+    if (!groups[lv]) groups[lv] = [];
+    groups[lv].push(r);
+  });
+
+  const levels = Object.keys(groups).map(Number).sort((a, b) => a - b);
+
+  let html = '';
+  let cardIndex = 0;
+
+  levels.forEach((lv, li) => {
+    const recipes = groups[lv];
+
+    html += `
+      <section class="level-block">
+        <div class="level-bar" style="animation-delay: ${li * 0.08}s">
+          <span class="level-badge-bar">
+            <span class="lv-num">Lv.${lv}</span>
+          </span>
+          <span class="level-line"></span>
+          <span class="level-count">${recipes.length} ${pluralRecipes(recipes.length)}</span>
+        </div>
+        <div class="level-group">
+    `;
+
+    recipes.forEach(recipe => {
+      const cardHtml = renderCard(recipe);
+      const delay = (cardIndex * 0.04).toFixed(2);
+      html += cardHtml.replace(
+        'class="card"',
+        `class="card" style="animation-delay:${delay}s"`
+      );
+      cardIndex++;
+    });
+
+    html += `
+        </div>
+      </section>
+    `;
+  });
+
+  grid.innerHTML = html;
+}
+
+function pluralRecipes(n) {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 14) return 'рецептов';
+  if (mod10 === 1) return 'рецепт';
+  if (mod10 >= 2 && mod10 <= 4) return 'рецепта';
+  return 'рецептов';
+}
+
+/* =========================================================
+   6) ТЕМА
+   ========================================================= */
+
+const themeToggle = document.getElementById('themeToggle');
+const root = document.documentElement;
+const mql = window.matchMedia('(prefers-color-scheme: light)');
+
+function getStoredTheme() {
+  try { return localStorage.getItem('theme'); } catch(e) { return null; }
+}
+
+function storeTheme(theme) {
+  try { localStorage.setItem('theme', theme); } catch(e) {}
+}
+
+function applyTheme(theme) {
+  if (theme === 'light') {
+    root.classList.add('light');
+    root.style.colorScheme = 'light';
+    document.querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', '#eef2f8');
+  } else {
+    root.classList.remove('light');
+    root.style.colorScheme = 'dark';
+    document.querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', '#0d1117');
+  }
+}
+
+function initTheme() {
+  const stored = getStoredTheme();
+  if (stored === 'light' || stored === 'dark') {
+    applyTheme(stored);
+  } else {
+    applyTheme(mql.matches ? 'light' : 'dark');
+  }
+}
+
+function toggleTheme() {
+  const isLight = root.classList.contains('light');
+  const next = isLight ? 'dark' : 'light';
+  applyTheme(next);
+  storeTheme(next);
+}
+
+themeToggle.addEventListener('click', toggleTheme);
+themeToggle.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    toggleTheme();
+  }
+});
+
+mql.addEventListener('change', (e) => {
+  if (!getStoredTheme()) {
+    applyTheme(e.matches ? 'light' : 'dark');
+  }
+});
+
+/* =========================================================
+   7) ЗАПУСК
+   ========================================================= */
+
+initTheme();
+render();
+</script>
 </body>
 </html>
