@@ -419,16 +419,12 @@
     transition: all 0.22s ease;
     cursor: pointer;
   }
-   @media (hover: hover) {
-    .slot:not(.empty):hover {
-      border-color: var(--accent);
-      transform: translateY(-2px) scale(1.04);
-      z-index: 3;
-      box-shadow:
-        0 6px 16px var(--accent-glow-strong),
-        0 0 0 2px var(--card);
-    }
+     @media (hover: hover) {
+  .slot:not(.empty):hover {
+    transform: translateY(-2px) scale(1.04);
+    z-index: 3;
   }
+}
   .slot.empty {
     background: repeating-linear-gradient(45deg,
       var(--pill-bg), var(--pill-bg) 4px,
