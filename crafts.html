@@ -259,16 +259,6 @@
     flex-shrink: 0; white-space: nowrap;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .lv-tag {
-    position: absolute; top: -8px; left: -8px;
-    background: var(--grad); color: #fff;
-    font-size: 0.62rem; font-weight: 900;
-    line-height: 1; padding: 4px 7px;
-    border-radius: 6px;
-    border: 1.5px solid var(--card);
-    letter-spacing: 0.03em;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
-  }
   .recipe-info { min-width: 0; flex: 1; }
   .recipe-name {
     font-size: 1.05rem; font-weight: 800;
@@ -550,13 +540,12 @@ html.light .slot-count {
 
 <script>
 /* =========================================================
-   ДАННЫЕ: ВСЕ КРАФТЫ
+   ДАННЫЕ: ВСЕ КРАФТЫ (синхронизировано с data.js)
    =========================================================
    cat        — категория (tool/weapon/armor/food/potion/block/misc)
    station    — 'hand' (руками) или 'table' (нужен стол)
-   tier       — 1..13 (или 0 если не указано)
-   needs      — что нужно: [[emoji|name, count], ...] или плоский массив
-   result     — что получится: [emoji, count] или [name, count]
+   tier       — 1..13
+   needs      — [[emoji + name, count], ...]
    ========================================================= */
 
 const crafts = [
@@ -564,152 +553,158 @@ const crafts = [
   { id:"pickStone",  name:"Каменная кирка",      cat:"tool",   station:"table", tier:1,
     icon:"⛏️", needs:[["🪨 Булыжник",3],["🌲 Дерево",2]] },
   { id:"pickBone",   name:"Костяная кирка",      cat:"tool",   station:"hand",  tier:2,
-    icon:"⛏️", needs:[["🦴 Осколок",3],["🌲 Дерево",2]] },
+    icon:"⛏️", needs:[["🦴 Костный осколок",3],["🌲 Дерево",2]] },
   { id:"pickCopper", name:"Медная кирка",        cat:"tool",   station:"table", tier:3,
-    icon:"⛏️", needs:[["🟧 Медь",3],["🌲 Дерево",2]] },
+    icon:"⛏️", needs:[["🟧 Медный слиток",3],["🌲 Дерево",2]] },
   { id:"pickTin",    name:"Оловянная кирка",     cat:"tool",   station:"table", tier:4,
-    icon:"⛏️", needs:[["⬜ Олово",3],["🌲 Дерево",2]] },
+    icon:"⛏️", needs:[["⬜ Оловянный слиток",3],["🌲 Дерево",2]] },
   { id:"pickIron",   name:"Железная кирка",      cat:"tool",   station:"table", tier:5,
-    icon:"⛏️", needs:[["⬜ Железо",3],["🌲 Дерево",2]] },
+    icon:"⛏️", needs:[["⬜ Железный слиток",3],["🌲 Дерево",2]] },
   { id:"pickSilver", name:"Серебряная кирка",    cat:"tool",   station:"table", tier:6,
-    icon:"⛏️", needs:[["⚪ Серебро",3],["🌲 Дерево",2]] },
+    icon:"⛏️", needs:[["⚪ Серебряный слиток",3],["🌲 Дерево",2]] },
   { id:"pickAmethyst",name:"Аметистовая кирка",  cat:"tool",   station:"table", tier:7,
-    icon:"⛏️", needs:[["🟣 Аметист",3],["⬜ Железо",1]] },
+    icon:"⛏️", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
   { id:"pickEcho",   name:"Эхо-кирка",           cat:"tool",   station:"table", tier:8,
-    icon:"⛏️", needs:[["🔊 Осколок",3],["🟣 Аметист",1]] },
+    icon:"⛏️", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]] },
   { id:"pickMoon",   name:"Лунная кирка",        cat:"tool",   station:"table", tier:9,
-    icon:"⛏️", needs:[["🌙 Лунный камень",3],["🔊 Осколок",1]] },
+    icon:"⛏️", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]] },
   { id:"pickVoid",   name:"Пустотная кирка",     cat:"tool",   station:"table", tier:10,
     icon:"⛏️", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]] },
   { id:"pickDiamond",name:"Алмазная кирка",      cat:"tool",   station:"table", tier:11,
-    icon:"⛏️", needs:[["💎 Алмаз",3],["⬛ Незерит",1]] },
+    icon:"⛏️", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
   { id:"pickNetherite",name:"Незеритовая кирка", cat:"tool",   station:"table", tier:12,
-    icon:"⛏️", needs:[["⬛ Незерит",3],["💎 Алмаз",1]] },
+    icon:"⛏️", needs:[["⬛ Незеритовый слиток",3],["💎 Алмаз",1]] },
   { id:"pickStar",   name:"Звёздная кирка",      cat:"tool",   station:"table", tier:13,
-    icon:"⛏️", needs:[["⭐ Осколок звезды",3],["⬛ Незерит",1]] },
+    icon:"⛏️", needs:[["⭐ Осколок звезды",3],["⬛ Незеритовый слиток",1]] },
 
   { id:"axeStone",   name:"Каменный топор",      cat:"tool",   station:"table", tier:1,
     icon:"🪓", needs:[["🪨 Булыжник",3],["🌲 Дерево",2]] },
   { id:"axeBone",    name:"Костяной топор",      cat:"tool",   station:"hand",  tier:2,
-    icon:"🪓", needs:[["🦴 Осколок",3],["🌲 Дерево",2]] },
+    icon:"🪓", needs:[["🦴 Костный осколок",3],["🌲 Дерево",2]] },
   { id:"axeCopper",  name:"Медный топор",        cat:"tool",   station:"table", tier:3,
-    icon:"🪓", needs:[["🟧 Медь",3],["🌲 Дерево",2]] },
+    icon:"🪓", needs:[["🟧 Медный слиток",3],["🌲 Дерево",2]] },
+  { id:"axeTin",     name:"Оловянный топор",     cat:"tool",   station:"table", tier:4,
+    icon:"🪓", needs:[["⬜ Оловянный слиток",3],["🌲 Дерево",2]] },
   { id:"axeIron",    name:"Железный топор",      cat:"tool",   station:"table", tier:5,
-    icon:"🪓", needs:[["⬜ Железо",3],["🌲 Дерево",2]] },
+    icon:"🪓", needs:[["⬜ Железный слиток",3],["🌲 Дерево",2]] },
   { id:"axeSilver",  name:"Серебряный топор",    cat:"tool",   station:"table", tier:6,
-    icon:"🪓", needs:[["⚪ Серебро",3],["🌲 Дерево",2]] },
+    icon:"🪓", needs:[["⚪ Серебряный слиток",3],["🌲 Дерево",2]] },
   { id:"axeAmethyst",name:"Аметистовый топор",   cat:"tool",   station:"table", tier:7,
-    icon:"🪓", needs:[["🟣 Аметист",3],["⬜ Железо",1]] },
+    icon:"🪓", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
   { id:"axeEcho",    name:"Эхо-топор",           cat:"tool",   station:"table", tier:8,
-    icon:"🪓", needs:[["🔊 Осколок",3],["🟣 Аметист",1]] },
+    icon:"🪓", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]] },
   { id:"axeMoon",    name:"Лунный топор",        cat:"tool",   station:"table", tier:9,
-    icon:"🪓", needs:[["🌙 Лунный камень",3],["🔊 Осколок",1]] },
+    icon:"🪓", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]] },
   { id:"axeVoid",    name:"Пустотный топор",     cat:"tool",   station:"table", tier:10,
     icon:"🪓", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]] },
   { id:"axeDiamond", name:"Алмазный топор",      cat:"tool",   station:"table", tier:11,
-    icon:"🪓", needs:[["💎 Алмаз",3],["⬛ Незерит",1]] },
+    icon:"🪓", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
   { id:"axeNetherite",name:"Незеритовый топор",  cat:"tool",   station:"table", tier:12,
-    icon:"🪓", needs:[["⬛ Незерит",3],["💎 Алмаз",1]] },
+    icon:"🪓", needs:[["⬛ Незеритовый слиток",3],["💎 Алмаз",1]] },
 
   { id:"shovelStone",  name:"Каменная лопата",   cat:"tool",   station:"table", tier:1,
     icon:"🥄", needs:[["🪨 Булыжник",1],["🌲 Дерево",2]] },
   { id:"shovelBone",   name:"Костяная лопата",   cat:"tool",   station:"hand",  tier:2,
-    icon:"🥄", needs:[["🦴 Осколок",1],["🌲 Дерево",2]] },
+    icon:"🥄", needs:[["🦴 Костный осколок",1],["🌲 Дерево",2]] },
   { id:"shovelCopper", name:"Медная лопата",     cat:"tool",   station:"table", tier:3,
-    icon:"🥄", needs:[["🟧 Медь",1],["🌲 Дерево",2]] },
+    icon:"🥄", needs:[["🟧 Медный слиток",1],["🌲 Дерево",2]] },
+  { id:"shovelTin",    name:"Оловянная лопата",  cat:"tool",   station:"table", tier:4,
+    icon:"🥄", needs:[["⬜ Оловянный слиток",1],["🌲 Дерево",2]] },
   { id:"shovelIron",   name:"Железная лопата",   cat:"tool",   station:"table", tier:5,
-    icon:"🥄", needs:[["⬜ Железо",1],["🌲 Дерево",2]] },
+    icon:"🥄", needs:[["⬜ Железный слиток",1],["🌲 Дерево",2]] },
   { id:"shovelSilver", name:"Серебряная лопата", cat:"tool",   station:"table", tier:6,
-    icon:"🥄", needs:[["⚪ Серебро",1],["🌲 Дерево",2]] },
+    icon:"🥄", needs:[["⚪ Серебряный слиток",1],["🌲 Дерево",2]] },
   { id:"shovelAmethyst",name:"Аметистовая лопата",cat:"tool",  station:"table", tier:7,
-    icon:"🥄", needs:[["🟣 Аметист",2],["⬜ Железо",1]] },
+    icon:"🥄", needs:[["🟣 Аметист",2],["⬜ Железный слиток",1]] },
   { id:"shovelEcho",   name:"Эхо-лопата",        cat:"tool",   station:"table", tier:8,
-    icon:"🥄", needs:[["🔊 Осколок",2],["🟣 Аметист",1]] },
+    icon:"🥄", needs:[["🔊 Осколок Эха",2],["🟣 Аметист",1]] },
   { id:"shovelMoon",   name:"Лунная лопата",     cat:"tool",   station:"table", tier:9,
-    icon:"🥄", needs:[["🌙 Лунный камень",2],["🔊 Осколок",1]] },
+    icon:"🥄", needs:[["🌙 Лунный камень",2],["🔊 Осколок Эха",1]] },
   { id:"shovelVoid",   name:"Пустотная лопата",  cat:"tool",   station:"table", tier:10,
     icon:"🥄", needs:[["🕳️ Пыль Пустоты",2],["🌙 Лунный камень",1]] },
   { id:"shovelDiamond",name:"Алмазная лопата",   cat:"tool",   station:"table", tier:11,
-    icon:"🥄", needs:[["💎 Алмаз",2],["⬛ Незерит",1]] },
+    icon:"🥄", needs:[["💎 Алмаз",2],["⬛ Незеритовый слиток",1]] },
 
   // ============ ОРУЖИЕ ============
   { id:"swordStone", name:"Каменный меч",        cat:"weapon", station:"table", tier:1,
     icon:"🗡️", needs:[["🪨 Булыжник",2],["🌲 Дерево",1]] },
   { id:"swordBone",  name:"Костяной меч",        cat:"weapon", station:"hand",  tier:2,
-    icon:"🗡️", needs:[["🦴 Осколок",2],["🌲 Дерево",1]] },
+    icon:"🗡️", needs:[["🦴 Костный осколок",2],["🌲 Дерево",1]] },
   { id:"swordCopper",name:"Медный меч",          cat:"weapon", station:"table", tier:3,
-    icon:"🗡️", needs:[["🟧 Медь",2],["🌲 Дерево",1]] },
+    icon:"🗡️", needs:[["🟧 Медный слиток",2],["🌲 Дерево",1]] },
   { id:"swordTin",   name:"Оловянный меч",       cat:"weapon", station:"table", tier:4,
-    icon:"🗡️", needs:[["⬜ Олово",2],["🌲 Дерево",1]] },
+    icon:"🗡️", needs:[["⬜ Оловянный слиток",2],["🌲 Дерево",1]] },
   { id:"swordIron",  name:"Железный меч",        cat:"weapon", station:"table", tier:5,
-    icon:"🗡️", needs:[["⬜ Железо",2],["🌲 Дерево",1]] },
+    icon:"🗡️", needs:[["⬜ Железный слиток",2],["🌲 Дерево",1]] },
   { id:"swordSilver",name:"Серебряный меч",      cat:"weapon", station:"table", tier:6,
-    icon:"🗡️", needs:[["⚪ Серебро",2],["🌲 Дерево",1]] },
+    icon:"🗡️", needs:[["⚪ Серебряный слиток",2],["🌲 Дерево",1]] },
   { id:"swordAmethyst",name:"Аметистовый меч",   cat:"weapon", station:"table", tier:7,
-    icon:"🗡️", needs:[["🟣 Аметист",2],["⬜ Железо",1]] },
+    icon:"🗡️", needs:[["🟣 Аметист",2],["⬜ Железный слиток",1]] },
   { id:"swordEcho",  name:"Эхо-меч",             cat:"weapon", station:"table", tier:8,
-    icon:"🗡️", needs:[["🔊 Осколок",2],["🟣 Аметист",1]] },
+    icon:"🗡️", needs:[["🔊 Осколок Эха",2],["🟣 Аметист",1]] },
   { id:"swordMoon",  name:"Лунный меч",          cat:"weapon", station:"table", tier:9,
-    icon:"🗡️", needs:[["🌙 Лунный камень",2],["🔊 Осколок",1]] },
+    icon:"🗡️", needs:[["🌙 Лунный камень",2],["🔊 Осколок Эха",1]] },
   { id:"swordVoid",  name:"Пустотный меч",       cat:"weapon", station:"table", tier:10,
     icon:"🗡️", needs:[["🕳️ Пыль Пустоты",2],["🌙 Лунный камень",1]] },
   { id:"swordDiamond",name:"Алмазный меч",       cat:"weapon", station:"table", tier:11,
-    icon:"🗡️", needs:[["💎 Алмаз",2],["⬛ Незерит",1]] },
+    icon:"🗡️", needs:[["💎 Алмаз",2],["⬛ Незеритовый слиток",1]] },
   { id:"swordNetherite",name:"Незеритовый меч",  cat:"weapon", station:"table", tier:12,
-    icon:"🗡️", needs:[["⬛ Незерит",2],["💎 Алмаз",1]] },
+    icon:"🗡️", needs:[["⬛ Незеритовый слиток",2],["💎 Алмаз",1]] },
   { id:"swordStar",  name:"Звёздный меч",        cat:"weapon", station:"table", tier:13,
-    icon:"🗡️", needs:[["⭐ Осколок звезды",2],["⬛ Незерит",1]] },
+    icon:"🗡️", needs:[["⭐ Осколок звезды",2],["⬛ Незеритовый слиток",1]] },
 
   { id:"spearWood",  name:"Деревянное копьё",    cat:"weapon", station:"hand",  tier:1,
     icon:"🔱", needs:[["🌲 Дерево",2],["🧵 Волокно",1]] },
   { id:"spearStone", name:"Каменное копьё",      cat:"weapon", station:"table", tier:1,
     icon:"🔱", needs:[["🪨 Булыжник",2],["🌲 Дерево",2]] },
   { id:"spearBone",  name:"Костяное копьё",      cat:"weapon", station:"hand",  tier:2,
-    icon:"🔱", needs:[["🦴 Осколок",2],["🌲 Дерево",2]] },
+    icon:"🔱", needs:[["🦴 Костный осколок",2],["🌲 Дерево",2]] },
   { id:"spearCopper",name:"Медное копьё",        cat:"weapon", station:"table", tier:3,
-    icon:"🔱", needs:[["🟧 Медь",2],["🌲 Дерево",2]] },
+    icon:"🔱", needs:[["🟧 Медный слиток",2],["🌲 Дерево",2]] },
+  { id:"spearTin",   name:"Оловянное копьё",     cat:"weapon", station:"table", tier:4,
+    icon:"🔱", needs:[["⬜ Оловянный слиток",2],["🌲 Дерево",2]] },
   { id:"spearIron",  name:"Железное копьё",      cat:"weapon", station:"table", tier:5,
-    icon:"🔱", needs:[["⬜ Железо",2],["🌲 Дерево",2]] },
+    icon:"🔱", needs:[["⬜ Железный слиток",2],["🌲 Дерево",2]] },
   { id:"spearSilver",name:"Серебряное копьё",    cat:"weapon", station:"table", tier:6,
-    icon:"🔱", needs:[["⚪ Серебро",2],["🌲 Дерево",2]] },
+    icon:"🔱", needs:[["⚪ Серебряный слиток",2],["🌲 Дерево",2]] },
   { id:"spearAmethyst",name:"Аметистовое копьё", cat:"weapon", station:"table", tier:7,
-    icon:"🔱", needs:[["🟣 Аметист",2],["⬜ Железо",1]] },
+    icon:"🔱", needs:[["🟣 Аметист",2],["⬜ Железный слиток",1]] },
   { id:"spearEcho",  name:"Эхо-копьё",           cat:"weapon", station:"table", tier:8,
-    icon:"🔱", needs:[["🔊 Осколок",2],["🟣 Аметист",1]] },
+    icon:"🔱", needs:[["🔊 Осколок Эха",2],["🟣 Аметист",1]] },
   { id:"spearMoon",  name:"Лунное копьё",        cat:"weapon", station:"table", tier:9,
-    icon:"🔱", needs:[["🌙 Лунный камень",2],["🔊 Осколок",1]] },
+    icon:"🔱", needs:[["🌙 Лунный камень",2],["🔊 Осколок Эха",1]] },
   { id:"spearVoid",  name:"Пустотное копьё",     cat:"weapon", station:"table", tier:10,
     icon:"🔱", needs:[["🕳️ Пыль Пустоты",2],["🌙 Лунный камень",1]] },
   { id:"spearDiamond",name:"Алмазное копьё",     cat:"weapon", station:"table", tier:11,
-    icon:"🔱", needs:[["💎 Алмаз",2],["⬛ Незерит",1]] },
+    icon:"🔱", needs:[["💎 Алмаз",2],["⬛ Незеритовый слиток",1]] },
   { id:"spearNetherite",name:"Незеритовое копьё",cat:"weapon", station:"table", tier:12,
-    icon:"🔱", needs:[["⬛ Незерит",2],["💎 Алмаз",1]] },
+    icon:"🔱", needs:[["⬛ Незеритовый слиток",2],["💎 Алмаз",1]] },
   { id:"spearStar",  name:"Звёздное копьё",      cat:"weapon", station:"table", tier:13,
-    icon:"🔱", needs:[["⭐ Осколок звезды",2],["⬛ Незерит",1]] },
+    icon:"🔱", needs:[["⭐ Осколок звезды",2],["⬛ Незеритовый слиток",1]] },
 
   { id:"bowShort",   name:"Короткий лук",        cat:"weapon", station:"table", tier:1,
     icon:"🏹", needs:[["🌲 Дерево",4],["🪡 Нить",2]] },
   { id:"bowLong",    name:"Длинный лук",         cat:"weapon", station:"table", tier:3,
     icon:"🏹", needs:[["🌲 Дерево",6],["🪡 Нить",4]] },
   { id:"bowComposite",name:"Составной лук",      cat:"weapon", station:"table", tier:5,
-    icon:"🏹", needs:[["🌲 Дерево",8],["🪡 Нить",6],["⬜ Железо",2]] },
+    icon:"🏹", needs:[["🌲 Дерево",8],["🪡 Нить",6],["⬜ Железный слиток",2]] },
   { id:"bowEcho",    name:"Эхо-лук",             cat:"weapon", station:"table", tier:7,
-    icon:"🏹", needs:[["🔊 Осколок",3],["🪡 Нить",6],["🟣 Аметист",2]] },
+    icon:"🏹", needs:[["🔊 Осколок Эха",3],["🪡 Нить",6],["🟣 Аметист",2]] },
   { id:"bowMoon",    name:"Лунный лук",          cat:"weapon", station:"table", tier:9,
-    icon:"🏹", needs:[["🌙 Лунный камень",3],["🪡 Нить",8],["🔊 Осколок",2]] },
+    icon:"🏹", needs:[["🌙 Лунный камень",3],["🪡 Нить",8],["🔊 Осколок Эха",2]] },
   { id:"bowVoid",    name:"Пустотный лук",       cat:"weapon", station:"table", tier:11,
     icon:"🏹", needs:[["🕳️ Пыль Пустоты",3],["🪡 Нить",10],["🌙 Лунный камень",2]] },
   { id:"bowStar",    name:"Звёздный лук",        cat:"weapon", station:"table", tier:13,
-    icon:"🏹", needs:[["⭐ Осколок звезды",3],["🪡 Нить",12],["⬛ Незерит",2]] },
+    icon:"🏹", needs:[["⭐ Осколок звезды",3],["🪡 Нить",12],["⬛ Незеритовый слиток",2]] },
 
-  { id:"arrow",      name:"Стрела ×8",           cat:"weapon", station:"table", tier:1,
+  { id:"arrow",      name:"Стрела ×4",           cat:"weapon", station:"table", tier:1,
     icon:"➡️", needs:[["🌲 Дерево",1],["🧵 Волокно",2],["🪶 Перо",1]] },
   { id:"arrowFire",  name:"Огненная стрела ×4",  cat:"weapon", station:"table", tier:3,
     icon:"🔥", needs:[["➡️ Стрела",4],["⚫ Уголь",2]] },
   { id:"arrowPoison",name:"Отравленная стрела ×4",cat:"weapon",station:"table", tier:3,
     icon:"☠️", needs:[["➡️ Стрела",4],["🍄 Гриб",2]] },
   { id:"arrowEcho",  name:"Эхо-стрела ×4",       cat:"weapon", station:"table", tier:7,
-    icon:"🔊", needs:[["➡️ Стрела",4],["🔊 Осколок",1]] },
+    icon:"🔊", needs:[["➡️ Стрела",4],["🔊 Осколок Эха",1]] },
   { id:"arrowMoon",  name:"Лунная стрела ×4",    cat:"weapon", station:"table", tier:9,
     icon:"🌙", needs:[["➡️ Стрела",4],["🌙 Лунный камень",1]] },
   { id:"arrowVoid",  name:"Пустотная стрела ×4", cat:"weapon", station:"table", tier:11,
@@ -733,46 +728,46 @@ const crafts = [
     icon:"👢", needs:[["🟤 Кожа",3]] },
 
   { id:"helmBone",   name:"Костяной шлем",       cat:"armor",  station:"table", tier:2,
-    icon:"💀", needs:[["🦴 Осколок",3]] },
+    icon:"💀", needs:[["🦴 Костный осколок",3]] },
   { id:"chestBone",  name:"Костяной панцирь",    cat:"armor",  station:"table", tier:2,
-    icon:"🦴", needs:[["🦴 Осколок",5]] },
+    icon:"🦴", needs:[["🦴 Костный осколок",5]] },
   { id:"bootsBone",  name:"Костяные накладки",   cat:"armor",  station:"table", tier:2,
-    icon:"🦿", needs:[["🦴 Осколок",3]] },
+    icon:"🦿", needs:[["🦴 Костный осколок",3]] },
 
   { id:"helmCopper", name:"Медный шлем",         cat:"armor",  station:"table", tier:3,
-    icon:"⛑️", needs:[["🟧 Медь",3]] },
+    icon:"⛑️", needs:[["🟧 Медный слиток",3]] },
   { id:"chestCopper",name:"Медный нагрудник",    cat:"armor",  station:"table", tier:3,
-    icon:"🟧", needs:[["🟧 Медь",5]] },
+    icon:"🟧", needs:[["🟧 Медный слиток",5]] },
   { id:"bootsCopper",name:"Медные сапоги",       cat:"armor",  station:"table", tier:3,
-    icon:"👢", needs:[["🟧 Медь",3]] },
+    icon:"👢", needs:[["🟧 Медный слиток",3]] },
 
   { id:"helmIron",   name:"Железный шлем",       cat:"armor",  station:"table", tier:5,
-    icon:"⛑️", needs:[["⬜ Железо",3]] },
+    icon:"⛑️", needs:[["⬜ Железный слиток",3]] },
   { id:"chestIron",  name:"Железный нагрудник",  cat:"armor",  station:"table", tier:5,
-    icon:"🦺", needs:[["⬜ Железо",5]] },
+    icon:"🦺", needs:[["⬜ Железный слиток",5]] },
   { id:"bootsIron",  name:"Железные сапоги",     cat:"armor",  station:"table", tier:5,
-    icon:"👢", needs:[["⬜ Железо",3]] },
+    icon:"👢", needs:[["⬜ Железный слиток",3]] },
 
   { id:"helmAmethyst",name:"Аметистовый шлем",   cat:"armor",  station:"table", tier:7,
-    icon:"🟣", needs:[["🟣 Аметист",3],["⬜ Железо",1]] },
+    icon:"🟣", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
   { id:"chestAmethyst",name:"Аметистовый нагрудник",cat:"armor",station:"table",tier:7,
-    icon:"🟣", needs:[["🟣 Аметист",5],["⬜ Железо",2]] },
+    icon:"🟣", needs:[["🟣 Аметист",5],["⬜ Железный слиток",2]] },
   { id:"bootsAmethyst",name:"Аметистовые сапоги",cat:"armor",  station:"table", tier:7,
-    icon:"👢", needs:[["🟣 Аметист",3],["⬜ Железо",1]] },
+    icon:"👢", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
 
   { id:"helmEcho",   name:"Эхо-шлем",            cat:"armor",  station:"table", tier:8,
-    icon:"🔊", needs:[["🔊 Осколок",3],["🟣 Аметист",1]] },
+    icon:"🔊", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]] },
   { id:"chestEcho",  name:"Эхо-нагрудник",       cat:"armor",  station:"table", tier:8,
-    icon:"🔊", needs:[["🔊 Осколок",5],["🟣 Аметист",2]] },
+    icon:"🔊", needs:[["🔊 Осколок Эха",5],["🟣 Аметист",2]] },
   { id:"bootsEcho",  name:"Эхо-сапоги",          cat:"armor",  station:"table", tier:8,
-    icon:"👢", needs:[["🔊 Осколок",3],["🟣 Аметист",1]] },
+    icon:"👢", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]] },
 
   { id:"helmMoon",   name:"Лунный шлем",         cat:"armor",  station:"table", tier:9,
-    icon:"🌙", needs:[["🌙 Лунный камень",3],["🔊 Осколок",1]] },
+    icon:"🌙", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]] },
   { id:"chestMoon",  name:"Лунный нагрудник",    cat:"armor",  station:"table", tier:9,
-    icon:"🌙", needs:[["🌙 Лунный камень",5],["🔊 Осколок",2]] },
+    icon:"🌙", needs:[["🌙 Лунный камень",5],["🔊 Осколок Эха",2]] },
   { id:"bootsMoon",  name:"Лунные сапоги",       cat:"armor",  station:"table", tier:9,
-    icon:"👢", needs:[["🌙 Лунный камень",3],["🔊 Осколок",1]] },
+    icon:"👢", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]] },
 
   { id:"helmVoid",   name:"Пустотный шлем",      cat:"armor",  station:"table", tier:10,
     icon:"🕳️", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]] },
@@ -782,18 +777,18 @@ const crafts = [
     icon:"👢", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]] },
 
   { id:"helmDiamond",name:"Алмазный шлем",       cat:"armor",  station:"table", tier:11,
-    icon:"💎", needs:[["💎 Алмаз",3],["⬛ Незерит",1]] },
+    icon:"💎", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
   { id:"chestDiamond",name:"Алмазный нагрудник", cat:"armor",  station:"table", tier:11,
-    icon:"💎", needs:[["💎 Алмаз",5],["⬛ Незерит",2]] },
+    icon:"💎", needs:[["💎 Алмаз",5],["⬛ Незеритовый слиток",2]] },
   { id:"bootsDiamond",name:"Алмазные сапоги",    cat:"armor",  station:"table", tier:11,
-    icon:"💎", needs:[["💎 Алмаз",3],["⬛ Незерит",1]] },
+    icon:"💎", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
 
   { id:"helmNetherite",name:"Незеритовый шлем",  cat:"armor",  station:"table", tier:12,
-    icon:"⬛", needs:[["⬛ Незерит",3]] },
+    icon:"⬛", needs:[["⬛ Незеритовый слиток",3]] },
   { id:"chestNetherite",name:"Незеритовый нагрудник",cat:"armor",station:"table",tier:12,
-    icon:"⬛", needs:[["⬛ Незерит",5]] },
+    icon:"⬛", needs:[["⬛ Незеритовый слиток",5]] },
   { id:"bootsNetherite",name:"Незеритовые сапоги",cat:"armor", station:"table", tier:12,
-    icon:"⬛", needs:[["⬛ Незерит",3]] },
+    icon:"⬛", needs:[["⬛ Незеритовый слиток",3]] },
 
   // ============ ЕДА ============
   { id:"bread",      name:"Хлеб",                cat:"food",   station:"hand",  tier:1,
@@ -817,11 +812,11 @@ const crafts = [
   { id:"potionHeal2",    name:"Зелье лечения II",  cat:"potion", station:"table", tier:6,
     icon:"🧪", needs:[["🧪 Зелье лечения",1],["🍎 Золотое яблоко",1]] },
   { id:"potionStrength", name:"Зелье силы",        cat:"potion", station:"table", tier:4,
-    icon:"🧪", needs:[["🦴 Осколок",2],["🔊 Осколок",1]] },
+    icon:"🧪", needs:[["🦴 Костный осколок",2],["🔊 Осколок Эха",1]] },
   { id:"potionStrength2",name:"Зелье силы II",     cat:"potion", station:"table", tier:7,
     icon:"🧪", needs:[["🧪 Зелье силы",1],["❤️ Рубин",1]] },
   { id:"potionSpeed",    name:"Зелье скорости",    cat:"potion", station:"table", tier:3,
-    icon:"🧪", needs:[["🪶 Перо",2],["🔊 Осколок",1]] },
+    icon:"🧪", needs:[["🪶 Перо",2],["🔊 Осколок Эха",1]] },
   { id:"potionSpeed2",   name:"Зелье скорости II", cat:"potion", station:"table", tier:6,
     icon:"🧪", needs:[["🧪 Зелье скорости",1],["🧡 Топаз",1]] },
   { id:"potionRegen",    name:"Зелье регенерации", cat:"potion", station:"table", tier:5,
@@ -865,7 +860,7 @@ const crafts = [
   { id:"fence",      name:"Забор ×6",            cat:"misc",   station:"hand",  tier:2,
     icon:"🚧", needs:[["🌲 Дерево",3],["🧵 Волокно",2]] },
   { id:"gate",       name:"Ворота",              cat:"misc",   station:"table", tier:2,
-    icon:"⛩️", needs:[["🌲 Дерево",4],["⬜ Железо",1]] },
+    icon:"⛩️", needs:[["🌲 Дерево",4],["⬜ Железный слиток",1]] },
   { id:"wall",       name:"Стена ×4",            cat:"misc",   station:"table", tier:3,
     icon:"🧱", needs:[["🪨 Булыжник",8]] },
   { id:"bed",        name:"Постель",             cat:"misc",   station:"table", tier:2,
@@ -881,7 +876,7 @@ const crafts = [
   { id:"brick",      name:"Кирпич",              cat:"block",  station:"hand",  tier:2,
     icon:"🧱", needs:[["🧱 Глина",2],["⚫ Уголь",1]] },
 
-  // ============ СЛИТКИ (плавка в кузне) ============
+  // ============ СЛИТКИ ============
   { id:"copperBar",  name:"Медный слиток",       cat:"misc",   station:"table", tier:3,
     icon:"🟧", needs:[["🟠 Медная руда",1],["⚫ Уголь",1]] },
   { id:"tinBar",     name:"Оловянный слиток",    cat:"misc",   station:"table", tier:4,
@@ -897,11 +892,11 @@ const crafts = [
 
   // ============ ОСОБЫЕ ============
   { id:"teleportScroll",name:"Свиток телепорта", cat:"misc",   station:"table", tier:4,
-    icon:"📜", needs:[["📄 Бумага",4],["🔊 Осколок",1],["🌙 Лунный камень",1]] },
+    icon:"📜", needs:[["📄 Бумага",4],["🔊 Осколок Эха",1],["🌙 Лунный камень",1]] },
   { id:"luckCharm",  name:"Амулет удачи",        cat:"misc",   station:"table", tier:5,
     icon:"🍀", needs:[["💚 Изумруд",2],["🟨 Золото",1],["🪡 Нить",2]] },
   { id:"strengthCharm",name:"Амулет силы",       cat:"misc",   station:"table", tier:5,
-    icon:"💪", needs:[["❤️ Рубин",2],["⬜ Железо",2],["🪡 Нить",2]] },
+    icon:"💪", needs:[["❤️ Рубин",2],["⬜ Железный слиток",2],["🪡 Нить",2]] },
   { id:"speedCharm", name:"Амулет скорости",     cat:"misc",   station:"table", tier:5,
     icon:"⚡", needs:[["🧡 Топаз",2],["🪶 Перо",4],["🪡 Нить",2]] },
   { id:"healthCharm",name:"Амулет здоровья",     cat:"misc",   station:"table", tier:5,
@@ -913,7 +908,7 @@ const crafts = [
   { id:"voidCharm",  name:"Амулет пустоты",      cat:"misc",   station:"table", tier:8,
     icon:"🕳️", needs:[["🕳️ Пыль Пустоты",6],["❤️ Рубин",4],["🪡 Нить",4]] },
   { id:"starCharm",  name:"Амулет звезды",       cat:"misc",   station:"table", tier:12,
-    icon:"⭐", needs:[["⭐ Осколок звезды",6],["⬛ Незерит",2],["🪡 Нить",6]] },
+    icon:"⭐", needs:[["⭐ Осколок звезды",6],["⬛ Незеритовый слиток",2],["🪡 Нить",6]] },
 ];
 
 /* =========================================================
@@ -921,11 +916,6 @@ const crafts = [
    ========================================================= */
 const escapeHtml = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-const CAT_LABEL = {
-  tool:"Инструменты", weapon:"Оружие", armor:"Броня",
-  food:"Еда", potion:"Зелья", block:"Блоки", misc:"Прочее"
-};
 
 // Парсим "🪨 Булыжник" → { emo:"🪨", name:"Булыжник" }
 function parseItem(s) {
@@ -941,18 +931,15 @@ let currentFilter = 'all';
 let currentSearch = '';
 
 function craftMatches(c, filter, query) {
-  // Категория
   if (filter === 'hand' && c.station !== 'hand') return false;
   if (filter === 'table' && c.station !== 'table') return false;
   if (['tool','weapon','armor','food','potion','block','misc'].includes(filter)) {
     if (c.cat !== filter) return false;
   }
-  // Поиск
   if (!query) return true;
   const q = query.toLowerCase().trim();
   if (c.name.toLowerCase().includes(q)) return true;
   if (c.id.toLowerCase().includes(q)) return true;
-  // по ингредиентам
   return c.needs.some(n => {
     const { name } = parseItem(n[0]);
     return name.toLowerCase().includes(q);
@@ -960,24 +947,22 @@ function craftMatches(c, filter, query) {
 }
 
 /* =========================================================
-   РЕНДЕР КАРТОЧКИ КРАФТА
+   РЕНДЕР КАРТОЧКИ
    ========================================================= */
 function renderCard(c) {
   const items = c.needs.map(n => parseItem(n[0]));
   const counts = c.needs.map(n => n[1]);
 
-  // Сетка: 1 строка, N столбцов
-  const cols = items.length;
-  const colPx = items.map((it, i) => {
+  const colPx = items.map((it) => {
     const len = [...it.emo].length;
     return Math.max(54, len * 28 + 24);
   });
 
-const slots = items.map((it, i) => {
-  const cnt = counts[i];
-  const badge = cnt > 1 ? `<span class="slot-count">${cnt}</span>` : '';
-  return `<div class="slot" data-name="${escapeHtml(it.name)} ×${cnt}">${escapeHtml(it.emo)}${badge}</div>`;
-}).join('');
+  const slots = items.map((it, i) => {
+    const cnt = counts[i];
+    const badge = cnt > 1 ? `<span class="slot-count">${cnt}</span>` : '';
+    return `<div class="slot" data-name="${escapeHtml(it.name)} ×${cnt}">${escapeHtml(it.emo)}${badge}</div>`;
+  }).join('');
 
   const gridStyle = `grid-template-columns: ${colPx.map(p => p + 'px').join(' ')};`;
 
@@ -992,10 +977,7 @@ const slots = items.map((it, i) => {
   return `
     <div class="recipe-card">
       <div class="recipe-head">
-        <div class="recipe-icon">
-          <span class="lv-tag">${CAT_LABEL[c.cat] || c.cat}</span>
-          ${escapeHtml(c.icon)}
-        </div>
+        <div class="recipe-icon">${escapeHtml(c.icon)}</div>
         <div class="recipe-info">
           <div class="recipe-name">${escapeHtml(c.name)}</div>
           <div class="recipe-meta">
@@ -1042,7 +1024,6 @@ function render(filter = 'all', query = '') {
     return;
   }
 
-  // Группировка по тирам
   const groups = {};
   filtered.forEach(c => {
     const t = c.tier || 0;
@@ -1076,7 +1057,11 @@ function render(filter = 'all', query = '') {
 function filterLabel(f) {
   if (f === 'hand') return 'Руками';
   if (f === 'table') return 'Стол';
-  return CAT_LABEL[f] || f;
+  const labels = {
+    tool:"Инструменты", weapon:"Оружие", armor:"Броня",
+    food:"Еда", potion:"Зелья", block:"Блоки", misc:"Прочее"
+  };
+  return labels[f] || f;
 }
 
 /* =========================================================
