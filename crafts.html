@@ -131,6 +131,27 @@
     margin-bottom: 24px;
     animation: cardIn 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
   }
+    /* ============ ИКОНКА ЧЕРТЕЖА ============ */
+  .blueprint-pill {
+    background: linear-gradient(135deg,
+      rgba(59, 130, 246, 0.20),
+      rgba(37, 99, 235, 0.10));
+    border-color: #3b82f6;
+    color: #60a5fa;
+
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    cursor: help;
+  }
+
+  html.light .blueprint-pill {
+    background: linear-gradient(135deg,
+      rgba(59, 130, 246, 0.14),
+      rgba(37, 99, 235, 0.06));
+    border-color: #2563eb;
+    color: #1d4ed8;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.20);
+  }
   @keyframes cardIn { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
   .search-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
   .search-input-wrap { flex: 1; min-width: 200px; position: relative; }
@@ -519,8 +540,13 @@ html.light .slot-count {
           <button class="chip active" data-table="all">Все</button>
           <button class="chip" data-table="0">✋ Руками</button>
           <button class="chip" data-table="1">🛠️ Стол ремесла</button>
-          <button class="chip" data-table="2">⚙️ Железный верстак</button>
-          <button class="chip" data-table="3">💎 Алмазный верстак</button>
+          <button class="chip" data-table="2">⚒️ Кузнечный стол</button>
+          <button class="chip" data-table="3">🏹 Стол стрелка</button>
+          <button class="chip" data-table="4">🍖 Кухонный стол</button>
+          <button class="chip" data-table="5">⚗️ Стол алхимика</button>
+          <button class="chip" data-table="6">💎 Ювелирный стол</button>
+          <button class="chip" data-table="7">📖 Стол чар</button>
+          <button class="chip" data-table="8">🎋 Стол призыва</button>
           <button class="chip" data-table="smelt">🔥 Кузня</button>
         </div>
       </div>
@@ -536,6 +562,7 @@ html.light .slot-count {
           <button class="chip" data-cat="potion">🧪 Зелья</button>
           <button class="chip" data-cat="block">🧱 Блоки</button>
           <button class="chip" data-cat="build">🏗️ Постройки</button>
+          <button class="chip" data-cat="charm">🍀 Амулеты</button>
           <button class="chip" data-cat="misc">📦 Прочее</button>
         </div>
       </div>
@@ -570,305 +597,499 @@ html.light .slot-count {
   </div>
 
 <script>
-/* =========================================================
-   ДАННЫЕ: КРАФТЫ И КУЗНЯ
-   =========================================================
-   cat        — tool | weapon | armor | food | potion | block | build | misc
-   tableLevel — 0=руками, 1=стол, 2=железный, 3=алмазный, "smelt"=кузня
-   tier       — 1..13
-   needs      — [[emoji + name, count], ...]
-   result     — что получается (для кузни)
-   ========================================================= */
-
 const crafts = [
   // ============================================================
-  // ============ TIER 1 =======================================
+  // ============ TIER 1 ========================================
   // ============================================================
-  // --- HANDCRAFT ---
-  { id:"table",         name:"Стол ремесла",         cat:"misc",   tableLevel:0, tier:1, icon:"🛠️", needs:[["🪵 Бревно",2]] },
-  { id:"campfire",      name:"Костёр",               cat:"misc",   tableLevel:0, tier:1, icon:"🔥",  needs:[["🪵 Бревно",3],["🪨 Булыжник",2]] },
-  { id:"torch",         name:"Факел ×4",             cat:"misc",   tableLevel:0, tier:1, icon:"🕯️", needs:[["🪵 Бревно",1],["⚫ Уголь",1]] },
-  { id:"sign",          name:"Табличка ×4",          cat:"misc",   tableLevel:0, tier:1, icon:"🪧", needs:[["🪵 Бревно",2]] },
-  { id:"chest",         name:"Сундук",               cat:"misc",   tableLevel:0, tier:1, icon:"📦", needs:[["🪵 Бревно",6]] },
-  { id:"paper",         name:"Бумага ×2",            cat:"misc",   tableLevel:0, tier:1, icon:"📄", needs:[["🧵 Волокно",3]] },
-  { id:"fence",         name:"Забор ×6",             cat:"build",  tableLevel:0, tier:1, icon:"🚧", needs:[["🪵 Бревно",3],["🧵 Волокно",2]] },
-  { id:"door",          name:"Дверь",                cat:"build",  tableLevel:0, tier:1, icon:"🚪", needs:[["🪵 Бревно",4]] },
-  { id:"spearWood",     name:"Деревянное копьё",     cat:"weapon", tableLevel:0, tier:1, icon:"🔱", needs:[["🪵 Бревно",2],["🧵 Волокно",1]] },
-  { id:"bread",         name:"Хлеб",                 cat:"food",   tableLevel:0, tier:1, icon:"🍞", needs:[["🌾 Пшеница",3],["🧂 Соль",1]] },
-  { id:"cookie",        name:"Печенье ×4",           cat:"food",   tableLevel:0, tier:1, icon:"🍪", needs:[["🌾 Пшеница",2],["🫐 Ягоды",1],["🧂 Соль",1]] },
-  { id:"fishingRodWood",name:"Деревянная удочка",    cat:"tool",   tableLevel:0, tier:1, icon:"🎣", needs:[["🪵 Бревно",3],["🧵 Волокно",2]] },
-  { id:"spikeBlock",    name:"Шипы ×4",              cat:"misc",   tableLevel:0, tier:1, icon:"⚔️", needs:[["⬜ Железный слиток",2],["🪨 Булыжник",2]] },
-  { id:"fireTrapBlock", name:"Огненная ловушка ×2",  cat:"misc",   tableLevel:0, tier:2, icon:"🔥", needs:[["⬜ Железный слиток",1],["🌫️ Пепел",4]] },
+  // --- РУКАМИ ---
+  { id:"table",          name:"Верстак",                   cat:"misc",   tableLevel:0, tier:1, icon:"🛠️", needs:[["🪵 Бревно",2]] },
+  { id:"tableCook",      name:"Кухонный стол",             cat:"misc",   tableLevel:0, tier:1, icon:"🍖", needs:[["🪵 Бревно",3],["🪨 Булыжник",2]] },
+  { id:"tableSmith",     name:"Кузнечный стол",            cat:"misc",   tableLevel:0, tier:1, icon:"⚒️", needs:[["🪵 Бревно",4],["🟧 Медный слиток",2],["🪨 Булыжник",4]] },
+  { id:"tableArcher",    name:"Стол стрелка",              cat:"misc",   tableLevel:0, tier:1, icon:"🏹", needs:[["🪵 Бревно",4],["🧵 Волокно",4],["🪡 Нить",2]] },
+  { id:"tableAlchemy",   name:"Стол алхимика",             cat:"misc",   tableLevel:0, tier:1, icon:"⚗️", needs:[["🪵 Бревно",4],["🔷 Стекло",4],["🌿 Трава",4],["🦴 Костный осколок",4]] },
+  { id:"campfire",       name:"Костёр",                    cat:"misc",   tableLevel:0, tier:1, icon:"🔥",  needs:[["🪵 Бревно",3],["🪨 Булыжник",2]] },
+  { id:"torch",          name:"Факел ×4",                  cat:"misc",   tableLevel:0, tier:1, icon:"🕯️", needs:[["🪵 Бревно",1],["⚫ Уголь",1]] },
+  { id:"sign",           name:"Табличка ×4",               cat:"misc",   tableLevel:0, tier:1, icon:"🪧", needs:[["🪵 Бревно",2]] },
+  { id:"chest",          name:"Сундук",                    cat:"misc",   tableLevel:0, tier:1, icon:"📦", needs:[["🪵 Бревно",6]] },
+  { id:"paper",          name:"Бумага ×2",                 cat:"misc",   tableLevel:0, tier:1, icon:"📄", needs:[["🧵 Волокно",3]] },
+  { id:"fence",          name:"Забор ×6",                  cat:"build",  tableLevel:0, tier:1, icon:"🚧", needs:[["🪵 Бревно",3],["🧵 Волокно",2]] },
+  { id:"door",           name:"Дверь",                     cat:"build",  tableLevel:0, tier:1, icon:"🚪", needs:[["🪵 Бревно",4]] },
+  { id:"spikeBlock",     name:"Шипы ×4",                   cat:"misc",   tableLevel:0, tier:1, icon:"⚔️", needs:[["⬜ Железный слиток",2],["🪨 Булыжник",2]] },
+  { id:"fireTrapBlock",  name:"Огненная ловушка ×2",       cat:"misc",   tableLevel:0, tier:1, icon:"🔥", needs:[["⬜ Железный слиток",1],["🌫️ Пепел",4]] },
+  { id:"coin",           name:"Монета",                    cat:"misc",   tableLevel:0, tier:1, icon:"🪙", needs:[["🟨 Золото",1]] },
+  { id:"string",         name:"Нить",                      cat:"misc",   tableLevel:0, tier:1, icon:"🪡", needs:[["🧵 Волокно",3]] },
+  { id:"cloth",          name:"Ткань",                     cat:"misc",   tableLevel:0, tier:1, icon:"🧶", needs:[["🧵 Волокно",4]] },
+  { id:"coal",           name:"Уголь",                     cat:"misc",   tableLevel:0, tier:1, icon:"⚫", needs:[["🪵 Бревно",2]] },
+  { id:"leather",        name:"Кожа",                      cat:"misc",   tableLevel:0, tier:1, icon:"🟤", needs:[["🍖 Сырое мясо",2],["🧂 Соль",1]] },
+  { id:"sprout",         name:"Росток",                    cat:"misc",   tableLevel:0, tier:1, icon:"🌱", needs:[["🪵 Бревно",1],["🧵 Волокно",2]] },
+  { id:"herb",           name:"Трава",                     cat:"misc",   tableLevel:0, tier:1, icon:"🌿", needs:[["🧵 Волокно",2],["🌸 Цветок",1]] },
+  { id:"book",           name:"Книга",                     cat:"misc",   tableLevel:0, tier:2, icon:"📕", needs:[["📄 Бумага",3],["🟤 Кожа",1]] },
+  { id:"keyWood",        name:"Деревянный ключ",           cat:"misc",   tableLevel:0, tier:1, icon:"🗝️", needs:[["🪵 Бревно",4],["🧵 Волокно",4]] },
+  { id:"treantBark",     name:"Кора древня",               cat:"misc",   tableLevel:0, tier:6, icon:"🌳", needs:[["🪵 Бревно",6],["🧵 Волокно",4]] },
+  { id:"wolfFang",       name:"Клык волка",                cat:"misc",   tableLevel:0, tier:5, icon:"🐺", needs:[["🦴 Костный осколок",3],["🟤 Кожа",2]] },
+  { id:"serpentScale",   name:"Чешуя змея",                cat:"misc",   tableLevel:0, tier:4, icon:"🐍", needs:[["🟤 Кожа",4],["🧵 Волокно",2]] },
+  { id:"spiderSilk",     name:"Паутинный шёлк",            cat:"misc",   tableLevel:0, tier:3, icon:"🕸️", needs:[["🪡 Нить",6],["🧵 Волокно",3]] },
 
-  // --- СТОЛ (tier 1) ---
-  { id:"pickStone",     name:"Каменная кирка",       cat:"tool",   tableLevel:1, tier:1, icon:"⛏️", needs:[["🪨 Булыжник",3],["🪵 Бревно",2]] },
-  { id:"axeStone",      name:"Каменный топор",       cat:"tool",   tableLevel:1, tier:1, icon:"🪓", needs:[["🪨 Булыжник",3],["🪵 Бревно",2]] },
-  { id:"shovelStone",   name:"Каменная лопата",      cat:"tool",   tableLevel:1, tier:1, icon:"🥄", needs:[["🪨 Булыжник",1],["🪵 Бревно",2]] },
-  { id:"swordStone",    name:"Каменный меч",         cat:"weapon", tableLevel:1, tier:1, icon:"🗡️", needs:[["🪨 Булыжник",2],["🪵 Бревно",1]] },
-  { id:"spearStone",    name:"Каменное копьё",       cat:"weapon", tableLevel:1, tier:1, icon:"🔱", needs:[["🪨 Булыжник",2],["🪵 Бревно",2]] },
-  { id:"bowShort",      name:"Короткий лук",         cat:"weapon", tableLevel:1, tier:1, icon:"🏹", needs:[["🪵 Бревно",4],["🪡 Нить",2]] },
-  { id:"arrow",         name:"Стрела ×4",            cat:"weapon", tableLevel:1, tier:1, icon:"➡️", needs:[["🪵 Бревно",1],["🧵 Волокно",2],["🪶 Перо",1]] },
-  { id:"capCloth",      name:"Тканевый капюшон",     cat:"armor",  tableLevel:1, tier:1, icon:"🧢", needs:[["🧶 Ткань",3]] },
-  { id:"vestCloth",     name:"Тканевый жилет",       cat:"armor",  tableLevel:1, tier:1, icon:"🦺", needs:[["🧶 Ткань",5]] },
-  { id:"bootsCloth",    name:"Тканевые ботинки",     cat:"armor",  tableLevel:1, tier:1, icon:"🥾", needs:[["🧶 Ткань",3]] },
-  { id:"capLeather",    name:"Кожаный шлем",         cat:"armor",  tableLevel:1, tier:1, icon:"🪖", needs:[["🟤 Кожа",3]] },
-  { id:"vestLeather",   name:"Кожаная куртка",       cat:"armor",  tableLevel:1, tier:1, icon:"🦺", needs:[["🟤 Кожа",5]] },
-  { id:"bootsLeather",  name:"Кожаные сапоги",       cat:"armor",  tableLevel:1, tier:1, icon:"👢", needs:[["🟤 Кожа",3]] },
-  { id:"keyWood",       name:"Деревянный ключ",      cat:"misc",   tableLevel:1, tier:1, icon:"🗝️", needs:[["🪵 Бревно",4],["🧵 Волокно",4]] },
-  { id:"heartLantern",  name:"Фонарь-сердце",        cat:"build",  tableLevel:1, tier:1, icon:"🏮", needs:[["⬜ Железный слиток",1],["🕯️ Факел",2]] },
-  { id:"luckCharm",     name:"Амулет удачи",         cat:"misc",   tableLevel:1, tier:1, icon:"🍀", needs:[["🟨 Золото",2],["🧵 Волокно",4],["🪡 Нить",2]] },
-  { id:"strengthCharm", name:"Амулет силы",          cat:"misc",   tableLevel:1, tier:1, icon:"💪", needs:[["⬜ Железный слиток",2],["🦴 Костный осколок",4],["🪡 Нить",2]] },
-  { id:"speedCharm",    name:"Амулет скорости",      cat:"misc",   tableLevel:1, tier:1, icon:"⚡", needs:[["🪶 Перо",6],["🧵 Волокно",4],["🪡 Нить",2]] },
-  { id:"potionHeal",    name:"Зелье лечения",        cat:"potion", tableLevel:1, tier:1, icon:"🧪", needs:[["🌸 Цветок",2],["🌿 Трава",2]] },
-  { id:"potionPoison",  name:"Зелье яда",            cat:"potion", tableLevel:1, tier:1, icon:"🧪", needs:[["🍄 Гриб",4],["🍄 Светогриб",2]] },
-  { id:"potionHaste",   name:"Зелье спешки",         cat:"potion", tableLevel:1, tier:1, icon:"🧪", needs:[["🟨 Золото",1],["⚫ Уголь",1]] },
-  { id:"potionGlow",    name:"Зелье свечения",       cat:"potion", tableLevel:1, tier:1, icon:"🧪", needs:[["🍄 Светогриб",3],["🟨 Золото",1]] },
+  // --- СТОЛ РЕМЕСЛА (tier 1) ---
+  { id:"pickStone",      name:"Каменная кирка",            cat:"tool",   tableLevel:1, tier:1, icon:"⛏️", needs:[["🪨 Булыжник",3],["🪵 Бревно",2]] },
+  { id:"axeStone",       name:"Каменный топор",            cat:"tool",   tableLevel:1, tier:1, icon:"🪓", needs:[["🪨 Булыжник",3],["🪵 Бревно",2]] },
+  { id:"shovelStone",    name:"Каменная лопата",           cat:"tool",   tableLevel:1, tier:1, icon:"🥄", needs:[["🪨 Булыжник",1],["🪵 Бревно",2]] },
+  { id:"swordStone",     name:"Каменный меч",              cat:"weapon", tableLevel:1, tier:1, icon:"🗡️", needs:[["🪨 Булыжник",2],["🪵 Бревно",1]] },
+  { id:"arrow",          name:"Стрела ×6",                 cat:"weapon", tableLevel:1, tier:1, icon:"➡️", needs:[["🪵 Бревно",1],["🧵 Волокно",2],["🪶 Перо",1]] },
+  { id:"bowShort",       name:"Короткий лук",              cat:"weapon", tableLevel:1, tier:1, icon:"🏹", needs:[["🪵 Бревно",4],["🪡 Нить",2]] },
+  { id:"bread",          name:"Хлеб",                      cat:"food",   tableLevel:1, tier:1, icon:"🍞", needs:[["🌾 Пшеница",3],["🧂 Соль",1]] },
+  { id:"cookedMeat",     name:"Жареное мясо",              cat:"food",   tableLevel:1, tier:1, icon:"🍗", needs:[["🍖 Сырое мясо",1],["⚫ Уголь",1]] },
+  { id:"cookedFish",     name:"Приготовленная рыба",       cat:"food",   tableLevel:1, tier:1, icon:"🐠", needs:[["🐟 Сырая рыба",1],["🧂 Соль",1],["⚫ Уголь",1]] },
+  { id:"charmWood",      name:"Деревянный амулет",         cat:"charm",  tableLevel:1, tier:1, icon:"🪵", needs:[["🪵 Бревно",2],["🪡 Нить",1]] },
+  { id:"charmStone",     name:"Каменный амулет",           cat:"charm",  tableLevel:1, tier:1, icon:"🪨", needs:[["🪨 Булыжник",3],["🪡 Нить",1]] },
+  { id:"charmBone",      name:"Костяной амулет",           cat:"charm",  tableLevel:1, tier:2, icon:"🦴", needs:[["🦴 Кость",2],["🪡 Нить",1]] },
+  { id:"charmHunterWeak",name:"Амулет охотника",           cat:"charm",  tableLevel:1, tier:2, icon:"🐺", needs:[["🟤 Кожа",3],["🪡 Нить",1]] },
+  { id:"charmRegenWeak", name:"Капля жизни",               cat:"charm",  tableLevel:1, tier:3, icon:"💚", needs:[["🌸 Цветок",4],["🪡 Нить",2]] },
+
+  // --- СТОЛ АЛХИМИКА (tier 1) ---
+  { id:"potionHeal",     name:"Зелье лечения",             cat:"potion", tableLevel:5, tier:1, icon:"🧪", needs:[["🌸 Цветок",2],["🌿 Трава",2]] },
+  { id:"potionPoison",   name:"Зелье яда",                 cat:"potion", tableLevel:5, tier:1, icon:"🧪", needs:[["🍄 Гриб",4],["🍄 Светогриб",2]] },
+  { id:"potionHaste",    name:"Зелье спешки",              cat:"potion", tableLevel:5, tier:1, icon:"🧪", needs:[["🟨 Золото",1],["⚫ Уголь",1]] },
+  { id:"potionGlow",     name:"Зелье свечения",            cat:"potion", tableLevel:5, tier:1, icon:"🧪", needs:[["🍄 Светогриб",3],["🟨 Золото",1]] },
 
   // --- КУЗНЯ (tier 1) ---
-  { id:"smelt_cookedMeat",name:"Жареное мясо ×4",   cat:"food",   tableLevel:"smelt", tier:1, icon:"🍗",
-    needs:[["🍖 Сырое мясо",1],["⚫ Уголь",1]], result:"🍗 Жареное мясо" },
-  { id:"smelt_cookedFish",name:"Приготовленная рыба ×4",cat:"food",tableLevel:"smelt", tier:1, icon:"🐠",
-    needs:[["🐟 Сырая рыба",1],["⚫ Уголь",1],["🧂 Соль",1]], result:"🐠 Приготовленная рыба" },
-  { id:"smelt_turf",    name:"Дёрн ×8",              cat:"block",  tableLevel:"smelt", tier:1, icon:"🌿",
-    needs:[["🟤 Грязь",1],["⚫ Уголь",1]], result:"🌿 Дёрн" },
-  { id:"smelt_boneShard",name:"Костный осколок ×8",  cat:"misc",   tableLevel:"smelt", tier:1, icon:"🦴",
-    needs:[["🦴 Кость",1],["⚫ Уголь",1]], result:"🦴 Костный осколок" },
+  { id:"smelt_copperBar",name:"Медный слиток ×3",          cat:"misc",   tableLevel:"smelt", tier:3, icon:"🟧", needs:[["🟠 Медная руда",1],["⚫ Уголь",1]], result:"🟧 Медный слиток" },
+  { id:"smelt_tinBar",   name:"Оловянный слиток ×2",       cat:"misc",   tableLevel:"smelt", tier:4, icon:"⬜", needs:[["⚙️ Оловянная руда",1],["⚫ Уголь",1]], result:"⬜ Оловянный слиток" },
+  { id:"smelt_ironBar",  name:"Железный слиток",           cat:"misc",   tableLevel:"smelt", tier:5, icon:"⬜", needs:[["🟫 Железная руда",1],["⚫ Уголь",1]], result:"⬜ Железный слиток" },
+  { id:"smelt_silverBar",name:"Серебряный слиток",         cat:"misc",   tableLevel:"smelt", tier:6, icon:"⚪", needs:[["⚪ Серебряная руда",1],["⚫ Уголь",1]], result:"⚪ Серебряный слиток" },
+  { id:"smelt_gold",     name:"Золото",                    cat:"misc",   tableLevel:"smelt", tier:6, icon:"🟨", needs:[["🪙 Золотая руда",1],["⚫ Уголь",2]], result:"🟨 Золото" },
+  { id:"smelt_netherite",name:"Незеритовый слиток",        cat:"misc",   tableLevel:"smelt", tier:12, icon:"⬛", needs:[["⬛ Незеритовый лом",2],["🟨 Золото",1],["⚫ Уголь",3]], result:"⬛ Незеритовый слиток" },
+  { id:"smelt_cookedMeat",name:"Жареное мясо ×4",          cat:"food",   tableLevel:"smelt", tier:1, icon:"🍗", needs:[["🍖 Сырое мясо",1],["⚫ Уголь",1]], result:"🍗 Жареное мясо" },
+  { id:"smelt_cookedFish",name:"Приготовленная рыба ×4",   cat:"food",   tableLevel:"smelt", tier:1, icon:"🐠", needs:[["🐟 Сырая рыба",1],["⚫ Уголь",1],["🧂 Соль",1]], result:"🐠 Приготовленная рыба" },
+  { id:"smelt_glass",    name:"Стекло ×8",                 cat:"block",  tableLevel:"smelt", tier:2, icon:"🔷", needs:[["🏖️ Песок",1],["⚫ Уголь",1]], result:"🔷 Стекло" },
+  { id:"smelt_turf",     name:"Дёрн ×8",                   cat:"block",  tableLevel:"smelt", tier:1, icon:"🌿", needs:[["🟤 Грязь",1],["⚫ Уголь",1]], result:"🌿 Дёрн" },
+  { id:"smelt_brick",    name:"Кирпич ×8",                 cat:"block",  tableLevel:"smelt", tier:2, icon:"🧱", needs:[["🧱 Глина",1],["⚫ Уголь",1]], result:"🧱 Кирпич" },
+  { id:"smelt_boneShard",name:"Костный осколок ×8",        cat:"misc",   tableLevel:"smelt", tier:1, icon:"🦴", needs:[["🦴 Кость",1],["⚫ Уголь",1]], result:"🦴 Костный осколок" },
 
   // ============================================================
-  // ============ TIER 2 =======================================
+  // ============ TIER 2 ========================================
   // ============================================================
-  { id:"pickBone",      name:"Костяная кирка",       cat:"tool",   tableLevel:0, tier:2, icon:"⛏️", needs:[["🦴 Костный осколок",3],["🪵 Бревно",2]] },
-  { id:"axeBone",       name:"Костяной топор",       cat:"tool",   tableLevel:0, tier:2, icon:"🪓", needs:[["🦴 Костный осколок",3],["🪵 Бревно",2]] },
-  { id:"shovelBone",    name:"Костяная лопата",      cat:"tool",   tableLevel:0, tier:2, icon:"🥄", needs:[["🦴 Костный осколок",1],["🪵 Бревно",2]] },
-  { id:"swordBone",     name:"Костяной меч",         cat:"weapon", tableLevel:0, tier:2, icon:"🗡️", needs:[["🦴 Костный осколок",2],["🪵 Бревно",1]] },
-  { id:"spearBone",     name:"Костяное копьё",       cat:"weapon", tableLevel:0, tier:2, icon:"🔱", needs:[["🦴 Костный осколок",2],["🪵 Бревно",2]] },
-  { id:"book",          name:"Книга",                cat:"misc",   tableLevel:0, tier:2, icon:"📕", needs:[["📄 Бумага",3],["🟤 Кожа",1]] },
-
-  { id:"bed",           name:"Постель",              cat:"build",  tableLevel:1, tier:2, icon:"🛏️", needs:[["🪵 Бревно",3],["🧶 Шерсть",3]] },
-  { id:"gate",          name:"Ворота",               cat:"build",  tableLevel:1, tier:2, icon:"⛩️", needs:[["🪵 Бревно",4],["⬜ Железный слиток",1]] },
-  { id:"tent",          name:"Палатка",              cat:"build",  tableLevel:1, tier:2, icon:"⛺", needs:[["🧶 Шерсть",4],["🪵 Бревно",2]] },
-  { id:"grave",         name:"Могила",               cat:"build",  tableLevel:1, tier:2, icon:"🪦", needs:[["🪨 Булыжник",2]] },
-  { id:"musicBox",      name:"Музыкальная шкатулка", cat:"build",  tableLevel:1, tier:2, icon:"🎵", needs:[["🪵 Бревно",4],["🟨 Золото",2]] },
-  { id:"pie",           name:"Пирог",                cat:"food",   tableLevel:1, tier:2, icon:"🥧", needs:[["🌾 Пшеница",2],["🫐 Ягоды",3],["🥚 Яйцо",1],["🧂 Соль",1]] },
-  { id:"soup",          name:"Похлёбка",             cat:"food",   tableLevel:1, tier:2, icon:"🥣", needs:[["🍄 Гриб",2],["🥕 Морковь",1],["🧂 Соль",1]] },
-  { id:"cake",          name:"Торт",                 cat:"food",   tableLevel:1, tier:2, icon:"🍰", needs:[["🌾 Пшеница",4],["🥚 Яйцо",2],["🥛 Молоко",1],["🫐 Ягоды",2],["🧂 Соль",1]] },
-
-  // --- КУЗНЯ (tier 2) ---
-  { id:"smelt_glass",   name:"Стекло ×8",            cat:"block",  tableLevel:"smelt", tier:2, icon:"🔷",
-    needs:[["🏖️ Песок",1],["⚫ Уголь",1]], result:"🔷 Стекло" },
-  { id:"smelt_brick",   name:"Кирпич ×8",            cat:"block",  tableLevel:"smelt", tier:2, icon:"🧱",
-    needs:[["🧱 Глина",1],["⚫ Уголь",1]], result:"🧱 Кирпич" },
+  { id:"pickBone",       name:"Костяная кирка",            cat:"tool",   tableLevel:2, tier:2, icon:"⛏️", needs:[["🦴 Костный осколок",3],["🪵 Бревно",2]] },
+  { id:"axeBone",        name:"Костяной топор",            cat:"tool",   tableLevel:2, tier:2, icon:"🪓", needs:[["🦴 Костный осколок",3],["🪵 Бревно",2]] },
+  { id:"shovelBone",     name:"Костяная лопата",           cat:"tool",   tableLevel:2, tier:2, icon:"🥄", needs:[["🦴 Костный осколок",1],["🪵 Бревно",2]] },
+  { id:"swordBone",      name:"Костяной меч",              cat:"weapon", tableLevel:2, tier:2, icon:"🗡️", needs:[["🦴 Костный осколок",2],["🪵 Бревно",1]] },
+  { id:"spearWood",      name:"Деревянное копьё",          cat:"weapon", tableLevel:2, tier:1, icon:"🔱", needs:[["🪵 Бревно",2],["🧵 Волокно",1]] },
+  { id:"spearBone",      name:"Костяное копьё",            cat:"weapon", tableLevel:2, tier:2, icon:"🔱", needs:[["🦴 Костный осколок",2],["🪵 Бревно",2]] },
+  { id:"pie",            name:"Пирог",                     cat:"food",   tableLevel:4, tier:1, icon:"🥧", needs:[["🌾 Пшеница",2],["🫐 Ягоды",3],["🥚 Яйцо",1],["🧂 Соль",1]] },
+  { id:"soup",           name:"Похлёбка",                  cat:"food",   tableLevel:4, tier:1, icon:"🥣", needs:[["🍄 Гриб",2],["🥕 Морковь",1],["🧂 Соль",1]] },
+  { id:"bed",            name:"Постель",                   cat:"build",  tableLevel:1, tier:2, icon:"🛏️", needs:[["🪵 Бревно",3],["🧶 Шерсть",3]] },
+  { id:"gate",           name:"Ворота",                    cat:"build",  tableLevel:1, tier:2, icon:"⛩️", needs:[["🪵 Бревно",4],["⬜ Железный слиток",1]] },
+  { id:"tent",           name:"Палатка",                   cat:"build",  tableLevel:1, tier:2, icon:"⛺", needs:[["🧶 Шерсть",4],["🪵 Бревно",2]] },
+  { id:"musicBox",       name:"Музыкальная шкатулка",      cat:"build",  tableLevel:1, tier:2, icon:"🎵", needs:[["🪵 Бревно",4],["🟨 Золото",2]] },
+  { id:"potionSpeed",    name:"Зелье скорости",            cat:"potion", tableLevel:5, tier:3, icon:"🧪", needs:[["🪶 Перо",2],["🔊 Осколок Эха",1]] },
+  { id:"potionNightVision",name:"Зелье ночного зрения",    cat:"potion", tableLevel:5, tier:4, icon:"🧪", needs:[["🌛 Лунный лепесток",1],["🍄 Светогриб",2]] },
+  { id:"potionJump",     name:"Зелье прыгучести",          cat:"potion", tableLevel:5, tier:4, icon:"🧪", needs:[["🪶 Перо",4],["🧡 Топаз",1]] },
+  { id:"potionWeak",     name:"Зелье слабости",            cat:"potion", tableLevel:5, tier:4, icon:"🧪", needs:[["💠 Кристалл. лепесток",2],["🟣 Аметист",1]] },
+  { id:"potionSlow",     name:"Зелье замедления",          cat:"potion", tableLevel:5, tier:4, icon:"🧪", needs:[["🧱 Глина",4],["💙 Сапфир",1]] },
 
   // ============================================================
-  // ============ TIER 3 =======================================
+  // ============ TIER 3 ========================================
   // ============================================================
-  { id:"pickCopper",    name:"Медная кирка",         cat:"tool",   tableLevel:1, tier:3, icon:"⛏️", needs:[["🟧 Медный слиток",3],["🪵 Бревно",2]] },
-  { id:"axeCopper",     name:"Медный топор",         cat:"tool",   tableLevel:1, tier:3, icon:"🪓", needs:[["🟧 Медный слиток",3],["🪵 Бревно",2]] },
-  { id:"shovelCopper",  name:"Медная лопата",        cat:"tool",   tableLevel:1, tier:3, icon:"🥄", needs:[["🟧 Медный слиток",1],["🪵 Бревно",2]] },
-  { id:"fishingRodCopper",name:"Медная удочка",      cat:"tool",   tableLevel:1, tier:3, icon:"🎣", needs:[["🪵 Бревно",3],["🧵 Волокно",2],["🟧 Медный слиток",1]] },
-  { id:"swordCopper",   name:"Медный меч",           cat:"weapon", tableLevel:1, tier:3, icon:"🗡️", needs:[["🟧 Медный слиток",2],["🪵 Бревно",1]] },
-  { id:"spearCopper",   name:"Медное копьё",         cat:"weapon", tableLevel:1, tier:3, icon:"🔱", needs:[["🟧 Медный слиток",2],["🪵 Бревно",2]] },
-  { id:"bowLong",       name:"Длинный лук",          cat:"weapon", tableLevel:1, tier:3, icon:"🏹", needs:[["🪵 Бревно",6],["🪡 Нить",4]] },
-  { id:"arrowFire",     name:"Огненная стрела ×4",   cat:"weapon", tableLevel:1, tier:3, icon:"🔥", needs:[["➡️ Стрела",4],["⚫ Уголь",2]] },
-  { id:"arrowPoison",   name:"Отравленная стрела ×4",cat:"weapon", tableLevel:1, tier:3, icon:"☠️", needs:[["➡️ Стрела",4],["🍄 Гриб",2]] },
-  { id:"helmCopper",    name:"Медный шлем",          cat:"armor",  tableLevel:1, tier:3, icon:"⛑️", needs:[["🟧 Медный слиток",3]] },
-  { id:"chestCopper",   name:"Медный нагрудник",     cat:"armor",  tableLevel:1, tier:3, icon:"🟧", needs:[["🟧 Медный слиток",5]] },
-  { id:"bootsCopper",   name:"Медные сапоги",        cat:"armor",  tableLevel:1, tier:3, icon:"👢", needs:[["🟧 Медный слиток",3]] },
-  { id:"forge",         name:"Кузня",                cat:"build",  tableLevel:1, tier:3, icon:"🔥",  needs:[["🪨 Булыжник",6],["⚫ Уголь",2]] },
-  { id:"wall",          name:"Стена ×4",             cat:"build",  tableLevel:1, tier:3, icon:"🧱", needs:[["🪨 Булыжник",8]] },
-  { id:"bookshelf",     name:"Книжная полка",        cat:"build",  tableLevel:1, tier:3, icon:"📚", needs:[["🪵 Бревно",6],["📄 Бумага",3],["📕 Книга",1]] },
-  { id:"lanternPost",   name:"Фонарный столб",       cat:"build",  tableLevel:1, tier:3, icon:"🏮", needs:[["⬜ Железный слиток",1],["🕯️ Факел",2]] },
-  { id:"bridge",        name:"Мост ×2",              cat:"build",  tableLevel:1, tier:3, icon:"🌉", needs:[["🪵 Бревно",4],["🪨 Булыжник",4]] },
-  { id:"fountain",      name:"Фонтан",               cat:"build",  tableLevel:1, tier:3, icon:"⛲", needs:[["🪨 Булыжник",6]] },
-  { id:"well",          name:"Колодец",              cat:"build",  tableLevel:1, tier:3, icon:"⛲", needs:[["🪨 Булыжник",8]] },
-  { id:"tradePost",     name:"Торговый пост",        cat:"misc",   tableLevel:1, tier:3, icon:"🏪", needs:[["🪵 Бревно",6],["💚 Изумруд",2]] },
-  { id:"keyIron",       name:"Железный ключ",        cat:"misc",   tableLevel:2, tier:3, icon:"🗝️", needs:[["⬜ Железный слиток",3],["🟨 Золото",2]] },
-  { id:"heartLamp",     name:"Лампа-сердце",         cat:"misc",   tableLevel:3, tier:3, icon:"❤️", needs:[["❤️ Рубин",1],["🟨 Золото",2],["🔊 Осколок Эха",1]] },
-  { id:"potionSpeed",   name:"Зелье скорости",       cat:"potion", tableLevel:2, tier:3, icon:"🧪", needs:[["🪶 Перо",2],["🔊 Осколок Эха",1]] },
-
-  // --- КУЗНЯ (tier 3) ---
-  { id:"smelt_copperBar", name:"Медный слиток ×3",   cat:"misc",   tableLevel:"smelt", tier:3, icon:"🟧",
-    needs:[["🟠 Медная руда",1],["⚫ Уголь",1]], result:"🟧 Медный слиток" },
+  { id:"pickCopper",     name:"Медная кирка",              cat:"tool",   tableLevel:2, tier:3, icon:"⛏️", needs:[["🟧 Медный слиток",3],["🪵 Бревно",2]] },
+  { id:"axeCopper",      name:"Медный топор",              cat:"tool",   tableLevel:2, tier:3, icon:"🪓", needs:[["🟧 Медный слиток",3],["🪵 Бревно",2]] },
+  { id:"shovelCopper",   name:"Медная лопата",             cat:"tool",   tableLevel:2, tier:3, icon:"🥄", needs:[["🟧 Медный слиток",1],["🪵 Бревно",2]] },
+  { id:"fishingRodCopper",name:"Медная удочка",            cat:"tool",   tableLevel:3, tier:3, icon:"🎣", needs:[["🪵 Бревно",3],["🧵 Волокно",2],["🟧 Медный слиток",1]] },
+  { id:"swordCopper",    name:"Медный меч",                cat:"weapon", tableLevel:2, tier:3, icon:"🗡️", needs:[["🟧 Медный слиток",2],["🪵 Бревно",1]] },
+  { id:"spearCopper",    name:"Медное копьё",              cat:"weapon", tableLevel:2, tier:3, icon:"🔱", needs:[["🟧 Медный слиток",2],["🪵 Бревно",2]] },
+  { id:"bowLong",        name:"Длинный лук",               cat:"weapon", tableLevel:3, tier:3, icon:"🏹", needs:[["🪵 Бревно",6],["🪡 Нить",4]] },
+  { id:"arrowFire",      name:"Огненная стрела ×4",        cat:"weapon", tableLevel:3, tier:3, icon:"🔥", needs:[["➡️ Стрела",4],["⚫ Уголь",2]] },
+  { id:"arrowPoison",    name:"Отравленная стрела ×4",     cat:"weapon", tableLevel:3, tier:3, icon:"☠️", needs:[["➡️ Стрела",4],["🍄 Гриб",2]] },
+  { id:"helmCopper",     name:"Медный шлем",               cat:"armor",  tableLevel:2, tier:3, icon:"⛑️", needs:[["🟧 Медный слиток",3]] },
+  { id:"chestCopper",    name:"Медный нагрудник",          cat:"armor",  tableLevel:2, tier:3, icon:"🟧", needs:[["🟧 Медный слиток",5]] },
+  { id:"bootsCopper",    name:"Медные сапоги",             cat:"armor",  tableLevel:2, tier:3, icon:"👢", needs:[["🟧 Медный слиток",3]] },
+  { id:"forge",          name:"Кузня",                     cat:"build",  tableLevel:2, tier:3, icon:"🔥",  needs:[["🪨 Булыжник",6],["⚫ Уголь",2]] },
+  { id:"wall",           name:"Стена ×4",                  cat:"build",  tableLevel:1, tier:3, icon:"🧱", needs:[["🪨 Булыжник",8]] },
+  { id:"bookshelf",      name:"Книжная полка",             cat:"build",  tableLevel:2, tier:3, icon:"📚", needs:[["🪵 Бревно",6],["📄 Бумага",3],["📕 Книга",1]] },
+  { id:"lanternPost",    name:"Фонарный столб",            cat:"build",  tableLevel:1, tier:3, icon:"🏮", needs:[["⬜ Железный слиток",1],["🕯️ Факел",2]] },
+  { id:"bridge",         name:"Мост ×2",                   cat:"build",  tableLevel:1, tier:3, icon:"🌉", needs:[["🪵 Бревно",4],["🪨 Булыжник",4]] },
+  { id:"fountain",       name:"Фонтан",                    cat:"build",  tableLevel:1, tier:3, icon:"⛲", needs:[["🪨 Булыжник",6]] },
+  { id:"well",           name:"Колодец",                   cat:"build",  tableLevel:1, tier:3, icon:"⛲", needs:[["🪨 Булыжник",8]] },
+  { id:"tradePost",      name:"Торговый пост",             cat:"misc",   tableLevel:1, tier:3, icon:"🏪", needs:[["🪵 Бревно",6],["💚 Изумруд",2]] },
+  { id:"keyIron",        name:"Железный ключ",             cat:"misc",   tableLevel:2, tier:3, icon:"🗝️", needs:[["⬜ Железный слиток",3],["🟨 Золото",2]] },
+  { id:"strengthCharm",  name:"Амулет силы",               cat:"charm",  tableLevel:6, tier:4, icon:"💪", needs:[["🟧 Медный слиток",2],["🦴 Костный осколок",4],["🪡 Нить",2]] },
+  { id:"speedCharm",     name:"Амулет скорости",           cat:"charm",  tableLevel:6, tier:4, icon:"⚡", needs:[["🪶 Перо",6],["🧵 Волокно",4],["🪡 Нить",2]] },
+  { id:"luckCharm",      name:"Амулет удачи",              cat:"charm",  tableLevel:6, tier:3, icon:"🍀", needs:[["🟨 Золото",2],["🧵 Волокно",4],["🪡 Нить",2]] },
+  { id:"charmCritWeak",  name:"Знак снайпера",             cat:"charm",  tableLevel:6, tier:3, icon:"🎯", needs:[["🪶 Перо",2],["🟧 Медный слиток",1]] },
 
   // ============================================================
-  // ============ TIER 4 =======================================
+  // ============ TIER 4 ========================================
   // ============================================================
-  { id:"pickTin",       name:"Оловянная кирка",      cat:"tool",   tableLevel:1, tier:4, icon:"⛏️", needs:[["⬜ Оловянный слиток",3],["🪵 Бревно",2]] },
-  { id:"axeTin",        name:"Оловянный топор",      cat:"tool",   tableLevel:1, tier:4, icon:"🪓", needs:[["⬜ Оловянный слиток",3],["🪵 Бревно",2]] },
-  { id:"shovelTin",     name:"Оловянная лопата",     cat:"tool",   tableLevel:1, tier:4, icon:"🥄", needs:[["⬜ Оловянный слиток",1],["🪵 Бревно",2]] },
-  { id:"swordTin",      name:"Оловянный меч",        cat:"weapon", tableLevel:1, tier:4, icon:"🗡️", needs:[["⬜ Оловянный слиток",2],["🪵 Бревно",1]] },
-  { id:"spearTin",      name:"Оловянное копьё",      cat:"weapon", tableLevel:1, tier:4, icon:"🔱", needs:[["⬜ Оловянный слиток",2],["🪵 Бревно",2]] },
-  { id:"barn",          name:"Амбар",                cat:"build",  tableLevel:2, tier:4, icon:"🏚️", needs:[["🪵 Бревно",12],["🪨 Булыжник",6]] },
-  { id:"mill",          name:"Мельница",             cat:"build",  tableLevel:2, tier:4, icon:"🌬️", needs:[["🪵 Бревно",8],["🪨 Булыжник",6]] },
-  { id:"smithy",        name:"Кузница",              cat:"build",  tableLevel:2, tier:4, icon:"🔨", needs:[["🪨 Булыжник",10],["⬜ Железный слиток",4]] },
-  { id:"inn",           name:"Постоялый двор",       cat:"build",  tableLevel:2, tier:4, icon:"🏠", needs:[["🪵 Бревно",12],["🧶 Шерсть",4]] },
-  { id:"marketStall",   name:"Рыночный лоток",       cat:"build",  tableLevel:2, tier:4, icon:"🏪", needs:[["🪵 Бревно",4],["🧶 Шерсть",2]] },
-  { id:"teleportScroll",name:"Свиток телепорта",     cat:"misc",   tableLevel:2, tier:4, icon:"📜", needs:[["📄 Бумага",4],["🔊 Осколок Эха",1],["🌙 Лунный камень",1]] },
-  { id:"nightVisionCharm",name:"Амулет ночного зрения",cat:"misc", tableLevel:2, tier:4, icon:"🌙", needs:[["🌛 Лунный лепесток",4],["🟨 Золото",2],["🪡 Нить",2]] },
-  { id:"potionStrength",name:"Зелье силы",           cat:"potion", tableLevel:2, tier:4, icon:"🧪", needs:[["🦴 Костный осколок",2],["🔊 Осколок Эха",1]] },
-  { id:"potionNightVision",name:"Зелье ночного зрения",cat:"potion",tableLevel:2, tier:4, icon:"🧪", needs:[["🌛 Лунный лепесток",1],["🍄 Светогриб",2]] },
-  { id:"potionWaterBreath",name:"Зелье дыхания",     cat:"potion", tableLevel:2, tier:4, icon:"🧪", needs:[["💙 Сапфир",1],["🍄 Светогриб",1]] },
-  { id:"potionJump",    name:"Зелье прыгучести",     cat:"potion", tableLevel:2, tier:4, icon:"🧪", needs:[["🪶 Перо",4],["🧡 Топаз",1]] },
-  { id:"potionWeak",    name:"Зелье слабости",       cat:"potion", tableLevel:2, tier:4, icon:"🧪", needs:[["💠 Кристалл. лепесток",2],["🟣 Аметист",1]] },
-  { id:"potionSlow",    name:"Зелье замедления",     cat:"potion", tableLevel:2, tier:4, icon:"🧪", needs:[["🧱 Глина",4],["💙 Сапфир",1]] },
-  { id:"healthCharm",   name:"Амулет здоровья",      cat:"misc",   tableLevel:2, tier:4, icon:"❤️", needs:[["❤️ Рубин",1],["💙 Сапфир",1],["🟨 Золото",4]] },
-  { id:"fireCharm",     name:"Амулет огня",          cat:"misc",   tableLevel:2, tier:4, icon:"🔥", needs:[["❤️ Рубин",2],["🌹 Пепельный лепесток",2],["🪡 Нить",2]] },
-
-  // --- КУЗНЯ (tier 4) ---
-  { id:"smelt_tinBar",  name:"Оловянный слиток ×2",  cat:"misc",   tableLevel:"smelt", tier:4, icon:"⬜",
-    needs:[["⚙️ Оловянная руда",1],["⚫ Уголь",1]], result:"⬜ Оловянный слиток" },
+  { id:"pickTin",        name:"Оловянная кирка",           cat:"tool",   tableLevel:2, tier:4, icon:"⛏️", needs:[["⬜ Оловянный слиток",3],["🪵 Бревно",2]] },
+  { id:"axeTin",         name:"Оловянный топор",           cat:"tool",   tableLevel:2, tier:4, icon:"🪓", needs:[["⬜ Оловянный слиток",3],["🪵 Бревно",2]] },
+  { id:"shovelTin",      name:"Оловянная лопата",          cat:"tool",   tableLevel:2, tier:4, icon:"🥄", needs:[["⬜ Оловянный слиток",1],["🪵 Бревно",2]] },
+  { id:"swordTin",       name:"Оловянный меч",             cat:"weapon", tableLevel:2, tier:4, icon:"🗡️", needs:[["⬜ Оловянный слиток",2],["🪵 Бревно",1]] },
+  { id:"barn",           name:"Амбар",                     cat:"build",  tableLevel:2, tier:4, icon:"🏚️", needs:[["🪵 Бревно",12],["🪨 Булыжник",6]] },
+  { id:"mill",           name:"Мельница",                  cat:"build",  tableLevel:2, tier:4, icon:"🌬️", needs:[["🪵 Бревно",8],["🪨 Булыжник",6]] },
+  { id:"smithy",         name:"Кузница",                   cat:"build",  tableLevel:2, tier:4, icon:"🔨", needs:[["🪨 Булыжник",10],["⬜ Железный слиток",4]] },
+  { id:"inn",            name:"Постоялый двор",            cat:"build",  tableLevel:2, tier:4, icon:"🏠", needs:[["🪵 Бревно",12],["🧶 Шерсть",4]] },
+  { id:"marketStall",    name:"Рыночный лоток",            cat:"build",  tableLevel:2, tier:4, icon:"🏪", needs:[["🪵 Бревно",4],["🧶 Шерсть",2]] },
+  { id:"teleportScroll", name:"Свиток телепорта",          cat:"misc",   tableLevel:2, tier:4, icon:"📜", needs:[["📄 Бумага",4],["🔊 Осколок Эха",1],["🌙 Лунный камень",1]] },
+  { id:"potionStrength", name:"Зелье силы",                cat:"potion", tableLevel:5, tier:4, icon:"🧪", needs:[["🦴 Костный осколок",2],["🔊 Осколок Эха",1]] },
+  { id:"potionWaterBreath", name:"Зелье дыхания воды",     cat:"potion", tableLevel:5, tier:4, icon:"🧪", needs:[["💙 Сапфир",1],["🍄 Светогриб",1]] },
+  { id:"charmMiner",     name:"Кирка рудокопа",            cat:"charm",  tableLevel:6, tier:4, icon:"⛏️", needs:[["🪨 Булыжник",8],["⬜ Железный слиток",1],["🪡 Нить",2]] },
+  { id:"charmFisher",    name:"Поплавок",                  cat:"charm",  tableLevel:6, tier:4, icon:"🎣", needs:[["🪶 Перо",3],["🧵 Волокно",2],["🪡 Нить",2]] },
+  { id:"charmFarmer",    name:"Серп",                      cat:"charm",  tableLevel:6, tier:4, icon:"🌾", needs:[["🌾 Пшеница",4],["🪵 Бревно",2],["🪡 Нить",1]] },
+  { id:"charmLumberjack", name:"Топор лесоруба",           cat:"charm",  tableLevel:6, tier:4, icon:"🪓", needs:[["🪵 Бревно",3],["⬜ Железный слиток",2],["🪡 Нить",2]] },
+  { id:"dungeonKeyShard", name:"Ключ Осколка",             cat:"misc",   tableLevel:3, tier:4, icon:"🔑", needs:[["🟣 Аметист",5],["🗝️ Кристальный ключ",1]] },
 
   // ============================================================
-  // ============ TIER 5 =======================================
+  // ============ TIER 5 ========================================
   // ============================================================
-  { id:"tableIron",     name:"Железный верстак",     cat:"misc",   tableLevel:1, tier:5, icon:"⚙️", needs:[["🛠️ Стол ремесла",1],["⬜ Железный слиток",3],["⚒️ Наковальня",1]] },
-  { id:"pickIron",      name:"Железная кирка",       cat:"tool",   tableLevel:2, tier:5, icon:"⛏️", needs:[["⬜ Железный слиток",3],["🪵 Бревно",2]] },
-  { id:"axeIron",       name:"Железный топор",       cat:"tool",   tableLevel:2, tier:5, icon:"🪓", needs:[["⬜ Железный слиток",3],["🪵 Бревно",2]] },
-  { id:"shovelIron",    name:"Железная лопата",      cat:"tool",   tableLevel:2, tier:5, icon:"🥄", needs:[["⬜ Железный слиток",1],["🪵 Бревно",2]] },
-  { id:"fishingRodIron",name:"Железная удочка",      cat:"tool",   tableLevel:2, tier:5, icon:"🎣", needs:[["🪵 Бревно",3],["🧵 Волокно",3],["⬜ Железный слиток",1]] },
-  { id:"swordIron",     name:"Железный меч",         cat:"weapon", tableLevel:2, tier:5, icon:"🗡️", needs:[["⬜ Железный слиток",2],["🪵 Бревно",1]] },
-  { id:"spearIron",     name:"Железное копьё",       cat:"weapon", tableLevel:2, tier:5, icon:"🔱", needs:[["⬜ Железный слиток",2],["🪵 Бревно",2]] },
-  { id:"bowComposite",  name:"Составной лук",        cat:"weapon", tableLevel:2, tier:5, icon:"🏹", needs:[["🪵 Бревно",8],["🪡 Нить",6],["⬜ Железный слиток",2]] },
-  { id:"helmIron",      name:"Железный шлем",        cat:"armor",  tableLevel:2, tier:5, icon:"⛑️", needs:[["⬜ Железный слиток",3]] },
-  { id:"chestIron",     name:"Железный нагрудник",   cat:"armor",  tableLevel:2, tier:5, icon:"🦺", needs:[["⬜ Железный слиток",5]] },
-  { id:"bootsIron",     name:"Железные сапоги",      cat:"armor",  tableLevel:2, tier:5, icon:"👢", needs:[["⬜ Железный слиток",3]] },
-  { id:"alchemyTable",  name:"Стол алхимика",        cat:"misc",   tableLevel:1, tier:5, icon:"⚗️", needs:[["🪵 Бревно",4],["🔷 Стекло",4],["🟨 Золото",2]] },
-  { id:"anvil",         name:"Наковальня",           cat:"misc",   tableLevel:1, tier:5, icon:"⚒️", needs:[["⬜ Железный слиток",5],["🪨 Булыжник",4]] },
-  { id:"watchtower",    name:"Смотровая башня",      cat:"build",  tableLevel:2, tier:5, icon:"🗼", needs:[["🪵 Бревно",10],["⬜ Железный слиток",4]] },
-  { id:"keyGold",       name:"Золотой ключ",         cat:"misc",   tableLevel:3, tier:5, icon:"🗝️", needs:[["🟨 Золото",6],["💚 Изумруд",1]] },
-  { id:"potionRegen",   name:"Зелье регенерации",    cat:"potion", tableLevel:3, tier:5, icon:"🧪", needs:[["🌛 Лунный лепесток",2],["🌙 Лунный камень",1]] },
-  { id:"potionResist",  name:"Зелье сопротивления",  cat:"potion", tableLevel:3, tier:5, icon:"🧪", needs:[["💠 Кристалл. лепесток",2],["🟣 Аметист",1]] },
-  { id:"potionFireResist",name:"Зелье огнестойкости",cat:"potion", tableLevel:3, tier:5, icon:"🧪", needs:[["🌹 Пепельный лепесток",2],["❤️ Рубин",1]] },
-
-  // --- КУЗНЯ (tier 5) ---
-  { id:"smelt_ironBar", name:"Железный слиток",      cat:"misc",   tableLevel:"smelt", tier:5, icon:"⬜",
-    needs:[["🟫 Железная руда",1],["⚫ Уголь",1]], result:"⬜ Железный слиток" },
-
-  // ============================================================
-  // ============ TIER 6 =======================================
-  // ============================================================
-  { id:"pickSilver",    name:"Серебряная кирка",     cat:"tool",   tableLevel:2, tier:6, icon:"⛏️", needs:[["⚪ Серебряный слиток",3],["🪵 Бревно",2]] },
-  { id:"axeSilver",     name:"Серебряный топор",     cat:"tool",   tableLevel:2, tier:6, icon:"🪓", needs:[["⚪ Серебряный слиток",3],["🪵 Бревно",2]] },
-  { id:"shovelSilver",  name:"Серебряная лопата",    cat:"tool",   tableLevel:2, tier:6, icon:"🥄", needs:[["⚪ Серебряный слиток",1],["🪵 Бревно",2]] },
-  { id:"swordSilver",   name:"Серебряный меч",       cat:"weapon", tableLevel:2, tier:6, icon:"🗡️", needs:[["⚪ Серебряный слиток",2],["🪵 Бревно",1]] },
-  { id:"spearSilver",   name:"Серебряное копьё",     cat:"weapon", tableLevel:2, tier:6, icon:"🔱", needs:[["⚪ Серебряный слиток",2],["🪵 Бревно",2]] },
-  { id:"goldenApple",   name:"Золотое яблоко",       cat:"food",   tableLevel:2, tier:6, icon:"🍎", needs:[["🟨 Золото",4],["🫐 Ягоды",1]] },
-  { id:"lighthouse",    name:"Маяк",                 cat:"build",  tableLevel:3, tier:6, icon:"🗼", needs:[["🪨 Булыжник",20],["🔷 Стекло",8]] },
-  { id:"potionLuck",    name:"Зелье удачи",          cat:"potion", tableLevel:2, tier:6, icon:"🧪", needs:[["💚 Изумруд",2],["🟨 Золото",1]] },
-  { id:"potionSpeed2",  name:"Зелье скорости II",    cat:"potion", tableLevel:3, tier:6, icon:"🧪", needs:[["🧪 Зелье скорости",1],["🧡 Топаз",1]] },
-  { id:"potionInvis",   name:"Зелье невидимости",    cat:"potion", tableLevel:3, tier:6, icon:"🧪", needs:[["🌑 Пустотный лепесток",2],["🕳️ Пыль Пустоты",1]] },
-  { id:"regenCharm",    name:"Амулет регенерации",   cat:"misc",   tableLevel:3, tier:6, icon:"💚", needs:[["🌙 Лунный камень",4],["🟨 Золото",4],["🪡 Нить",2]] },
-  { id:"memoryCrystal", name:"Кристалл памяти",      cat:"misc",   tableLevel:3, tier:6, icon:"🔮", needs:[["🟣 Аметист",6],["🟨 Золото",4],["🔊 Осколок Эха",2]] },
-
-  // --- КУЗНЯ (tier 6) ---
-  { id:"smelt_silverBar",name:"Серебряный слиток",   cat:"misc",   tableLevel:"smelt", tier:6, icon:"⚪",
-    needs:[["⚪ Серебряная руда",1],["⚫ Уголь",1]], result:"⚪ Серебряный слиток" },
-  { id:"smelt_gold",    name:"Золото",               cat:"misc",   tableLevel:"smelt", tier:6, icon:"🟨",
-    needs:[["🪙 Золотая руда",1],["⚫ Уголь",2]], result:"🟨 Золото" },
+  { id:"pickIron",       name:"Железная кирка",            cat:"tool",   tableLevel:2, tier:5, icon:"⛏️", needs:[["⬜ Железный слиток",3],["🪵 Бревно",2]] },
+  { id:"axeIron",        name:"Железный топор",            cat:"tool",   tableLevel:2, tier:5, icon:"🪓", needs:[["⬜ Железный слиток",3],["🪵 Бревно",2]] },
+  { id:"shovelIron",     name:"Железная лопата",           cat:"tool",   tableLevel:2, tier:5, icon:"🥄", needs:[["⬜ Железный слиток",1],["🪵 Бревно",2]] },
+  { id:"fishingRodIron", name:"Железная удочка",           cat:"tool",   tableLevel:3, tier:5, icon:"🎣", needs:[["🪵 Бревно",3],["🧵 Волокно",3],["⬜ Железный слиток",1]] },
+  { id:"swordIron",      name:"Железный меч",              cat:"weapon", tableLevel:2, tier:5, icon:"🗡️", needs:[["⬜ Железный слиток",2],["🪵 Бревно",1]] },
+  { id:"spearIron",      name:"Железное копьё",            cat:"weapon", tableLevel:2, tier:5, icon:"🔱", needs:[["⬜ Железный слиток",2],["🪵 Бревно",2]] },
+  { id:"daggerIron",     name:"Железный кинжал",           cat:"weapon", tableLevel:2, tier:5, icon:"🔪", needs:[["⬜ Железный слиток",1],["🪵 Бревно",1]] },
+  { id:"bowComposite",   name:"Составной лук",             cat:"weapon", tableLevel:3, tier:5, icon:"🏹", needs:[["🪵 Бревно",8],["🪡 Нить",6],["⬜ Железный слиток",2]] },
+  { id:"helmIron",       name:"Железный шлем",             cat:"armor",  tableLevel:2, tier:5, icon:"⛑️", needs:[["⬜ Железный слиток",3]] },
+  { id:"chestIron",      name:"Железный нагрудник",        cat:"armor",  tableLevel:2, tier:5, icon:"🦺", needs:[["⬜ Железный слиток",5]] },
+  { id:"bootsIron",      name:"Железные сапоги",           cat:"armor",  tableLevel:2, tier:5, icon:"👢", needs:[["⬜ Железный слиток",3]] },
+  { id:"anvil",          name:"Наковальня",                cat:"misc",   tableLevel:2, tier:5, icon:"⚒️", needs:[["⬜ Железный слиток",5],["🪨 Булыжник",4]] },
+  { id:"watchtower",     name:"Смотровая башня",           cat:"build",  tableLevel:2, tier:5, icon:"🗼", needs:[["🪵 Бревно",10],["⬜ Железный слиток",4]] },
+  { id:"keyGold",        name:"Золотой ключ",              cat:"misc",   tableLevel:3, tier:5, icon:"🗝️", needs:[["🟨 Золото",6],["💚 Изумруд",1]] },
+  { id:"potionRegen",    name:"Зелье регенерации",         cat:"potion", tableLevel:5, tier:5, icon:"🧪", needs:[["🌛 Лунный лепесток",2],["🌙 Лунный камень",1]] },
+  { id:"potionResist",   name:"Зелье сопротивления",       cat:"potion", tableLevel:5, tier:5, icon:"🧪", needs:[["💠 Кристалл. лепесток",2],["🟣 Аметист",1]] },
+  { id:"potionFireResist", name:"Зелье огнестойкости",     cat:"potion", tableLevel:5, tier:5, icon:"🧪", needs:[["🌹 Пепельный лепесток",2],["❤️ Рубин",1]] },
+  { id:"charmBrewer",    name:"Кольцо алхимика",           cat:"charm",  tableLevel:6, tier:5, icon:"⚗️", needs:[["🔷 Стекло",4],["🌿 Трава",4],["🪡 Нить",2]] },
+  { id:"charmSmith",     name:"Молот кузнеца",             cat:"charm",  tableLevel:6, tier:5, icon:"🔨", needs:[["⬜ Железный слиток",4],["🪨 Булыжник",2],["🪡 Нить",2]] },
+  { id:"charmAutoPickup", name:"Магнит",                   cat:"charm",  tableLevel:6, tier:5, icon:"🧲", needs:[["⬜ Железный слиток",5],["🟨 Золото",5],["🪡 Нить",3]] },
+  { id:"dodgeCharm",     name:"Плащ уклонения",            cat:"charm",  tableLevel:6, tier:5, icon:"💨", needs:[["🪶 Перо",8],["💙 Сапфир",2],["🪡 Нить",3]] },
+  { id:"nightVisionCharm", name:"Глаз совы",               cat:"charm",  tableLevel:6, tier:5, icon:"🌙", needs:[["🌛 Лунный лепесток",4],["🟨 Золото",2],["🪡 Нить",2]] },
+  { id:"healthCharm",    name:"Амулет здоровья",           cat:"charm",  tableLevel:6, tier:5, icon:"❤️", needs:[["❤️ Рубин",1],["💙 Сапфир",1],["🟨 Золото",4]] },
+  { id:"charmFire",      name:"Амулет огня",               cat:"charm",  tableLevel:6, tier:5, icon:"🔥", needs:[["❤️ Рубин",2],["🌹 Пепельный лепесток",2],["🪡 Нить",2]] },
+  { id:"charmWater",     name:"Амулет воды",               cat:"charm",  tableLevel:6, tier:5, icon:"💧", needs:[["💙 Сапфир",1],["💠 Кристалл. лепесток",1],["🪡 Нить",2]] },
+  { id:"dungeonKeyBone", name:"Ключ Костей",               cat:"misc",   tableLevel:3, tier:5, icon:"🔑", needs:[["🦴 Костный осколок",10],["🗝️ Железный ключ",1]] },
+  { id:"swordWolf",      name:"Клык волка",                cat:"weapon", tableLevel:2, tier:5, icon:"🐺", needs:[["🐺 Клык волка",3],["🟤 Кожа",3],["⬜ Железный слиток",2]], blueprint:"📜 Чертёж: клык волка" },
+  { id:"blueprint_swordWolf", name:"Чертёж: клык волка",   cat:"misc",   tableLevel:7, tier:5, icon:"📜", needs:[["📄 Бумага",3],["🐺 Клык волка",3],["🗡️ Железный меч",1]] },
 
   // ============================================================
-  // ============ TIER 7 =======================================
+  // ============ TIER 6 ========================================
   // ============================================================
-  { id:"pickAmethyst",  name:"Аметистовая кирка",    cat:"tool",   tableLevel:2, tier:7, icon:"⛏️", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
-  { id:"axeAmethyst",   name:"Аметистовый топор",    cat:"tool",   tableLevel:2, tier:7, icon:"🪓", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
-  { id:"shovelAmethyst",name:"Аметистовая лопата",   cat:"tool",   tableLevel:2, tier:7, icon:"🥄", needs:[["🟣 Аметист",2],["⬜ Железный слиток",1]] },
-  { id:"fishingRodAmethyst",name:"Аметистовая удочка",cat:"tool", tableLevel:2, tier:7, icon:"🎣", needs:[["🪵 Бревно",3],["🧵 Волокно",4],["🟣 Аметист",2],["⬜ Железный слиток",1]] },
-  { id:"swordAmethyst", name:"Аметистовый меч",      cat:"weapon", tableLevel:2, tier:7, icon:"🗡️", needs:[["🟣 Аметист",2],["⬜ Железный слиток",1]] },
-  { id:"spearAmethyst", name:"Аметистовое копьё",    cat:"weapon", tableLevel:2, tier:7, icon:"🔱", needs:[["🟣 Аметист",2],["⬜ Железный слиток",1]] },
-  { id:"bowEcho",       name:"Эхо-лук",              cat:"weapon", tableLevel:2, tier:7, icon:"🏹", needs:[["🔊 Осколок Эха",3],["🪡 Нить",6],["🟣 Аметист",2]] },
-  { id:"arrowEcho",     name:"Эхо-стрела ×4",        cat:"weapon", tableLevel:2, tier:7, icon:"🔊", needs:[["➡️ Стрела",4],["🔊 Осколок Эха",1]] },
-  { id:"helmAmethyst",  name:"Аметистовый шлем",     cat:"armor",  tableLevel:2, tier:7, icon:"🟣", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
-  { id:"chestAmethyst", name:"Аметистовый нагрудник",cat:"armor",  tableLevel:2, tier:7, icon:"🟣", needs:[["🟣 Аметист",5],["⬜ Железный слиток",2]] },
-  { id:"bootsAmethyst", name:"Аметистовые сапоги",   cat:"armor",  tableLevel:2, tier:7, icon:"👢", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
-  { id:"temple",        name:"Храм",                 cat:"build",  tableLevel:3, tier:7, icon:"🏛️", needs:[["🪨 Булыжник",20],["💎 Алмаз",2]] },
-  { id:"keyCrystal",    name:"Кристальный ключ",     cat:"misc",   tableLevel:3, tier:7, icon:"🗝️", needs:[["🟣 Аметист",4],["🟨 Золото",4]] },
-  { id:"enchantTable",  name:"Стол чар",             cat:"misc",   tableLevel:1, tier:7, icon:"📖", needs:[["🪵 Бревно",4],["🟣 Аметист",2],["📄 Бумага",2]] },
-  { id:"potionStrength2",name:"Зелье силы II",       cat:"potion", tableLevel:3, tier:7, icon:"🧪", needs:[["🧪 Зелье силы",1],["❤️ Рубин",1]] },
+  { id:"pickSilver",     name:"Серебряная кирка",          cat:"tool",   tableLevel:2, tier:6, icon:"⛏️", needs:[["⚪ Серебряный слиток",3],["🪵 Бревно",2]] },
+  { id:"axeSilver",      name:"Серебряный топор",          cat:"tool",   tableLevel:2, tier:6, icon:"🪓", needs:[["⚪ Серебряный слиток",3],["🪵 Бревно",2]] },
+  { id:"shovelSilver",   name:"Серебряная лопата",         cat:"tool",   tableLevel:2, tier:6, icon:"🥄", needs:[["⚪ Серебряный слиток",1],["🪵 Бревно",2]] },
+  { id:"swordSilver",    name:"Серебряный меч",            cat:"weapon", tableLevel:2, tier:6, icon:"🗡️", needs:[["⚪ Серебряный слиток",2],["🪵 Бревно",1]] },
+  { id:"spearSilver",    name:"Серебряное копьё",          cat:"weapon", tableLevel:2, tier:6, icon:"🔱", needs:[["⚪ Серебряный слиток",2],["🪵 Бревно",2]] },
+  { id:"lighthouse",     name:"Маяк",                      cat:"build",  tableLevel:3, tier:6, icon:"🗼", needs:[["🪨 Булыжник",20],["🔷 Стекло",8]] },
+  { id:"memoryCrystal",  name:"Кристалл памяти",           cat:"misc",   tableLevel:6, tier:6, icon:"🔮", needs:[["🟣 Аметист",6],["🟨 Золото",4],["🔊 Осколок Эха",2]] },
+  { id:"potionLuck",     name:"Зелье удачи",               cat:"potion", tableLevel:5, tier:6, icon:"🧪", needs:[["💚 Изумруд",2],["🟨 Золото",1]] },
+  { id:"potionInvis",    name:"Зелье невидимости",         cat:"potion", tableLevel:5, tier:6, icon:"🧪", needs:[["🌑 Пустотный лепесток",2],["🕳️ Пыль Пустоты",1]] },
+  { id:"potionHeal2",    name:"Зелье лечения II",          cat:"potion", tableLevel:5, tier:6, icon:"🧪", needs:[["🧪 Зелье лечения",1],["❤️ Рубин",1]] },
+  { id:"potionSpeed2",   name:"Зелье скорости II",         cat:"potion", tableLevel:5, tier:6, icon:"🧪", needs:[["🧪 Зелье скорости",1],["🧡 Топаз",1]] },
+  { id:"regenCharm",     name:"Амулет регенерации",        cat:"charm",  tableLevel:6, tier:6, icon:"💚", needs:[["🌙 Лунный камень",4],["🟨 Золото",4],["🪡 Нить",2]] },
+  { id:"critCharm",      name:"Амулет крита",              cat:"charm",  tableLevel:6, tier:6, icon:"🎯", needs:[["🟣 Аметист",3],["❤️ Рубин",1],["🟨 Золото",4]] },
+  { id:"hunterCharm",    name:"Клык волка",                cat:"charm",  tableLevel:6, tier:6, icon:"🐺", needs:[["🟤 Кожа",5],["💚 Изумруд",2],["🪡 Нить",3]] },
+  { id:"charmTreasure",  name:"Глаз сокровищ",             cat:"charm",  tableLevel:6, tier:6, icon:"💎", needs:[["💎 Алмаз",1],["🟨 Золото",8],["🪡 Нить",3]] },
+  { id:"charmArcherEye", name:"Глаз стрелка",              cat:"charm",  tableLevel:6, tier:6, icon:"👁️", needs:[["🪶 Перо",8],["🎯 Знак снайпера",2],["🪡 Нить",3]] },
+  { id:"charmIce",       name:"Ледяная сфера",             cat:"charm",  tableLevel:6, tier:6, icon:"❄️", needs:[["🧊 Лёд",10],["💙 Сапфир",2],["🪡 Нить",3]] },
+  { id:"charmFireHit",   name:"Сердце пламени",            cat:"charm",  tableLevel:6, tier:6, icon:"🔥", needs:[["❤️ Рубин",3],["🔥 Ядро угля",1],["🪡 Нить",3]] },
+  { id:"charmJumpDouble", name:"Крылья ветра",             cat:"charm",  tableLevel:6, tier:6, icon:"🪶", needs:[["🪶 Перо",10],["💚 Изумруд",3],["🪡 Нить",3]] },
+  { id:"charmPoison",    name:"Клык змеи",                 cat:"charm",  tableLevel:6, tier:6, icon:"☠️", needs:[["🍄 Гриб",8],["🐍 Чешуя змея",3],["🪡 Нить",3]] },
+  { id:"charmFireTrail", name:"Пламенный след",            cat:"charm",  tableLevel:6, tier:6, icon:"🔥", needs:[["❤️ Рубин",2],["🌫️ Пепел",6],["🪡 Нить",3]] },
+  { id:"charmFairyWings", name:"Крылья феи",               cat:"charm",  tableLevel:6, tier:6, icon:"🧚", needs:[["🧚 Крыло феи",4],["🧵 Лунный шёлк",2],["🟨 Золото",5]], blueprint:"📜 Чертёж: крылья феи" },
+
+  // --- КОМПОНЕНТЫ tier 6 ---
+  { id:"boneBlade",      name:"Костяной клинок",           cat:"misc",   tableLevel:2, tier:6, icon:"🗡️", needs:[["🦴 Кость",3],["🦴 Костный осколок",2],["⬜ Железный слиток",1]] },
+  { id:"boneCore",       name:"Костяное ядро",             cat:"misc",   tableLevel:2, tier:6, icon:"💀", needs:[["🦴 Костный осколок",4],["⚪ Серебряный слиток",1]] },
+  { id:"treantBark",     name:"Кора древня",               cat:"misc",   tableLevel:2, tier:6, icon:"🌳", needs:[["🪵 Бревно",6],["🧵 Волокно",4]] },
+  { id:"fairyWing",      name:"Крыло феи",                 cat:"misc",   tableLevel:2, tier:6, icon:"🧚", needs:[["🪶 Перо",6],["🌸 Цветок",4],["🟨 Золото",2]] },
+  { id:"skullFragment",  name:"Фрагмент черепа",           cat:"misc",   tableLevel:2, tier:6, icon:"💀", needs:[["🦴 Кость",4],["🦴 Костный осколок",2]] },
+  { id:"dungeonKeyShard",name:"Ключ Осколка",              cat:"misc",   tableLevel:3, tier:6, icon:"🔑", needs:[["🟣 Аметист",5],["🗝️ Кристальный ключ",1]] },
+  { id:"blueprintDungeonKeyShard", name:"Чертёж: ключ Осколка", cat:"misc", tableLevel:7, tier:6, icon:"📜", needs:[["📄 Бумага",3],["🟣 Аметист",3],["💠 Кристалл. лепесток",2]] },
+  { id:"blueprintAlchemy", name:"Чертёж: стол алхимика",   cat:"misc",   tableLevel:7, tier:6, icon:"📜", needs:[["📄 Бумага",4],["🌸 Цветок",4],["🟣 Аметист",2]] },
+
+  // --- УНИКАЛЬНЫЕ tier 6 ---
+  { id:"swordBoneKnight", name:"Костяной клинок рыцаря",   cat:"weapon", tableLevel:2, tier:6, icon:"🗡️", needs:[["🗡️ Костяной клинок",3],["💀 Костяное ядро",1],["🪵 Бревно",2]], blueprint:"📜 Чертёж: костяной клинок рыцаря" },
+  { id:"axeBoneKnight",  name:"Костяной топор рыцаря",     cat:"weapon", tableLevel:2, tier:6, icon:"🪓", needs:[["🗡️ Костяной клинок",4],["💀 Костяное ядро",1],["🪵 Бревно",2]], blueprint:"📜 Чертёж: костяной топор рыцаря" },
+  { id:"helmBoneKnight", name:"Шлем костяного рыцаря",     cat:"armor",  tableLevel:2, tier:6, icon:"💀", needs:[["💀 Фрагмент черепа",3],["💀 Костяное ядро",1],["⬜ Железный слиток",2]], blueprint:"📜 Чертёж: шлем костяного рыцаря" },
+  { id:"chestTreant",    name:"Доспех древня",             cat:"armor",  tableLevel:2, tier:6, icon:"🌳", needs:[["🌳 Кора древня",5],["🧚 Крыло феи",2],["🪵 Бревно",4]], blueprint:"📜 Чертёж: доспех древня" },
+  { id:"blueprint_swordBoneKnight", name:"Чертёж: костяной клинок рыцаря", cat:"misc", tableLevel:7, tier:6, icon:"📜", needs:[["📄 Бумага",4],["🦴 Костный осколок",6],["🗡️ Серебряный меч",1]] },
+  { id:"blueprint_axeBoneKnight",   name:"Чертёж: костяной топор рыцаря",  cat:"misc", tableLevel:7, tier:6, icon:"📜", needs:[["📄 Бумага",4],["🦴 Костный осколок",6],["🪓 Серебряный топор",1]] },
+  { id:"blueprint_helmBoneKnight",  name:"Чертёж: шлем костяного рыцаря",  cat:"misc", tableLevel:7, tier:6, icon:"📜", needs:[["📄 Бумага",4],["🦴 Костный осколок",4],["⚪ Серебряный слиток",3]] },
+  { id:"blueprint_chestTreant",     name:"Чертёж: доспех древня",          cat:"misc", tableLevel:7, tier:6, icon:"📜", needs:[["📄 Бумага",4],["🌳 Кора древня",5],["🌿 Тканевый жилет",1]] },
 
   // ============================================================
-  // ============ TIER 8 =======================================
+  // ============ TIER 7 ========================================
   // ============================================================
-  { id:"pickEcho",      name:"Эхо-кирка",            cat:"tool",   tableLevel:3, tier:8, icon:"⛏️", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]] },
-  { id:"axeEcho",       name:"Эхо-топор",            cat:"tool",   tableLevel:3, tier:8, icon:"🪓", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]] },
-  { id:"shovelEcho",    name:"Эхо-лопата",           cat:"tool",   tableLevel:3, tier:8, icon:"🥄", needs:[["🔊 Осколок Эха",2],["🟣 Аметист",1]] },
-  { id:"swordEcho",     name:"Эхо-меч",              cat:"weapon", tableLevel:3, tier:8, icon:"🗡️", needs:[["🔊 Осколок Эха",2],["🟣 Аметист",1]] },
-  { id:"spearEcho",     name:"Эхо-копьё",            cat:"weapon", tableLevel:3, tier:8, icon:"🔱", needs:[["🔊 Осколок Эха",2],["🟣 Аметист",1]] },
-  { id:"helmEcho",      name:"Эхо-шлем",             cat:"armor",  tableLevel:3, tier:8, icon:"🔊", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]] },
-  { id:"chestEcho",     name:"Эхо-нагрудник",        cat:"armor",  tableLevel:3, tier:8, icon:"🔊", needs:[["🔊 Осколок Эха",5],["🟣 Аметист",2]] },
-  { id:"bootsEcho",     name:"Эхо-сапоги",           cat:"armor",  tableLevel:3, tier:8, icon:"👢", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]] },
-  { id:"voidCharm",     name:"Амулет пустоты",       cat:"misc",   tableLevel:3, tier:8, icon:"🕳️", needs:[["🕳️ Пыль Пустоты",6],["❤️ Рубин",4],["🪡 Нить",4]] },
+  { id:"pickAmethyst",   name:"Аметистовая кирка",         cat:"tool",   tableLevel:2, tier:7, icon:"⛏️", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
+  { id:"axeAmethyst",    name:"Аметистовый топор",         cat:"tool",   tableLevel:2, tier:7, icon:"🪓", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
+  { id:"shovelAmethyst", name:"Аметистовая лопата",        cat:"tool",   tableLevel:2, tier:7, icon:"🥄", needs:[["🟣 Аметист",2],["⬜ Железный слиток",1]] },
+  { id:"fishingRodAmethyst", name:"Аметистовая удочка",    cat:"tool",   tableLevel:3, tier:7, icon:"🎣", needs:[["🪵 Бревно",3],["🧵 Волокно",4],["🟣 Аметист",2],["⬜ Железный слиток",1]] },
+  { id:"swordAmethyst",  name:"Аметистовый меч",           cat:"weapon", tableLevel:2, tier:7, icon:"🗡️", needs:[["🟣 Аметист",2],["⬜ Железный слиток",1]] },
+  { id:"spearAmethyst",  name:"Аметистовое копьё",         cat:"weapon", tableLevel:2, tier:7, icon:"🔱", needs:[["🟣 Аметист",2],["⬜ Железный слиток",1]] },
+  { id:"bowEcho",        name:"Эхо-лук",                   cat:"weapon", tableLevel:3, tier:7, icon:"🏹", needs:[["🔊 Осколок Эха",3],["🪡 Нить",6],["🟣 Аметист",2]] },
+  { id:"arrowEcho",      name:"Эхо-стрела ×4",             cat:"weapon", tableLevel:3, tier:7, icon:"🔊", needs:[["➡️ Стрела",4],["🔊 Осколок Эха",1]] },
+  { id:"helmAmethyst",   name:"Аметистовый шлем",          cat:"armor",  tableLevel:2, tier:7, icon:"🟣", needs:[["🟣 Аметист",3],["⬜ Железный слиток",1]] },
+  { id:"chestAmethyst",  name:"Аметистовый нагрудник",     cat:"armor",  tableLevel:2, tier:7, icon:"🟣", needs:[["🟣 Аметист",5],["⬜ Железный слиток",2]] },
+  { id:"temple",         name:"Храм",                      cat:"build",  tableLevel:3, tier:7, icon:"🏛️", needs:[["🪨 Булыжник",20],["💎 Алмаз",2]] },
+  { id:"keyCrystal",     name:"Кристальный ключ",          cat:"misc",   tableLevel:3, tier:7, icon:"🗝️", needs:[["🟣 Аметист",4],["🟨 Золото",4]] },
+  { id:"enchantTable",   name:"Стол чар",                  cat:"misc",   tableLevel:7, tier:7, icon:"📖", needs:[["🪵 Бревно",4],["🟣 Аметист",2],["📄 Бумага",2]] },
+  { id:"potionStrength2", name:"Зелье силы II",            cat:"potion", tableLevel:5, tier:7, icon:"🧪", needs:[["🧪 Зелье силы",1],["❤️ Рубин",1]] },
+  { id:"undeadCharm",    name:"Святой символ",             cat:"charm",  tableLevel:6, tier:7, icon:"💀", needs:[["🦴 Костный осколок",5],["⚪ Серебряный слиток",2],["🪡 Нить",3]] },
+  { id:"charmElemental", name:"Сердце стихий",             cat:"charm",  tableLevel:6, tier:7, icon:"🔥", needs:[["❤️ Рубин",2],["💙 Сапфир",2],["💚 Изумруд",2],["🪡 Нить",3]] },
+  { id:"charmMage",      name:"Кристалл мага",             cat:"charm",  tableLevel:6, tier:7, icon:"🔮", needs:[["🟣 Аметист",5],["🔊 Осколок Эха",3],["🟨 Золото",5],["🪡 Нить",3]] },
+  { id:"charmSpeedDemon", name:"Плащ ветра",               cat:"charm",  tableLevel:6, tier:7, icon:"⚡", needs:[["🌙 Лунный камень",5],["🪶 Перо",10],["🪡 Нить",4]] },
+  { id:"charmVampire",   name:"Клык вампира",              cat:"charm",  tableLevel:6, tier:7, icon:"🩸", needs:[["🕳️ Пыль Пустоты",5],["❤️ Рубин",3],["🪡 Нить",4]] },
+  { id:"charmBlink",     name:"Свиток блинка",             cat:"charm",  tableLevel:6, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🟣 Аметист",3],["🪡 Нить",2]] },
+  { id:"charmShieldAura", name:"Аура щита",                cat:"charm",  tableLevel:6, tier:7, icon:"🛡️", needs:[["⬜ Железный слиток",8],["💠 Кристалл. лепесток",3],["🪡 Нить",4]] },
+  { id:"charmGemCore",   name:"Самоцветное сердце",        cat:"charm",  tableLevel:6, tier:8, icon:"💎", needs:[["💎 Самоцветное ядро",2],["🟣 Аметист",3],["🟨 Золото",5]] },
+
+  // --- КОМПОНЕНТЫ tier 7 ---
+  { id:"ashFeather",     name:"Пепельное перо",            cat:"misc",   tableLevel:2, tier:7, icon:"🪶", needs:[["🪶 Перо",4],["🌫️ Пепел",2]] },
+  { id:"emberCore",      name:"Ядро угля",                 cat:"misc",   tableLevel:2, tier:7, icon:"🔥", needs:[["⚫ Уголь",8],["❤️ Рубин",1]] },
+  { id:"lavaShard",      name:"Осколок лавы",              cat:"misc",   tableLevel:2, tier:7, icon:"🌋", needs:[["🌫️ Пепел",4],["❤️ Рубин",1],["🔥 Эссенция огня",1]] },
+  { id:"frostCore",      name:"Морозное ядро",             cat:"misc",   tableLevel:2, tier:7, icon:"❄️", needs:[["🧊 Лёд",8],["💙 Сапфир",1]] },
+  { id:"crystalSting",   name:"Кристальное жало",          cat:"misc",   tableLevel:6, tier:7, icon:"💠", needs:[["🟣 Аметист",2],["🪡 Нить",1]] },
+  { id:"blueprintEnchant", name:"Чертёж: стол чар",        cat:"misc",   tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🟣 Аметист",2],["💚 Изумруд",2]] },
+  { id:"blueprintMemoryCrystal", name:"Чертёж: кристалл памяти", cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🔮 Кристалл памяти",1],["🔊 Осколок Эха",2]] },
+  { id:"blueprintPickEcho", name:"Чертёж: эхо-кирка",      cat:"misc",   tableLevel:7, tier:8, icon:"📜", needs:[["📄 Бумага",4],["🔊 Осколок Эха",4],["⛏️ Железная кирка",1]] },
+  { id:"blueprintSwordEcho",name:"Чертёж: эхо-меч",        cat:"misc",   tableLevel:7, tier:8, icon:"📜", needs:[["📄 Бумага",4],["🔊 Осколок Эха",3],["🗡️ Железный меч",1]] },
+  { id:"blueprintBowEcho",  name:"Чертёж: эхо-лук",        cat:"misc",   tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🔊 Осколок Эха",3],["🏹 Составной лук",1]] },
+  { id:"blueprintChestAmethyst", name:"Чертёж: аметист. нагрудник", cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🟣 Аметист",4],["🟧 Медный нагрудник",1]] },
+  { id:"blueprint_daggerCrystal", name:"Чертёж: кристальный кинжал", cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🟣 Аметист",4],["🔪 Железный кинжал",1]] },
+  { id:"blueprint_swordAsh", name:"Чертёж: пепельный клинок", cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🌫️ Пепел",10],["🗡️ Аметистовый меч",1]] },
+  { id:"blueprint_bowAsh",   name:"Чертёж: пепельный лук",   cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🌫️ Пепел",10],["🏹 Эхо-лук",1]] },
+  { id:"blueprint_chestAsh", name:"Чертёж: пепельный доспех", cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🌫️ Пепел",10],["🟣 Аметистовый нагрудник",1]] },
+  { id:"blueprint_staffFrost", name:"Чертёж: морозный посох", cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🧊 Лёд",10],["🪄 Посох ученика",1]] },
+  { id:"blueprint_swordFrost", name:"Чертёж: ледяной клинок", cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",4],["🧊 Лёд",10],["🗡️ Аметистовый меч",1]] },
+
+  // --- УНИКАЛЬНЫЕ tier 7 ---
+  { id:"swordAsh",       name:"Пепельный клинок",          cat:"weapon", tableLevel:2, tier:7, icon:"🔥", needs:[["🪶 Пепельное перо",2],["🔥 Ядро угля",1],["⬜ Железный слиток",3]], blueprint:"📜 Чертёж: пепельный клинок" },
+  { id:"bowAsh",         name:"Пепельный лук",             cat:"weapon", tableLevel:3, tier:7, icon:"🏹", needs:[["🪶 Пепельное перо",3],["🔥 Ядро угля",1],["🪡 Нить",4]], blueprint:"📜 Чертёж: пепельный лук" },
+  { id:"chestAsh",       name:"Пепельный доспех",          cat:"armor",  tableLevel:2, tier:7, icon:"🔥", needs:[["🪶 Пепельное перо",4],["🌋 Осколок лавы",2],["⬜ Железный слиток",5]], blueprint:"📜 Чертёж: пепельный доспех" },
+  { id:"staffFrost",     name:"Морозный посох",            cat:"weapon", tableLevel:2, tier:7, icon:"🪄", needs:[["❄️ Морозное ядро",1],["🧊 Ледяной осколок",3],["🪵 Бревно",3]], blueprint:"📜 Чертёж: морозный посох" },
+  { id:"swordFrost",     name:"Ледяной клинок",            cat:"weapon", tableLevel:2, tier:7, icon:"❄️", needs:[["❄️ Морозное ядро",1],["🧊 Ледяной осколок",2],["⬜ Железный слиток",3]], blueprint:"📜 Чертёж: ледяной клинок" },
+  { id:"daggerCrystal",  name:"Кристальный кинжал",        cat:"weapon", tableLevel:2, tier:7, icon:"🔪", needs:[["💠 Кристальное жало",2],["🟣 Аметист",1],["⬜ Железный слиток",1]], blueprint:"📜 Чертёж: кристальный кинжал" },
+  { id:"staffApprentice",name:"Посох ученика",             cat:"weapon", tableLevel:2, tier:7, icon:"🪄", needs:[["🪵 Бревно",3],["🟣 Аметист",2]] },
+  { id:"robeApprentice", name:"Мантия ученика",            cat:"armor",  tableLevel:2, tier:7, icon:"🥼", needs:[["🧶 Ткань",4],["🟣 Аметист",1]] },
 
   // ============================================================
-  // ============ TIER 9 =======================================
+  // ============ TIER 8 ========================================
   // ============================================================
-  { id:"pickMoon",      name:"Лунная кирка",         cat:"tool",   tableLevel:3, tier:9, icon:"⛏️", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]] },
-  { id:"axeMoon",       name:"Лунный топор",         cat:"tool",   tableLevel:3, tier:9, icon:"🪓", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]] },
-  { id:"shovelMoon",    name:"Лунная лопата",        cat:"tool",   tableLevel:3, tier:9, icon:"🥄", needs:[["🌙 Лунный камень",2],["🔊 Осколок Эха",1]] },
-  { id:"fishingRodMoon",name:"Лунная удочка",        cat:"tool",   tableLevel:3, tier:9, icon:"🎣", needs:[["🪵 Бревно",4],["🧵 Волокно",5],["🌙 Лунный камень",2],["🔊 Осколок Эха",1]] },
-  { id:"swordMoon",     name:"Лунный меч",           cat:"weapon", tableLevel:3, tier:9, icon:"🗡️", needs:[["🌙 Лунный камень",2],["🔊 Осколок Эха",1]] },
-  { id:"spearMoon",     name:"Лунное копьё",         cat:"weapon", tableLevel:3, tier:9, icon:"🔱", needs:[["🌙 Лунный камень",2],["🔊 Осколок Эха",1]] },
-  { id:"bowMoon",       name:"Лунный лук",           cat:"weapon", tableLevel:3, tier:9, icon:"🏹", needs:[["🌙 Лунный камень",3],["🪡 Нить",8],["🔊 Осколок Эха",2]] },
-  { id:"arrowMoon",     name:"Лунная стрела ×4",     cat:"weapon", tableLevel:3, tier:9, icon:"🌙", needs:[["➡️ Стрела",4],["🌙 Лунный камень",1]] },
-  { id:"helmMoon",      name:"Лунный шлем",          cat:"armor",  tableLevel:3, tier:9, icon:"🌙", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]] },
-  { id:"chestMoon",     name:"Лунный нагрудник",     cat:"armor",  tableLevel:3, tier:9, icon:"🌙", needs:[["🌙 Лунный камень",5],["🔊 Осколок Эха",2]] },
-  { id:"bootsMoon",     name:"Лунные сапоги",        cat:"armor",  tableLevel:3, tier:9, icon:"👢", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]] },
-  { id:"keyVoid",       name:"Пустотный ключ",       cat:"misc",   tableLevel:3, tier:9, icon:"🗝️", needs:[["🕳️ Пыль Пустоты",4],["🌙 Лунный камень",2]] },
+  { id:"pickEcho",       name:"Эхо-кирка",                 cat:"tool",   tableLevel:2, tier:8, icon:"⛏️", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]], blueprint:"📜 Чертёж: эхо-кирка" },
+  { id:"axeEcho",        name:"Эхо-топор",                 cat:"tool",   tableLevel:2, tier:8, icon:"🪓", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]], blueprint:"📜 Чертёж: эхо-топор" },
+  { id:"shovelEcho",     name:"Эхо-лопата",                cat:"tool",   tableLevel:2, tier:8, icon:"🥄", needs:[["🔊 Осколок Эха",2],["🟣 Аметист",1]], blueprint:"📜 Чертёж: эхо-лопата" },
+  { id:"swordEcho",      name:"Эхо-меч",                   cat:"weapon", tableLevel:2, tier:8, icon:"🗡️", needs:[["🔊 Осколок Эха",2],["🟣 Аметист",1]], blueprint:"📜 Чертёж: эхо-меч" },
+  { id:"spearEcho",      name:"Эхо-копьё",                 cat:"weapon", tableLevel:2, tier:8, icon:"🔱", needs:[["🔊 Осколок Эха",2],["🟣 Аметист",1]] },
+  { id:"helmEcho",       name:"Эхо-шлем",                  cat:"armor",  tableLevel:2, tier:8, icon:"🔊", needs:[["🔊 Осколок Эха",3],["🟣 Аметист",1]], blueprint:"📜 Чертёж: эхо-шлем" },
+  { id:"chestEcho",      name:"Эхо-нагрудник",             cat:"armor",  tableLevel:2, tier:8, icon:"🔊", needs:[["🔊 Осколок Эха",5],["🟣 Аметист",2]], blueprint:"📜 Чертёж: эхо-нагрудник" },
+  { id:"charmGreed",     name:"Рука жадности",             cat:"charm",  tableLevel:6, tier:8, icon:"💰", needs:[["💎 Алмаз",3],["💚 Изумруд",5],["🟨 Золото",10],["🪡 Нить",5]] },
+  { id:"charmAllRounder", name:"Универсальный медальон",   cat:"charm",  tableLevel:6, tier:8, icon:"⚜️", needs:[["🟨 Золото",10],["❤️ Рубин",2],["💙 Сапфир",2],["💚 Изумруд",2],["🪡 Нить",5]] },
+  { id:"charmSurvivor",  name:"Медальон выжившего",        cat:"charm",  tableLevel:6, tier:8, icon:"🏅", needs:[["🟨 Золото",10],["💚 Изумруд",5],["🪡 Нить",5]] },
+  { id:"charmEcho",      name:"Резонатор эха",             cat:"charm",  tableLevel:6, tier:8, icon:"🔊", needs:[["🔊 Осколок Эха",6],["🟣 Аметист",4],["🪡 Нить",4]] },
+
+  // --- КОМПОНЕНТЫ tier 8 ---
+  { id:"gemCore",        name:"Самоцветное ядро",          cat:"misc",   tableLevel:6, tier:8, icon:"💎", needs:[["💎 Алмаз",1],["💚 Изумруд",2],["❤️ Рубин",2]] },
+  { id:"voidTentacle",   name:"Пустотное щупальце",        cat:"misc",   tableLevel:6, tier:8, icon:"🕳️", needs:[["🕳️ Пыль Пустоты",4],["🌑 Теневая эссенция",2]] },
+  { id:"shadowEssence",  name:"Эссенция тени",             cat:"misc",   tableLevel:6, tier:8, icon:"🌑", needs:[["🕳️ Пыль Пустоты",2],["⚫ Уголь",4]] },
+  { id:"shadowCloak",    name:"Теневой плащ",              cat:"misc",   tableLevel:6, tier:8, icon:"🥷", needs:[["🧶 Ткань",4],["🌑 Теневая эссенция",2]] },
+  { id:"assassinMark",   name:"Метка ассасина",            cat:"misc",   tableLevel:6, tier:8, icon:"🎯", needs:[["🎯 Знак снайпера",2],["🌑 Теневая эссенция",1]] },
+  { id:"fogEssence",     name:"Эссенция тумана",           cat:"misc",   tableLevel:5, tier:8, icon:"🌫️", needs:[["🌌 Камень Снов",2],["🌙 Лунный камень",1]] },
+  { id:"fireEssence",    name:"Эссенция огня",             cat:"misc",   tableLevel:5, tier:8, icon:"🔥", needs:[["🌫️ Пепел",4],["❤️ Рубин",1]] },
+  { id:"dungeonKeyVoid", name:"Ключ Пустоты",              cat:"misc",   tableLevel:3, tier:8, icon:"🔑", needs:[["🕳️ Пыль Пустоты",5],["🗝️ Пустотный ключ",1]] },
+  { id:"dungeonKeyDream",name:"Ключ Снов",                 cat:"misc",   tableLevel:3, tier:8, icon:"🔑", needs:[["🌌 Камень Снов",5],["🗝️ Пустотный ключ",1]] },
+  { id:"dungeonKeyAsh",  name:"Ключ Пепла",                cat:"misc",   tableLevel:3, tier:8, icon:"🔑", needs:[["🌫️ Пепел",15],["🗝️ Пустотный ключ",1]] },
+  { id:"dungeonKeyCrystal",name:"Ключ Кристалла",          cat:"misc",   tableLevel:3, tier:8, icon:"🔑", needs:[["🟣 Аметист",10],["🗝️ Пустотный ключ",1]] },
+  { id:"blueprintNetherite", name:"Чертёж: незеритовый слиток", cat:"misc", tableLevel:7, tier:8, icon:"📜", needs:[["📄 Бумага",4],["⬛ Незеритовый лом",2],["💎 Алмаз",1]] },
+  { id:"blueprintDungeonKeyVoid", name:"Чертёж: ключ Пустоты", cat:"misc", tableLevel:7, tier:8, icon:"📜", needs:[["📄 Бумага",4],["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",2]] },
+  { id:"blueprintPickMoon", name:"Чертёж: лунная кирка",    cat:"misc",   tableLevel:7, tier:9, icon:"📜", needs:[["📄 Бумага",4],["🌙 Лунный камень",4],["⛏️ Аметистовая кирка",1]] },
+  { id:"blueprintSwordMoon",name:"Чертёж: лунный меч",      cat:"misc",   tableLevel:7, tier:9, icon:"📜", needs:[["📄 Бумага",4],["🌙 Лунный камень",3],["🗡️ Эхо-меч",1]] },
+  { id:"blueprintBowMoon",  name:"Чертёж: лунный лук",      cat:"misc",   tableLevel:7, tier:9, icon:"📜", needs:[["📄 Бумага",4],["🌙 Лунный камень",4],["🏹 Эхо-лук",1]] },
+  { id:"blueprintChestDiamond", name:"Чертёж: алмазный нагрудник", cat:"misc", tableLevel:7, tier:11, icon:"📜", needs:[["📄 Бумага",5],["💎 Алмаз",4],["🟣 Аметистовый нагрудник",1]] },
+  { id:"blueprintChestNetherite",name:"Чертёж: незерит. нагрудник", cat:"misc", tableLevel:7, tier:12, icon:"📜", needs:[["📄 Бумага",5],["⬛ Незеритовый слиток",4],["💎 Алмазный нагрудник",1]] },
+  { id:"blueprint_daggerVoidAssassin", name:"Чертёж: кинжал теней", cat:"misc", tableLevel:7, tier:9, icon:"📜", needs:[["📄 Бумага",5],["🌑 Теневая эссенция",3],["🔪 Аметистовый кинжал",1]] },
+  { id:"blueprint_chestVoidRobe", name:"Чертёж: мантия пустоты", cat:"misc", tableLevel:7, tier:9, icon:"📜", needs:[["📄 Бумага",5],["🕳️ Пыль Пустоты",5],["🥼 Мантия мага",1]] },
+  { id:"blueprint_robeShadow", name:"Чертёж: мантия теней", cat:"misc",   tableLevel:7, tier:8, icon:"📜", needs:[["📄 Бумага",5],["🌑 Теневая эссенция",3],["🥼 Мантия ученика",1]] },
+  { id:"blueprint_daggerAssassin", name:"Чертёж: кинжал ассасина", cat:"misc", tableLevel:7, tier:8, icon:"📜", needs:[["📄 Бумага",5],["🎯 Метка ассасина",2],["🔪 Железный кинжал",1]] },
+
+  // --- УНИКАЛЬНЫЕ tier 8 ---
+  { id:"robeShadow",     name:"Мантия теней",              cat:"armor",  tableLevel:2, tier:8, icon:"🥷", needs:[["🥷 Теневой плащ",3],["🌑 Теневая эссенция",2],["🧶 Ткань",6]], blueprint:"📜 Чертёж: мантия теней" },
+  { id:"daggerAssassin", name:"Кинжал ассасина",           cat:"weapon", tableLevel:2, tier:8, icon:"🗡️", needs:[["🎯 Метка ассасина",2],["🌑 Теневая эссенция",3],["⬜ Железный слиток",2]], blueprint:"📜 Чертёж: кинжал ассасина" },
 
   // ============================================================
-  // ============ TIER 10 ======================================
+  // ============ TIER 9 ========================================
   // ============================================================
-  { id:"tableDiamond",  name:"Алмазный верстак",     cat:"misc",   tableLevel:2, tier:10, icon:"💎", needs:[["⚙️ Железный верстак",1],["💎 Алмаз",3],["⚒️ Наковальня",1]] },
-  { id:"pickVoid",      name:"Пустотная кирка",      cat:"tool",   tableLevel:3, tier:10, icon:"⛏️", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]] },
-  { id:"axeVoid",       name:"Пустотный топор",      cat:"tool",   tableLevel:3, tier:10, icon:"🪓", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]] },
-  { id:"shovelVoid",    name:"Пустотная лопата",     cat:"tool",   tableLevel:3, tier:10, icon:"🥄", needs:[["🕳️ Пыль Пустоты",2],["🌙 Лунный камень",1]] },
-  { id:"swordVoid",     name:"Пустотный меч",        cat:"weapon", tableLevel:3, tier:10, icon:"🗡️", needs:[["🕳️ Пыль Пустоты",2],["🌙 Лунный камень",1]] },
-  { id:"spearVoid",     name:"Пустотное копьё",      cat:"weapon", tableLevel:3, tier:10, icon:"🔱", needs:[["🕳️ Пыль Пустоты",2],["🌙 Лунный камень",1]] },
-  { id:"helmVoid",      name:"Пустотный шлем",       cat:"armor",  tableLevel:3, tier:10, icon:"🕳️", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]] },
-  { id:"chestVoid",     name:"Пустотный нагрудник",  cat:"armor",  tableLevel:3, tier:10, icon:"🕳️", needs:[["🕳️ Пыль Пустоты",5],["🌙 Лунный камень",2]] },
-  { id:"bootsVoid",     name:"Пустотные сапоги",     cat:"armor",  tableLevel:3, tier:10, icon:"👢", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]] },
-  { id:"keyAncient",    name:"Древний ключ",         cat:"misc",   tableLevel:3, tier:10, icon:"🗝️", needs:[["🪬 Рунный камень",4],["⬛ Незеритовый слиток",2]] },
+  { id:"pickMoon",       name:"Лунная кирка",              cat:"tool",   tableLevel:2, tier:9, icon:"⛏️", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]], blueprint:"📜 Чертёж: лунная кирка" },
+  { id:"axeMoon",        name:"Лунный топор",              cat:"tool",   tableLevel:2, tier:9, icon:"🪓", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]], blueprint:"📜 Чертёж: лунный топор" },
+  { id:"shovelMoon",     name:"Лунная лопата",             cat:"tool",   tableLevel:2, tier:9, icon:"🥄", needs:[["🌙 Лунный камень",2],["🔊 Осколок Эха",1]], blueprint:"📜 Чертёж: лунная лопата" },
+  { id:"fishingRodMoon", name:"Лунная удочка",             cat:"tool",   tableLevel:3, tier:9, icon:"🎣", needs:[["🪵 Бревно",4],["🧵 Волокно",5],["🌙 Лунный камень",2],["🔊 Осколок Эха",1]], blueprint:"📜 Чертёж: лунная удочка" },
+  { id:"swordMoon",      name:"Лунный меч",                cat:"weapon", tableLevel:2, tier:9, icon:"🗡️", needs:[["🌙 Лунный камень",2],["🔊 Осколок Эха",1]], blueprint:"📜 Чертёж: лунный меч" },
+  { id:"spearMoon",      name:"Лунное копьё",              cat:"weapon", tableLevel:2, tier:9, icon:"🔱", needs:[["🌙 Лунный камень",2],["🔊 Осколок Эха",1]] },
+  { id:"bowMoon",        name:"Лунный лук",                cat:"weapon", tableLevel:3, tier:9, icon:"🏹", needs:[["🌙 Лунный камень",3],["🪡 Нить",8],["🔊 Осколок Эха",2]], blueprint:"📜 Чертёж: лунный лук" },
+  { id:"arrowMoon",      name:"Лунная стрела ×4",          cat:"weapon", tableLevel:3, tier:9, icon:"🌙", needs:[["➡️ Стрела",4],["🌙 Лунный камень",1]] },
+  { id:"helmMoon",       name:"Лунный шлем",               cat:"armor",  tableLevel:2, tier:9, icon:"🌙", needs:[["🌙 Лунный камень",3],["🔊 Осколок Эха",1]], blueprint:"📜 Чертёж: лунный шлем" },
+  { id:"chestMoon",      name:"Лунный нагрудник",          cat:"armor",  tableLevel:2, tier:9, icon:"🌙", needs:[["🌙 Лунный камень",5],["🔊 Осколок Эха",2]], blueprint:"📜 Чертёж: лунный нагрудник" },
+  { id:"keyVoid",        name:"Пустотный ключ",            cat:"misc",   tableLevel:3, tier:9, icon:"🗝️", needs:[["🕳️ Пыль Пустоты",4],["🌙 Лунный камень",2]] },
+  { id:"charmMoon",      name:"Лунный медальон",           cat:"charm",  tableLevel:6, tier:9, icon:"🌙", needs:[["🌙 Лунный камень",10],["🔊 Осколок Эха",5],["🟨 Золото",10]] },
+  { id:"charmBoneLord",  name:"Корона костяного лорда",    cat:"charm",  tableLevel:6, tier:9, icon:"💀", needs:[["🦴 Кость",20],["🦴 Костный осколок",10],["❤️ Рубин",4]] },
+  { id:"charmAncientRune", name:"Древняя руна",            cat:"charm",  tableLevel:6, tier:9, icon:"🪬", needs:[["🪬 Рунный камень",5],["🟣 Аметист",5],["🟨 Золото",5]] },
+  { id:"charmMagnet",    name:"Лунный магнит",             cat:"charm",  tableLevel:6, tier:9, icon:"🧲", needs:[["🌙 Лунный камень",8],["🟣 Аметист",5],["🪡 Нить",5]] },
+  { id:"charmFrozenHeart", name:"Ледяное сердце",          cat:"charm",  tableLevel:6, tier:9, icon:"❄️", needs:[["❄️ Кристалл вечной мерзлоты",1],["💙 Сапфир",5],["🪡 Нить",4]] },
+  { id:"charmMist",      name:"Корона тумана",             cat:"charm",  tableLevel:6, tier:9, icon:"🌫️", needs:[["🌌 Камень Снов",8],["🌫️ Эссенция тумана",3],["🪡 Нить",5]] },
+  { id:"charmAsh",       name:"Сердце пепла",              cat:"charm",  tableLevel:6, tier:9, icon:"🔥", needs:[["🌋 Осколок лавы",4],["🔥 Эссенция огня",3],["🪡 Нить",5]] },
+  { id:"charmAncient",   name:"Семя древня",               cat:"charm",  tableLevel:6, tier:9, icon:"🌳", needs:[["🌳 Кора древня",5],["🌱 Росток",10],["🪡 Нить",4]] },
+
+  // --- КОМПОНЕНТЫ tier 9 ---
+  { id:"permafrostCrystal", name:"Кристалл вечной мерзлоты",cat:"misc",  tableLevel:2, tier:9, icon:"❄️", needs:[["🧊 Голубой лёд",4],["💙 Сапфир",2],["🔊 Осколок Эха",1]] },
+  { id:"moonSilk",       name:"Лунный шёлк",               cat:"misc",   tableLevel:6, tier:9, icon:"🧵", needs:[["🧵 Волокно",6],["🌙 Лунный камень",2]] },
+  { id:"lunarCore",      name:"Лунное ядро",               cat:"misc",   tableLevel:6, tier:9, icon:"🌙", needs:[["🌙 Лунный камень",4],["💎 Алмаз",1]] },
+  { id:"dungeonKeyMoon", name:"Ключ Луны",                 cat:"misc",   tableLevel:3, tier:9, icon:"🔑", needs:[["🌙 Лунный камень",5],["🗝️ Пустотный ключ",1]] },
+  { id:"blueprintDungeonKeyMoon", name:"Чертёж: ключ Луны",cat:"misc",   tableLevel:7, tier:9, icon:"📜", needs:[["📄 Бумага",4],["🌙 Лунный камень",3],["🔊 Осколок Эха",2]] },
+  { id:"blueprintFishingMoon", name:"Чертёж: лунная удочка",cat:"misc",  tableLevel:7, tier:9, icon:"📜", needs:[["📄 Бумага",4],["🎣 Железная удочка",1],["🌙 Лунный камень",3]] },
+  { id:"blueprint_charmFrozenHeart",name:"Чертёж: ледяное сердце",cat:"misc",tableLevel:7,tier:9,icon:"📜",needs:[["📄 Бумага",5],["💙 Сапфир",5],["❄️ Кристалл вечной мерзлоты",1]] },
+  { id:"blueprint_charmAbyssEye", name:"Чертёж: амулет ока бездны", cat:"misc", tableLevel:7, tier:11, icon:"📜", needs:[["📄 Бумага",5],["👁️ Око бездны",1],["🕳️ Пыль Пустоты",5]] },
+  { id:"blueprint_robeMoonWeaver", name:"Чертёж: мантия лунной ткачихи", cat:"misc", tableLevel:7, tier:10, icon:"📜", needs:[["📄 Бумага",5],["🌙 Лунный камень",5],["🥼 Мантия мага",1]] },
+  { id:"blueprint_charmLunarCore", name:"Чертёж: лунное ядро", cat:"misc", tableLevel:7, tier:10, icon:"📜", needs:[["📄 Бумага",5],["🌙 Лунное ядро",2],["🌙 Лунный медальон",1]] },
+
+  // --- УНИКАЛЬНЫЕ tier 9 ---
+  { id:"summonMistQueen",name:"Призыв: Королева Тумана",   cat:"misc",   tableLevel:8, tier:9, icon:"🎋", needs:[["🌌 Камень Снов",10],["🌙 Лунный камень",5],["🌫️ Эссенция тумана",3]] },
+  { id:"summonAshDragon",name:"Призыв: Пепельный дракон",  cat:"misc",   tableLevel:8, tier:9, icon:"🎋", needs:[["🌫️ Пепел",40],["❤️ Рубин",10],["🔥 Эссенция огня",5]] },
+  { id:"summonAncientTree",name:"Призыв: Древень",         cat:"misc",   tableLevel:8, tier:9, icon:"🎋", needs:[["🪵 Бревно",50],["🌱 Росток",10],["🌛 Лунный лепесток",10]] },
+  { id:"chestVoidRobe",  name:"Мантия пустоты",            cat:"armor",  tableLevel:2, tier:9, icon:"🕳️", needs:[["🕳️ Пустотное щупальце",2],["🌑 Теневая эссенция",2],["🧶 Ткань",6]], blueprint:"📜 Чертёж: мантия пустоты" },
+  { id:"daggerVoidAssassin",name:"Кинжал теней",           cat:"weapon", tableLevel:2, tier:9, icon:"🗡️", needs:[["🌑 Теневая эссенция",3],["🎯 Метка ассасина",1],["🕳️ Пыль Пустоты",2]], blueprint:"📜 Чертёж: кинжал теней" },
 
   // ============================================================
-  // ============ TIER 11 ======================================
+  // ============ TIER 10 =======================================
   // ============================================================
-  { id:"pickDiamond",   name:"Алмазная кирка",       cat:"tool",   tableLevel:3, tier:11, icon:"⛏️", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
-  { id:"axeDiamond",    name:"Алмазный топор",       cat:"tool",   tableLevel:3, tier:11, icon:"🪓", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
-  { id:"shovelDiamond", name:"Алмазная лопата",      cat:"tool",   tableLevel:3, tier:11, icon:"🥄", needs:[["💎 Алмаз",2],["⬛ Незеритовый слиток",1]] },
-  { id:"fishingRodStar",name:"Звёздная удочка",      cat:"tool",   tableLevel:3, tier:11, icon:"🎣", needs:[["🪵 Бревно",5],["🧵 Волокно",6],["⭐ Осколок звезды",2],["⬛ Незеритовый слиток",1]] },
-  { id:"swordDiamond",  name:"Алмазный меч",         cat:"weapon", tableLevel:3, tier:11, icon:"🗡️", needs:[["💎 Алмаз",2],["⬛ Незеритовый слиток",1]] },
-  { id:"spearDiamond",  name:"Алмазное копьё",       cat:"weapon", tableLevel:3, tier:11, icon:"🔱", needs:[["💎 Алмаз",2],["⬛ Незеритовый слиток",1]] },
-  { id:"bowVoid",       name:"Пустотный лук",        cat:"weapon", tableLevel:3, tier:11, icon:"🏹", needs:[["🕳️ Пыль Пустоты",3],["🪡 Нить",10],["🌙 Лунный камень",2]] },
-  { id:"arrowVoid",     name:"Пустотная стрела ×4",  cat:"weapon", tableLevel:3, tier:11, icon:"🕳️", needs:[["➡️ Стрела",4],["🕳️ Пыль Пустоты",1]] },
-  { id:"helmDiamond",   name:"Алмазный шлем",        cat:"armor",  tableLevel:3, tier:11, icon:"💎", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
-  { id:"chestDiamond",  name:"Алмазный нагрудник",   cat:"armor",  tableLevel:3, tier:11, icon:"💎", needs:[["💎 Алмаз",5],["⬛ Незеритовый слиток",2]] },
-  { id:"bootsDiamond",  name:"Алмазные сапоги",      cat:"armor",  tableLevel:3, tier:11, icon:"💎", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
+  { id:"tableSummon",    name:"Стол призыва",              cat:"misc",   tableLevel:2, tier:10, icon:"🎋", needs:[["🪵 Бревно",6],["🟣 Аметист",3],["🪬 Рунный камень",2]] },
+  { id:"tableJeweler",   name:"Ювелирный стол",            cat:"misc",   tableLevel:2, tier:10, icon:"💎", needs:[["🪵 Бревно",4],["🟨 Золото",2],["💚 Изумруд",2]] },
+  { id:"pickVoid",       name:"Пустотная кирка",           cat:"tool",   tableLevel:2, tier:10, icon:"⛏️", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]], blueprint:"📜 Чертёж: пустотная кирка" },
+  { id:"axeVoid",        name:"Пустотный топор",           cat:"tool",   tableLevel:2, tier:10, icon:"🪓", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]], blueprint:"📜 Чертёж: пустотный топор" },
+  { id:"swordVoid",      name:"Пустотный меч",             cat:"weapon", tableLevel:2, tier:10, icon:"🗡️", needs:[["🕳️ Пыль Пустоты",2],["🌙 Лунный камень",1]], blueprint:"📜 Чертёж: пустотный меч" },
+  { id:"spearVoid",      name:"Пустотное копьё",           cat:"weapon", tableLevel:2, tier:10, icon:"🔱", needs:[["🕳️ Пыль Пустоты",2],["🌙 Лунный камень",1]] },
+  { id:"bowVoid",        name:"Пустотный лук",             cat:"weapon", tableLevel:3, tier:10, icon:"🏹", needs:[["🕳️ Пыль Пустоты",3],["🪡 Нить",10],["🌙 Лунный камень",2]], blueprint:"📜 Чертёж: пустотный лук" },
+  { id:"helmVoid",       name:"Пустотный шлем",            cat:"armor",  tableLevel:2, tier:10, icon:"🕳️", needs:[["🕳️ Пыль Пустоты",3],["🌙 Лунный камень",1]], blueprint:"📜 Чертёж: пустотный шлем" },
+  { id:"keyAncient",     name:"Древний ключ",              cat:"misc",   tableLevel:3, tier:10, icon:"🗝️", needs:[["🪬 Рунный камень",4],["⬛ Незеритовый слиток",2]] },
+  { id:"summonEchoMaster", name:"Призыв: Мастер Эха",      cat:"misc",   tableLevel:8, tier:10, icon:"🎋", needs:[["🔊 Осколок Эха",10],["🟣 Аметист",10],["🪬 Рунный камень",5]] },
+  { id:"summonBoneLord", name:"Призыв: Костяной лорд",     cat:"misc",   tableLevel:8, tier:10, icon:"🎋", needs:[["🦴 Кость",30],["🦴 Костный осколок",20],["❤️ Рубин",3]] },
+  { id:"summonFrozenKing",name:"Призыв: Ледяной король",   cat:"misc",   tableLevel:8, tier:10, icon:"🎋", needs:[["💙 Сапфир",10],["🧊 Лёд",30],["💎 Алмаз",3]] },
+  { id:"charmVoid",      name:"Око пустоты",               cat:"charm",  tableLevel:6, tier:10, icon:"🕳️", needs:[["🕳️ Пыль Пустоты",15],["🟣 Аметист",10],["🌙 Лунный камень",5]] },
+  { id:"charmNecronomicon", name:"Некрономикон",           cat:"charm",  tableLevel:6, tier:10, icon:"📕", needs:[["📕 Книга",5],["🦴 Костный осколок",10],["🌑 Теневая эссенция",5]] },
+  { id:"charmLunarCore", name:"Лунное ядро",               cat:"charm",  tableLevel:6, tier:10, icon:"🌙", needs:[["🌙 Лунное ядро",2],["🧵 Лунный шёлк",3],["🌙 Лунный камень",5]], blueprint:"📜 Чертёж: лунное ядро" },
+
+  // --- КОМПОНЕНТЫ tier 10 ---
+  { id:"prismShard",     name:"Призматический осколок",    cat:"misc",   tableLevel:6, tier:10, icon:"🔷", needs:[["💎 Алмаз",2],["⭐ Осколок звезды",1],["🟣 Аметист",3]] },
+  { id:"blueprintPickVoid", name:"Чертёж: пустотная кирка",cat:"misc",   tableLevel:7, tier:10, icon:"📜", needs:[["📄 Бумага",5],["🕳️ Пыль Пустоты",4],["⛏️ Эхо-кирка",1]] },
+  { id:"blueprintSwordVoid",name:"Чертёж: пустотный меч",  cat:"misc",   tableLevel:7, tier:10, icon:"📜", needs:[["📄 Бумага",5],["🕳️ Пыль Пустоты",3],["🗡️ Лунный меч",1]] },
+
+  // --- УНИКАЛЬНЫЕ tier 10 ---
+  { id:"robeMoonWeaver", name:"Мантия лунной ткачихи",     cat:"armor",  tableLevel:2, tier:10, icon:"🥼", needs:[["🧵 Лунный шёлк",4],["🌙 Лунное ядро",1],["🧶 Ткань",6]], blueprint:"📜 Чертёж: мантия лунной ткачихи" },
 
   // ============================================================
-  // ============ TIER 12 ======================================
+  // ============ TIER 11 =======================================
   // ============================================================
-  { id:"pickNetherite", name:"Незеритовая кирка",    cat:"tool",   tableLevel:3, tier:12, icon:"⛏️", needs:[["⬛ Незеритовый слиток",3],["💎 Алмаз",1]] },
-  { id:"axeNetherite",  name:"Незеритовый топор",    cat:"tool",   tableLevel:3, tier:12, icon:"🪓", needs:[["⬛ Незеритовый слиток",3],["💎 Алмаз",1]] },
-  { id:"swordNetherite",name:"Незеритовый меч",      cat:"weapon", tableLevel:3, tier:12, icon:"🗡️", needs:[["⬛ Незеритовый слиток",2],["💎 Алмаз",1]] },
-  { id:"spearNetherite",name:"Незеритовое копьё",    cat:"weapon", tableLevel:3, tier:12, icon:"🔱", needs:[["⬛ Незеритовый слиток",2],["💎 Алмаз",1]] },
-  { id:"helmNetherite", name:"Незеритовый шлем",     cat:"armor",  tableLevel:3, tier:12, icon:"⬛", needs:[["⬛ Незеритовый слиток",3]] },
-  { id:"chestNetherite",name:"Незеритовый нагрудник",cat:"armor",  tableLevel:3, tier:12, icon:"⬛", needs:[["⬛ Незеритовый слиток",5]] },
-  { id:"bootsNetherite",name:"Незеритовые сапоги",   cat:"armor",  tableLevel:3, tier:12, icon:"⬛", needs:[["⬛ Незеритовый слиток",3]] },
-  { id:"keyStar",       name:"Звёздный ключ",        cat:"misc",   tableLevel:3, tier:12, icon:"🗝️", needs:[["⭐ Осколок звезды",4],["💎 Алмаз",2]] },
-  { id:"starCharm",     name:"Амулет звезды",        cat:"misc",   tableLevel:3, tier:12, icon:"⭐", needs:[["⭐ Осколок звезды",6],["⬛ Незеритовый слиток",2],["🪡 Нить",6]] },
+  { id:"pickDiamond",    name:"Алмазная кирка",            cat:"tool",   tableLevel:2, tier:11, icon:"⛏️", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
+  { id:"axeDiamond",     name:"Алмазный топор",            cat:"tool",   tableLevel:2, tier:11, icon:"🪓", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
+  { id:"shovelDiamond",  name:"Алмазная лопата",           cat:"tool",   tableLevel:2, tier:11, icon:"🥄", needs:[["💎 Алмаз",2],["⬛ Незеритовый слиток",1]] },
+  { id:"swordDiamond",   name:"Алмазный меч",              cat:"weapon", tableLevel:2, tier:11, icon:"🗡️", needs:[["💎 Алмаз",2],["⬛ Незеритовый слиток",1]] },
+  { id:"spearDiamond",   name:"Алмазное копьё",            cat:"weapon", tableLevel:2, tier:11, icon:"🔱", needs:[["💎 Алмаз",2],["⬛ Незеритовый слиток",1]] },
+  { id:"helmDiamond",    name:"Алмазный шлем",             cat:"armor",  tableLevel:2, tier:11, icon:"💎", needs:[["💎 Алмаз",3],["⬛ Незеритовый слиток",1]] },
+  { id:"chestDiamond",   name:"Алмазный нагрудник",        cat:"armor",  tableLevel:2, tier:11, icon:"💎", needs:[["💎 Алмаз",5],["⬛ Незеритовый слиток",2]] },
+  { id:"charmKey",       name:"Медальон хранителя",        cat:"charm",  tableLevel:6, tier:11, icon:"🗝️", needs:[["🕳️ Пыль Пустоты",10],["🌙 Лунный камень",10],["⭐ Осколок звезды",2]] },
+  { id:"summonVoidDragon",name:"Призыв: Дракон Пустоты",   cat:"misc",   tableLevel:8, tier:11, icon:"🎋", needs:[["🕳️ Пыль Пустоты",10],["🌙 Лунный камень",5],["⭐ Осколок звезды",1]] },
+  { id:"summonMoonQueen",name:"Призыв: Лунная королева",   cat:"misc",   tableLevel:8, tier:11, icon:"🎋", needs:[["🌙 Лунный камень",10],["💎 Алмаз",5],["🌛 Лунный лепесток",5]] },
 
-  // --- КУЗНЯ (tier 12) ---
-  { id:"smelt_netherite",name:"Незеритовый слиток",  cat:"misc",   tableLevel:"smelt", tier:12, icon:"⬛",
-    needs:[["⬛ Незеритовый лом",2],["🟨 Золото",1],["⚫ Уголь",3]], result:"⬛ Незеритовый слиток" },
+  // --- КОМПОНЕНТЫ tier 11 ---
+  { id:"abyssEye",       name:"Око бездны",                cat:"misc",   tableLevel:6, tier:11, icon:"👁️", needs:[["🕳️ Пыль Пустоты",6],["🌑 Теневая эссенция",4],["⭐ Осколок звезды",1]] },
+  { id:"dragonFang",     name:"Клык дракона",              cat:"misc",   tableLevel:2, tier:11, icon:"🦷", needs:[["🦴 Костный осколок",6],["🐉 Драконья чешуя",2]] },
+  { id:"dragonScale",    name:"Чешуя дракона",             cat:"misc",   tableLevel:2, tier:11, icon:"🐉", needs:[["🟤 Кожа",10],["💎 Алмаз",2],["⭐ Осколок звезды",1]] },
+  { id:"demonHorn",      name:"Демонический рог",          cat:"misc",   tableLevel:2, tier:11, icon:"😈", needs:[["❤️ Рубин",4],["🔥 Эссенция огня",2],["🐉 Драконья чешуя",1]] },
+  { id:"infernalCore",   name:"Адское ядро",               cat:"misc",   tableLevel:2, tier:11, icon:"🔥", needs:[["🔥 Ядро угля",2],["🌋 Осколок лавы",2],["❤️ Рубин",3]] },
+  { id:"blueprintBowVoid", name:"Чертёж: пустотный лук",   cat:"misc",   tableLevel:7, tier:11, icon:"📜", needs:[["📄 Бумага",5],["🕳️ Пыль Пустоты",4],["🏹 Лунный лук",1]] },
+  { id:"blueprintFishingStar",name:"Чертёж: звёздная удочка",cat:"misc", tableLevel:7, tier:11, icon:"📜", needs:[["📄 Бумага",5],["🎣 Лунная удочка",1],["⭐ Осколок звезды",2]] },
+  { id:"blueprint_swordDemonic", name:"Чертёж: демонический клинок", cat:"misc", tableLevel:7, tier:11, icon:"📜", needs:[["📄 Бумага",5],["😈 Демонический рог",2],["🗡️ Пустотный меч",1]] },
+  { id:"blueprint_chestInfernal",name:"Чертёж: адская броня",cat:"misc",  tableLevel:7, tier:11, icon:"📜", needs:[["📄 Бумага",5],["😈 Демонический рог",3],["🕳️ Пустотный нагрудник",1]] },
+  { id:"blueprint_charmAbyssEye2", name:"Чертёж: амулет ока бездны (полный)", cat:"misc", tableLevel:7, tier:11, icon:"📜", needs:[["📄 Бумага",5],["👁️ Око бездны",1],["🕳️ Пыль Пустоты",5]] },
+
+  // --- УНИКАЛЬНЫЕ tier 11 ---
+  { id:"swordDemonic",   name:"Демонический клинок",       cat:"weapon", tableLevel:2, tier:11, icon:"😈", needs:[["😈 Демонический рог",2],["🔥 Адское ядро",1],["⬛ Незеритовый слиток",2]], blueprint:"📜 Чертёж: демонический клинок" },
+  { id:"chestInfernal",  name:"Адская броня",              cat:"armor",  tableLevel:2, tier:11, icon:"🔥", needs:[["😈 Демонический рог",3],["🔥 Адское ядро",2],["⬛ Незеритовый слиток",4]], blueprint:"📜 Чертёж: адская броня" },
+  { id:"charmAbyssEye",  name:"Амулет ока бездны",         cat:"charm",  tableLevel:6, tier:11, icon:"👁️", needs:[["👁️ Око бездны",1],["🕳️ Пустотное щупальце",2],["🌑 Теневая эссенция",3]], blueprint:"📜 Чертёж: амулет ока бездны" },
 
   // ============================================================
-  // ============ TIER 13 ======================================
+  // ============ TIER 12 =======================================
   // ============================================================
-  { id:"pickStar",      name:"Звёздная кирка",       cat:"tool",   tableLevel:3, tier:13, icon:"⛏️", needs:[["⭐ Осколок звезды",3],["⬛ Незеритовый слиток",1]] },
-  { id:"swordStar",     name:"Звёздный меч",         cat:"weapon", tableLevel:3, tier:13, icon:"🗡️", needs:[["⭐ Осколок звезды",2],["⬛ Незеритовый слиток",1]] },
-  { id:"spearStar",     name:"Звёздное копьё",       cat:"weapon", tableLevel:3, tier:13, icon:"🔱", needs:[["⭐ Осколок звезды",2],["⬛ Незеритовый слиток",1]] },
-  { id:"bowStar",       name:"Звёздный лук",         cat:"weapon", tableLevel:3, tier:13, icon:"🏹", needs:[["⭐ Осколок звезды",3],["🪡 Нить",12],["⬛ Незеритовый слиток",2]] },
-  { id:"arrowStar",     name:"Звёздная стрела ×4",   cat:"weapon", tableLevel:3, tier:13, icon:"⭐", needs:[["➡️ Стрела",4],["⭐ Осколок звезды",1]] },
-  { id:"starFruit",     name:"Звёздный плод",        cat:"food",   tableLevel:3, tier:13, icon:"⭐", needs:[["⭐ Осколок звезды",4],["🍎 Золотое яблоко",1]] },
+  { id:"pickNetherite",  name:"Незеритовая кирка",         cat:"tool",   tableLevel:2, tier:12, icon:"⛏️", needs:[["⬛ Незеритовый слиток",3],["💎 Алмаз",1]] },
+  { id:"axeNetherite",   name:"Незеритовый топор",         cat:"tool",   tableLevel:2, tier:12, icon:"🪓", needs:[["⬛ Незеритовый слиток",3],["💎 Алмаз",1]] },
+  { id:"swordNetherite", name:"Незеритовый меч",           cat:"weapon", tableLevel:2, tier:12, icon:"🗡️", needs:[["⬛ Незеритовый слиток",2],["💎 Алмаз",1]] },
+  { id:"spearNetherite", name:"Незеритовое копьё",         cat:"weapon", tableLevel:2, tier:12, icon:"🔱", needs:[["⬛ Незеритовый слиток",2],["💎 Алмаз",1]] },
+  { id:"helmNetherite",  name:"Незеритовый шлем",          cat:"armor",  tableLevel:2, tier:12, icon:"⬛", needs:[["⬛ Незеритовый слиток",3]] },
+  { id:"chestNetherite", name:"Незеритовый нагрудник",     cat:"armor",  tableLevel:2, tier:12, icon:"⬛", needs:[["⬛ Незеритовый слиток",5]] },
+  { id:"keyStar",        name:"Звёздный ключ",             cat:"misc",   tableLevel:3, tier:12, icon:"🗝️", needs:[["⭐ Осколок звезды",4],["💎 Алмаз",2]] },
+  { id:"charmStar",      name:"Амулет звезды",             cat:"charm",  tableLevel:6, tier:12, icon:"⭐", needs:[["⭐ Осколок звезды",6],["⬛ Незеритовый слиток",2],["🪡 Нить",6]] },
+  { id:"charmEternal",   name:"Кольцо вечности",           cat:"charm",  tableLevel:6, tier:12, icon:"💍", needs:[["⭐ Амулет звезды",3],["⭐ Осколок звезды",10],["⬛ Незеритовый слиток",5],["💎 Алмаз",10]] },
+  { id:"summonStarEmperor",name:"Призыв: Звёздный император",cat:"misc", tableLevel:8, tier:14, icon:"🎋", needs:[["⭐ Осколок звезды",10],["⬛ Незеритовый слиток",5],["💎 Алмаз",10]] },
+  { id:"dungeonKeyStar", name:"Звёздный ключ данжа",       cat:"misc",   tableLevel:3, tier:12, icon:"🔑", needs:[["⭐ Осколок звезды",8],["🗝️ Звёздный ключ",1]] },
+
+  // --- КОМПОНЕНТЫ tier 12 ---
+  { id:"blueprintDungeonKeyStar", name:"Чертёж: звёздный ключ",cat:"misc",tableLevel:7, tier:12, icon:"📜", needs:[["📄 Бумага",5],["⭐ Осколок звезды",3],["💎 Алмаз",2]] },
+  { id:"blueprintPickStar", name:"Чертёж: звёздная кирка", cat:"misc",   tableLevel:7, tier:12, icon:"📜", needs:[["📄 Бумага",5],["⭐ Осколок звезды",4],["⛏️ Пустотная кирка",1]] },
+  { id:"blueprintSwordStar",name:"Чертёж: звёздный меч",   cat:"misc",   tableLevel:7, tier:12, icon:"📜", needs:[["📄 Бумага",5],["⭐ Осколок звезды",3],["🗡️ Пустотный меч",1]] },
+  { id:"blueprintBowStar",  name:"Чертёж: звёздный лук",   cat:"misc",   tableLevel:7, tier:12, icon:"📜", needs:[["📄 Бумага",5],["⭐ Осколок звезды",4],["🏹 Пустотный лук",1]] },
+  { id:"blueprint_swordDragon", name:"Чертёж: драконий клинок", cat:"misc", tableLevel:7, tier:12, icon:"📜", needs:[["📄 Бумага",6],["🐉 Драконья чешуя",3],["🗡️ Незеритовый меч",1]] },
+  { id:"blueprint_chestDragon", name:"Чертёж: драконья броня",cat:"misc",  tableLevel:7, tier:12, icon:"📜", needs:[["📄 Бумага",6],["🐉 Драконья чешуя",5],["⬛ Незеритовый нагрудник",1]] },
+
+  // --- УНИКАЛЬНЫЕ tier 12 ---
+  { id:"swordDragon",    name:"Драконий клинок",           cat:"weapon", tableLevel:2, tier:12, icon:"🐉", needs:[["🦷 Клык дракона",1],["🐉 Драконья чешуя",3],["⬛ Незеритовый слиток",2]], blueprint:"📜 Чертёж: драконий клинок" },
+  { id:"chestDragon",    name:"Драконья броня",            cat:"armor",  tableLevel:2, tier:12, icon:"🐉", needs:[["🐉 Драконья чешуя",5],["❤️‍🔥 Сердце дракона",1],["⬛ Незеритовый слиток",4]], blueprint:"📜 Чертёж: драконья броня" },
+
+  // ============================================================
+  // ============ TIER 13 =======================================
+  // ============================================================
+  { id:"pickStar",       name:"Звёздная кирка",            cat:"tool",   tableLevel:2, tier:13, icon:"⛏️", needs:[["⭐ Осколок звезды",3],["⬛ Незеритовый слиток",1]], blueprint:"📜 Чертёж: звёздная кирка" },
+  { id:"swordStar",      name:"Звёздный меч",              cat:"weapon", tableLevel:2, tier:13, icon:"🗡️", needs:[["⭐ Осколок звезды",2],["⬛ Незеритовый слиток",1]], blueprint:"📜 Чертёж: звёздный меч" },
+  { id:"spearStar",      name:"Звёздное копьё",            cat:"weapon", tableLevel:2, tier:13, icon:"🔱", needs:[["⭐ Осколок звезды",2],["⬛ Незеритовый слиток",1]] },
+  { id:"bowStar",        name:"Звёздный лук",              cat:"weapon", tableLevel:3, tier:13, icon:"🏹", needs:[["⭐ Осколок звезды",3],["🪡 Нить",12],["⬛ Незеритовый слиток",2]], blueprint:"📜 Чертёж: звёздный лук" },
+  { id:"charmCosmic",    name:"Космическое око",           cat:"charm",  tableLevel:6, tier:13, icon:"🌌", needs:[["⭐ Осколок звезды",10],["🕳️ Пыль Пустоты",10],["🌙 Лунный камень",10]] },
+  { id:"charmInfinity",  name:"Осколок бесконечности",     cat:"charm",  tableLevel:6, tier:13, icon:"♾️", needs:[["⭐ Осколок звезды",20],["🕳️ Пыль Пустоты",20],["🌌 Камень Снов",10],["⬛ Незеритовый слиток",10]] },
+
+  // --- КОМПОНЕНТЫ tier 13 ---
+  { id:"dragonHeart",    name:"Сердце дракона",            cat:"misc",   tableLevel:2, tier:13, icon:"❤️‍🔥", needs:[["❤️ Рубин",10],["⭐ Осколок звезды",2],["🔥 Эссенция огня",3]] },
+  { id:"blueprint_charmDragonHeart", name:"Чертёж: сердце дракона", cat:"misc", tableLevel:7, tier:13, icon:"📜", needs:[["📄 Бумага",6],["❤️‍🔥 Сердце дракона",1],["🌌 Космическое око",1]] },
+
+  // --- УНИКАЛЬНЫЕ tier 13 ---
+  { id:"charmDragonHeart",name:"Сердце дракона",           cat:"charm",  tableLevel:6, tier:13, icon:"❤️‍🔥", needs:[["❤️‍🔥 Сердце дракона",1],["🐉 Драконья чешуя",5],["🔷 Призматический осколок",3]], blueprint:"📜 Чертёж: сердце дракона" },
+
+  // ============================================================
+  // ============ TIER 14 =======================================
+  // ============================================================
+  { id:"summonStarEmperor", name:"Призыв: Звёздный император",cat:"misc",tableLevel:8, tier:14, icon:"🎋", needs:[["⭐ Осколок звезды",10],["⬛ Незеритовый слиток",5],["💎 Алмаз",10]] },
+
+  // ============================================================
+  // 🆕 ДОПОЛНИТЕЛЬНЫЕ ПРИЗЫВЫ / РЕДКИЕ (расширение)
+  // ============================================================
+  { id:"summonEchoMasterX", name:"Призыв: Мастер Эха (полный)", cat:"misc", tableLevel:8, tier:10, icon:"🎋", needs:[["🔊 Осколок Эха",15],["🟣 Аметист",15],["🪬 Рунный камень",8]] },
+
+  // ============================================================
+  // 🆕 ЧЕРТЕЖИ (расширенный набор)
+  // ============================================================
+  { id:"blueprint_staffFrostExtra", name:"Чертёж: морозный посох (усиленный)", cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",5],["❄️ Морозное ядро",2],["🪄 Морозный посох",1]] },
+  { id:"blueprint_bowAshExtra",     name:"Чертёж: пепельный лук (усиленный)",  cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",5],["🔥 Ядро угля",2],["🏹 Пепельный лук",1]] },
+  { id:"blueprint_swordFrostExtra", name:"Чертёж: ледяной клинок (усиленный)", cat:"misc", tableLevel:7, tier:7, icon:"📜", needs:[["📄 Бумага",5],["❄️ Морозное ядро",2],["🗡️ Ледяной клинок",1]] },
+
+  // ============================================================
+  // 🆕 РЕСУРСЫ ДЛЯ ДАНЖЕЙ И КРАФТА (расширение)
+  // ============================================================
+  { id:"boneSoil",       name:"Костяная почва",            cat:"block",  tableLevel:1, tier:4, icon:"🦴", needs:[["🦴 Костный осколок",4],["🪨 Булыжник",2]] },
+  { id:"crystalSoil",    name:"Кристалл. почва",           cat:"block",  tableLevel:1, tier:4, icon:"💠", needs:[["🟣 Аметист",4],["🪨 Булыжник",2]] },
+  { id:"voidSoil",       name:"Пустотная почва",           cat:"block",  tableLevel:1, tier:8, icon:"🕳️", needs:[["🕳️ Пыль Пустоты",4],["🪨 Булыжник",2]] },
+  { id:"dreamSoil",      name:"Сонная почва",              cat:"block",  tableLevel:1, tier:7, icon:"🌌", needs:[["🌌 Камень Снов",4],["🪨 Булыжник",2]] },
+  { id:"echoSoil",       name:"Эхо-почва",                 cat:"block",  tableLevel:1, tier:6, icon:"🔊", needs:[["🔊 Осколок Эха",4],["🪨 Булыжник",2]] },
+  { id:"moonSoil",       name:"Лунная почва",              cat:"block",  tableLevel:1, tier:6, icon:"🌙", needs:[["🌙 Лунный камень",2],["🪨 Булыжник",2]] },
+  { id:"scorched",       name:"Выжженная земля",           cat:"block",  tableLevel:1, tier:3, icon:"🔥", needs:[["🌫️ Пепел",4],["🪨 Булыжник",2]] },
+
+  // ============================================================
+  // 🆕 СТОЛЫ И АЛТАРИ
+  // ============================================================
+  { id:"tableJewelerX",  name:"Ювелирный стол (полный)",   cat:"misc",   tableLevel:2, tier:10, icon:"💎", needs:[["🪵 Бревно",6],["🟨 Золото",4],["💚 Изумруд",4],["🟣 Аметист",2]] },
+  { id:"memoryCrystalX", name:"Кристалл памяти (полный)",  cat:"misc",   tableLevel:6, tier:8, icon:"🔮", needs:[["🔊 Осколок Эха",6],["🟣 Аметист",8],["🌙 Лунный камень",2]] },
 ];
 
 /* =========================================================
@@ -902,6 +1123,7 @@ function craftMatches(c, table, cat, query) {
   if (c.name.toLowerCase().includes(q)) return true;
   if (c.id.toLowerCase().includes(q)) return true;
   if (c.result && c.result.toLowerCase().includes(q)) return true;
+  if (c.blueprint && c.blueprint.toLowerCase().includes(q)) return true;
 
   return c.needs.some(n => {
     const { name } = parseItem(n[0]);
@@ -910,10 +1132,9 @@ function craftMatches(c, table, cat, query) {
 }
 
 /* =========================================================
-   РЕНДЕР КАРТОЧКИ — ЕДИНЫЙ (и крафт, и кузня)
+   РЕНДЕР КАРТОЧКИ
    ========================================================= */
 function renderCard(c) {
-  // Собираем все ингредиенты: для кузни needs уже содержит и топливо, и добавки
   const items = c.needs.map(n => parseItem(n[0]));
   const counts = c.needs.map(n => n[1]);
 
@@ -932,15 +1153,23 @@ function renderCard(c) {
 
   let stationLabel, stationClass;
   switch(c.tableLevel) {
-    case 0:            stationLabel = "✋ Руками";            stationClass = "hand";          break;
-    case 1:            stationLabel = "🛠️ Стол ремесла";     stationClass = "table";         break;
-    case 2:            stationLabel = "⚙️ Железный верстак";  stationClass = "iron_table";    break;
-    case 3:            stationLabel = "💎 Алмазный верстак";  stationClass = "diamond_table"; break;
-    case "smelt":      stationLabel = "🔥 Кузня";             stationClass = "forge";         break;
+    case 0:            stationLabel = "✋ Руками";              stationClass = "hand";          break;
+    case 1:            stationLabel = "🛠️ Стол ремесла";       stationClass = "table";         break;
+    case 2:            stationLabel = "⚒️ Кузнечный стол";      stationClass = "iron_table";    break;
+    case 3:            stationLabel = "🏹 Стол стрелка";        stationClass = "diamond_table"; break;
+    case 4:            stationLabel = "🍖 Кухонный стол";       stationClass = "table";         break;
+    case 5:            stationLabel = "⚗️ Стол алхимика";       stationClass = "forge";         break;
+    case 6:            stationLabel = "💎 Ювелирный стол";      stationClass = "iron_table";    break;
+    case 7:            stationLabel = "📖 Стол чар";            stationClass = "diamond_table"; break;
+    case 8:            stationLabel = "🎋 Стол призыва";        stationClass = "forge";         break;
+    case "smelt":      stationLabel = "🔥 Кузня";               stationClass = "forge";         break;
     default:           stationLabel = "?"; stationClass = "";
   }
   const station = `<span class="pill station ${stationClass}">${stationLabel}</span>`;
   const tier = c.tier ? `<span class="pill"><b>${c.tier}⭐</b></span>` : '';
+  const blueprintIcon = c.blueprint
+    ? `<span class="pill blueprint-pill" title="${escapeHtml(c.blueprint)}">📜</span>`
+    : '';
 
   return `
     <div class="recipe-card">
@@ -951,6 +1180,7 @@ function renderCard(c) {
           <div class="recipe-meta">
             ${tier}
             ${station}
+            ${blueprintIcon}
           </div>
         </div>
       </div>
@@ -1030,8 +1260,13 @@ function tableLabel(t) {
     all: "Все",
     "0": "✋ Руками",
     "1": "🛠️ Стол ремесла",
-    "2": "⚙️ Железный верстак",
-    "3": "💎 Алмазный верстак",
+    "2": "⚒️ Кузнечный стол",
+    "3": "🏹 Стол стрелка",
+    "4": "🍖 Кухонный стол",
+    "5": "⚗️ Стол алхимика",
+    "6": "💎 Ювелирный стол",
+    "7": "📖 Стол чар",
+    "8": "🎋 Стол призыва",
     smelt: "🔥 Кузня"
   };
   return labels[String(t)] || t;
@@ -1046,6 +1281,7 @@ function catLabel(c) {
     potion: "🧪 Зелья",
     block:  "🧱 Блоки",
     build:  "🏗️ Постройки",
+    charm:  "🍀 Амулеты",
     misc:   "📦 Прочее"
   };
   return labels[c] || c;
