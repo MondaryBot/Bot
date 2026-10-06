@@ -27,6 +27,9 @@
     --pill-bg: rgba(255,255,255,0.04);
     --line: #34424f;
     --line-hi: rgba(255,169,77,0.85);
+    --tag-bg: rgba(255,255,255,0.06);
+    --tag-border: rgba(255,255,255,0.1);
+    --rare: #ffc95c;
   }
   html.light {
     --bg-1: #e8dfd1; --bg-2: #d9cdb9;
@@ -48,6 +51,9 @@
     --pill-bg: rgba(201, 136, 80, 0.10);
     --line: #b8a181;
     --line-hi: rgba(201, 136, 80, 0.9);
+    --tag-bg: rgba(0,0,0,0.04);
+    --tag-border: rgba(0,0,0,0.08);
+    --rare: #b8860b;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; }
@@ -127,9 +133,12 @@
 
   .layout {
     display: grid;
-    grid-template-columns: 1fr 360px;
+    grid-template-columns: 1fr 400px;
     gap: 16px;
     align-items: start;
+  }
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr 360px; }
   }
   @media (max-width: 980px) {
     .layout { grid-template-columns: 1fr; }
@@ -270,7 +279,12 @@
     animation: cardIn 0.35s cubic-bezier(0.2, 0.8, 0.3, 1) both;
     position: sticky;
     top: 16px;
+    max-height: 88vh;
+    overflow-y: auto;
   }
+  .info-panel::-webkit-scrollbar { width: 6px; }
+  .info-panel::-webkit-scrollbar-track { background: transparent; }
+  .info-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   .info-panel-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
   .info-icon {
     width: 60px; height: 60px; border-radius: 16px;
@@ -291,13 +305,7 @@
     display: inline-block;
     margin-top: 4px;
   }
-  .info-type .type-stars {
-    color: #ffc95c;
-    font-size: 0.72rem;
-    margin-left: 5px;
-    text-shadow: 0 0 6px rgba(255, 201, 92, 0.55);
-    font-weight: 900;
-  }
+  .info-type .type-stars { color: var(--rare); font-size: 0.72rem; margin-left: 5px; text-shadow: 0 0 6px rgba(255, 201, 92, 0.55); font-weight: 900; }
   .info-hint { color: var(--text-mut); font-size: 0.9rem; text-align: center; padding: 24px 10px; }
   .info-block { margin-top: 14px; }
   .info-block-label {
@@ -314,11 +322,94 @@
     font-size: 0.83rem; font-weight: 700;
     color: var(--text-dim);
   }
-  .info-tag .lvl {
-    color: var(--accent);
-    font-size: 0.72rem;
+  .info-tag .lvl { color: var(--accent); font-size: 0.72rem; font-weight: 800; }
+
+  /* Стили для лута */
+  .loot-section {
+    margin-top: 10px;
+    border-top: 1px solid var(--divider);
+    padding-top: 8px;
+}
+  .loot-title {
+    font-size: 0.7rem;
     font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
+.loot-item {
+    margin-bottom: 6px;
+    background: var(--tag-bg);
+    border-radius: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--tag-border);
+}
+.loot-item:last-child {
+    margin-bottom: 0;
+}
+.loot-enemy {
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.3;
+}
+  .loot-drops {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .loot-drop {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: var(--tag-bg);
+    border: 1px solid var(--tag-border);
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+  .loot-drop .chance {
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 0.72rem;
+  }
+  .loot-drop.rare {
+    border-color: var(--rare);
+    background: rgba(255, 201, 92, 0.08);
+  }
+  .loot-drop.rare .chance { color: var(--rare); }
+  .loot-subtitle {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-mut);
+    margin-top: 4px;
+    margin-bottom: 2px;
+}
+  .info-stars-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .info-star-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: var(--tag-bg);
+    border: 1px solid var(--tag-border);
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+  .info-star-chip.req { border-color: var(--rare); color: var(--rare); }
 
   .footer {
     max-width: 1500px; margin: 40px auto 0;
@@ -340,24 +431,18 @@
     html.light .toggle-knob { left: calc(100% - 24px); }
     .back-link { padding: 6px 10px; font-size: 0.72rem; }
     .map-viewport { height: 68vh; min-height: 460px; }
-    .info-panel { padding: 16px; position: static; }
+    .info-panel { padding: 16px; position: static; max-height: none; }
     .node { width: 120px; padding: 9px 6px 8px; }
     .node-icon { font-size: 1.55rem; }
     .node-name { font-size: 0.8rem; }
     .node-mark { font-size: 0.78rem; }
-
-    /* Кнопки зума чуть крупнее и иконки больше на телефоне */
     .zoom-controls { top: 10px; right: 10px; gap: 7px; }
     .zoom-btn { width: 46px; height: 46px; font-size: 1.5rem; border-radius: 13px; }
     .zoom-btn svg { width: 22px; height: 22px; }
     .zoom-btn.reset-btn svg { width: 25px; height: 25px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   }
   html.light body {
     background:
@@ -365,13 +450,8 @@
       radial-gradient(700px 400px at 90% 110%, var(--glow-2), transparent 70%),
       linear-gradient(180deg, var(--bg-1), var(--bg-2));
   }
-  html.light .map-wrap,
-  html.light .info-panel,
-  html.light .zoom-btn {
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 1) inset,
-      0 6px 20px var(--shadow-soft),
-      0 2px 6px rgba(70, 45, 15, 0.08);
+  html.light .map-wrap, html.light .info-panel, html.light .zoom-btn {
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 1) inset, 0 6px 20px var(--shadow-soft), 0 2px 6px rgba(70, 45, 15, 0.08);
   }
   html.light .node {
     background: linear-gradient(160deg, #fbf3e5, #f0e2c9);
@@ -397,7 +477,6 @@
 
   <div class="container">
     <div class="layout">
-
       <div class="map-wrap" id="mapWrap">
         <div class="map-viewport" id="mapViewport">
           <div class="map-stage" id="mapStage">
@@ -426,7 +505,6 @@
           </button>
         </div>
       </div>
-
       <div id="infoPanelHost">
         <div class="info-panel">
           <div class="info-hint">
@@ -436,7 +514,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -472,11 +549,10 @@ const TYPES = {
   10: { label: "Вода",     color: "#38bdf8" }
 };
 
-/* Типы, у которых показываем редкость */
 const STAR_TYPES = new Set([6, 7, 8]);
 
 /* ============================================================
-   ДАННЫЕ
+   ПОЛНЫЕ ДАННЫЕ ИЗ data.js
    ============================================================ */
 const campNpcs = [
   { id: 1,  name: "🍊Мандарин-тян",         stPlace: 2  },
@@ -502,205 +578,750 @@ const campBuilds = [
 ];
 
 const campItems = [
-  { id: 104, name: "⚪️Железная руда",      weight: 3,  type: "ore" },
-  { id: 106, name: "⚪️Серебрянная руда",   weight: 4,  type: "ore" },
-  { id: 108, name: "🟡Золотая руда",        weight: 6,  type: "ore" },
-  { id: 112, name: "⚪️Платиновая руда",    weight: 6,  type: "ore" },
-  { id: 114, name: "🔴Рубин",               weight: 15, type: "gem" },
-  { id: 501, name: "🗝Ключ от старых ворот",     type: "key" },
-  { id: 502, name: "🗝Древесный ключ",            type: "key" },
-  { id: 503, name: "🗝Рунный ключ",               type: "key" },
-  { id: 504, name: "🗝Ключ в пустыню",            type: "key" },
-  { id: 505, name: "🗝Ключ в пустынный город",   type: "key" }
+  { id: 101, name: "🪵Дерево", type: 1, weight: 1, delete: true },
+  { id: 102, name: "🪨Камень", type: 1, weight: 1, delete: true },
+  { id: 103, name: "🌾Сено", type: 1, weight: 1, delete: true },
+  { id: 104, name: "⚪️Железная руда", type: 1, weight: 3, delete: true },
+  { id: 105, name: "⬜️Железный слиток", type: 1, weight: 15, delete: true },
+  { id: 106, name: "⚪️Серебрянная руда", type: 1, weight: 4, delete: true },
+  { id: 107, name: "⬜️Серебрянный слиток", type: 1, weight: 20, delete: true },
+  { id: 108, name: "🟡Золотая руда", type: 1, weight: 6, delete: true },
+  { id: 109, name: "🟨Золотой слиток", type: 1, weight: 30, delete: true },
+  { id: 110, name: "🫘Приманка (1⭐)", type: 1, weight: 2, delete: true },
+  { id: 111, name: "🫘Приманка (2⭐)", type: 1, weight: 3, delete: true },
+  { id: 112, name: "⚪️Платиновая руда", type: 1, weight: 6, delete: true },
+  { id: 113, name: "⬜️Платиновый слиток", type: 1, weight: 30, delete: true },
+  { id: 114, name: "🔴Рубин", type: 1, weight: 15, delete: true },
+  { id: 115, name: "🫘Приманка (3⭐)", type: 1, weight: 4, delete: true },
+  { id: 116, name: "⬜️Белое золото", type: 1, weight: 40, delete: true },
+  { id: 201, name: "🥩Сырое мясо (1⭐)", type: 2, exp: 25, weight: 3, stars: 1, delete: true },
+  { id: 202, name: "🥩Птичье мясо (1⭐)", type: 2, exp: 25, weight: 3, stars: 1, delete: true },
+  { id: 203, name: "🐟Сырая рыба (1⭐)", type: 2, exp: 15, weight: 3, stars: 1, delete: true },
+  { id: 204, name: "🍖Мясо (1⭐)", type: 2, exp: 32, weight: 3, stars: 1, delete: true },
+  { id: 205, name: "🍗Куриные крылышки (1⭐)", type: 2, exp: 32, weight: 3, stars: 1, delete: true },
+  { id: 206, name: "🐟Жаренная рыба (1⭐)", type: 2, exp: 20, weight: 3, stars: 1, delete: true },
+  { id: 207, name: "🍞Хлеб (1⭐)", type: 2, exp: 25, weight: 5, stars: 1, delete: true },
+  { id: 208, name: "🥩Сырое мясо (2⭐)", type: 2, exp: 32, weight: 4, stars: 2, delete: true },
+  { id: 209, name: "🥩Птичье мясо (2⭐)", type: 2, exp: 32, weight: 4, stars: 2, delete: true },
+  { id: 210, name: "🐟Сырая рыба (2⭐)", type: 2, exp: 20, weight: 4, stars: 2, delete: true },
+  { id: 211, name: "🍖Мясо (2⭐)", type: 2, exp: 42, weight: 4, stars: 2, delete: true },
+  { id: 212, name: "🍗Куриные крылышки (2⭐)", type: 2, exp: 42, weight: 4, stars: 2, delete: true },
+  { id: 213, name: "🐟Жаренная рыба (2⭐)", type: 2, exp: 27, weight: 4, stars: 2, delete: true },
+  { id: 214, name: "🐟Сырая рыба (3⭐)", type: 2, exp: 36, weight: 5, stars: 3, delete: true },
+  { id: 215, name: "🐟Сырая рыба (4⭐)", type: 2, exp: 48, weight: 6, stars: 4, delete: true },
+  { id: 216, name: "🥩Сырое мясо (3⭐)", type: 2, exp: 42, weight: 5, stars: 3, delete: true },
+  { id: 217, name: "🥩Птичье мясо (3⭐)", type: 2, exp: 42, weight: 5, stars: 3, delete: true },
+  { id: 218, name: "🍖Мясо (3⭐)", type: 2, exp: 56, weight: 5, stars: 3, delete: true },
+  { id: 219, name: "🍗Куриные крылышки (3⭐)", type: 2, exp: 56, weight: 5, stars: 3, delete: true },
+  { id: 220, name: "🐟Жаренная рыба (3⭐)", type: 2, exp: 36, weight: 5, stars: 3, delete: true },
+  { id: 301, name: "🪶Перо (1⭐)", type: 3, weight: 3, delete: true },
+  { id: 302, name: "🦷Клык (1⭐)", type: 3, weight: 3, delete: true },
+  { id: 303, name: "🦴Кость (1⭐)", type: 3, weight: 3, delete: true },
+  { id: 304, name: "🟤Кожа (1⭐)", type: 3, weight: 3, delete: true },
+  { id: 305, name: "🪶Перо (2⭐)", type: 3, weight: 4, delete: true },
+  { id: 306, name: "🦷Клык (2⭐)", type: 3, weight: 4, delete: true },
+  { id: 307, name: "🦴Кость (2⭐)", type: 3, weight: 4, delete: true },
+  { id: 308, name: "🟤Кожа (2⭐)", type: 3, weight: 4, delete: true },
+  { id: 309, name: "🪶Перо (3⭐)", type: 3, weight: 5, delete: true },
+  { id: 310, name: "🦷Клык (3⭐)", type: 3, weight: 5, delete: true },
+  { id: 311, name: "🦴Кость (3⭐)", type: 3, weight: 5, delete: true },
+  { id: 312, name: "🟤Кожа (3⭐)", type: 3, weight: 5, delete: true },
+  { id: 401, name: "💍Железное кольцо", type: 4, weight: 20, delete: true },
+  { id: 402, name: "💍Серебрянное кольцо", type: 4, weight: 30, delete: true },
+  { id: 403, name: "🪶Шляпа из перьев", type: 4, weight: 12, delete: true },
+  { id: 404, name: "💍Золотой браслет", type: 4, weight: 40, delete: true },
+  { id: 405, name: "💍Платиновое кольцо", type: 4, weight: 40, delete: true },
+  { id: 406, name: "🛡Щит-подарок", type: 4, weight: 50, delete: true },
+  { id: 407, name: "👑Тиара с рубином", type: 4, weight: 40, delete: true },
+  { id: 408, name: "📿Амулет подношения", type: 4, weight: 25, delete: true },
+  { id: 409, name: "🪢Браслет из белого золота", type: 4, weight: 60, delete: true },
+  { id: 501, name: "🗝Ключ от старых ворот", type: 5 },
+  { id: 502, name: "🗝Древесный ключ", type: 5 },
+  { id: 503, name: "🗝Рунный ключ", type: 5 },
+  { id: 504, name: "🗝Ключ в пустыню", type: 5 },
+  { id: 505, name: "🗝Ключ в пустынный город", type: 5 },
+  { id: 506, name: "🗝Ключ в ?", type: 5 }
 ];
 
-/* campPlaces — starsDo только для рудников (7), рощ (6) и полей (8) */
 const campPlaces = [
-  { id: 1,  type: 1,  name: "🏘️Главная площадь", near: [2,3,4,5], builds: [6,2] },
-  { id: 2,  type: 1,  name: "🏠Дом жриц", near: [1,5,10] },
-  { id: 3,  type: 1,  name: "🪚Ремесленная", near: [1,4,5], builds: [3,4] },
-  { id: 4,  type: 10, name: "💧Берег", near: [1,3], builds: [5], fishes: true },
-  { id: 5,  type: 1,  name: "🐾Пастбище", near: [1,2,3,6], builds: [1] },
-  { id: 6,  type: 1,  name: "🌿Поляна", near: [5,7] },
-  { id: 7,  type: 8,  name: "🌾Сад", near: [6,8,9], hunt: true, find: true, starsDo: 1 },
-  { id: 8,  type: 6,  name: "🌳Роща", near: [7], hunt: true, find: true, starsDo: 1 },
-  { id: 9,  type: 7,  name: "⛰️Железный рудник", near: [7], hunt: true, find: true, mineItems: [104], starsDo: 1 },
-  { id: 10, type: 1,  name: "🌿Тропинка", near: [2,11] },
-  { id: 11, type: 9,  name: "⛩️Старые ворота", near: [10,12], key: 501 },
-  { id: 12, type: 2,  name: "🌿Заросли", near: [11,13,15,17], fight: [{name:"🐺Сбежавший Волк"}] },
-  { id: 13, type: 6,  name: "🌳Осиная роща", near: [12,14], hunt: true, find: true, starsDo: 2 },
-  { id: 14, type: 8,  name: "🌾Пшеничное поле", near: [13], hunt: true, find: true, starsDo: 2 },
-  { id: 15, type: 1,  name: "🌿Тропинка", near: [12,16,17,23] },
-  { id: 16, type: 1,  name: "🏚️Старый дом", near: [15] },
-  { id: 17, type: 7,  name: "⛰️Серебрянный рудник", near: [12,15,18], hunt: true, find: true, mineItems: [106,104], starsDo: 2 },
-  { id: 18, type: 4,  name: "🕸️Темная пещера", near: [17,19], enemies: true },
-  { id: 19, type: 3,  name: "🕸️Туннель", near: [18,20], enemies: true },
-  { id: 20, type: 3,  name: "🕸️Туннель", near: [19,21], enemies: true },
-  { id: 21, type: 5,  name: "🕸️Подземный ручей", near: [20,22], fight: [{name:"🐻Большой медведь"}] },
-  { id: 22, type: 9,  name: "⛩️Таинственные руны", near: [21], key: 503 },
-  { id: 23, type: 9,  name: "⛩️Врата в лес", near: [15,24], key: 502 },
-  { id: 24, type: 3,  name: "🌿Вход в лес", near: [23,25], enemies: true },
-  { id: 25, type: 2,  name: "🌿Страж леса", near: [24,26], fight: [{name:"🐺Волк-стражник"}] },
-  { id: 26, type: 1,  name: "🐾Лесной загон", near: [25,27,34], builds: [1] },
-  { id: 27, type: 1,  name: "🏘️Главное строение", near: [26,28,30,34], builds: [6,2] },
-  { id: 28, type: 1,  name: "🏠Домик на озере", near: [27,29,30] },
-  { id: 29, type: 10, name: "💧Озеро", near: [28], builds: [5], fishes: true },
-  { id: 30, type: 6,  name: "🌲Дубовая роща", near: [27,28,31,32], hunt: true, find: true, starsDo: 3 },
-  { id: 31, type: 1,  name: "⛺Палатка", near: [30,32,42] },
-  { id: 32, type: 8,  name: "🌾Садовое поле", near: [30,31,33], hunt: true, find: true, starsDo: 3 },
-  { id: 33, type: 4,  name: "⚔️Опасный край", near: [32], enemies: true },
-  { id: 34, type: 1,  name: "🪚Крафтовая", near: [26,27,35], builds: [3,4] },
-  { id: 35, type: 2,  name: "🕸️Вход в пещеру", near: [34,36], fight: [{name:"🦇Летучие мыши"}] },
-  { id: 36, type: 7,  name: "⛰️Золотой рудник", near: [35,37,38], hunt: true, find: true, mineItems: [108,106,104], starsDo: 3 },
-  { id: 37, type: 1,  name: "🛖Поселение", near: [36] },
-  { id: 38, type: 2,  name: "🕸️Глубь пещеры", near: [36,39,40], fight: [{name:"🦊Лиса-охотник"}] },
-  { id: 39, type: 3,  name: "🕸️Тупик", near: [38], enemies: true },
-  { id: 40, type: 3,  name: "🕸️Туннель", near: [38,41], enemies: true },
-  { id: 41, type: 5,  name: "🕸️Гробница эльфов", near: [40], fight: [{name:"🧝Фантом-воин"},{name:"🧝Фантом-маг"}] },
-  { id: 42, type: 9,  name: "⛩️Странные лианы", near: [31], key: 504 },
-  { id: 43, type: 3,  name: "🏜Перепутье каньона", near: [59,53,44], enemies: true },
-  { id: 44, type: 3,  name: "🏜Правый каньон", near: [43,45], enemies: true },
-  { id: 45, type: 2,  name: "🏜Вход в шахту пустыни", near: [44,47,46], fight: [{name:"🦂Ядовитый скорпион"}] },
-  { id: 46, type: 7,  name: "🌋Рубиновая шахта", near: [45,48], hunt: true, find: true, mineItems: [114,108,106,104], starsDo: 4 },
-  { id: 47, type: 3,  name: "🏜Нижний проход", near: [45,48], enemies: true },
-  { id: 48, type: 1,  name: "⛺️Убежище чужеземки", near: [47,49,46] },
-  { id: 49, type: 1,  name: "🏜Выход из шахты пустыни", near: [50,48] },
-  { id: 50, type: 1,  name: "🏜Скальный проход", near: [51,49] },
-  { id: 51, type: 3,  name: "🌵Кактусовое поле", near: [54,65,50,52], enemies: true },
-  { id: 52, type: 6,  name: "🌴Оазис", near: [51,53], hunt: true, find: true, starsDo: 4 },
-  { id: 53, type: 3,  name: "🏝Ручей", near: [52,43], enemies: true },
-  { id: 54, type: 3,  name: "🏜Выход из саванны", near: [55,51], enemies: true },
-  { id: 55, type: 1,  name: "🌵Колючки", near: [56,54] },
-  { id: 56, type: 4,  name: "⚔️Водопой", near: [55,57], enemies: true },
-  { id: 57, type: 1,  name: "🪨Скала", near: [64,56,58,61] },
-  { id: 58, type: 2,  name: "🪨Обвал", near: [57,59,60], fight: [{name:"🐕Одинокий кайот"}] },
-  { id: 59, type: 3,  name: "🏜Левый каньон", near: [58,43], enemies: true },
-  { id: 60, type: 1,  name: "🏜Обрыв", near: [58,61] },
-  { id: 61, type: 1,  name: "🏜Яма", near: [57,60,62] },
-  { id: 62, type: 2,  name: "🏜Отверстие в яме", near: [63,61], fight: [{name:"🐍Кобра"}] },
-  { id: 63, type: 5,  name: "🪹Логово скорпиона", near: [62], fight: [{name:"🦂Черный скорпион"}] },
-  { id: 64, type: 8,  name: "🌱Поле жизни", near: [57], hunt: true, find: true, starsDo: 4 },
-  { id: 65, type: 2,  name: "🏜Ловушка в песке", near: [66,51], fight: [{name:"🦎Игуанна"}] },
-  { id: 66, type: 9,  name: "⛩Пустынный пропуск", near: [67,65], key: 505 },
-  { id: 67, type: 1,  name: "🏝Пригородный ручей", near: [68,66] },
-  { id: 68, type: 1,  name: "🏜Развилка", near: [75,69] },
-  { id: 69, type: 2,  name: "🏛Врата в город", near: [72,70,68], fight: [{name:"🪃Зашитница-чужеземка"}] },
-  { id: 70, type: 1,  name: "🛕Вход во дворец", near: [69,72,73,71], builds: [2] },
-  { id: 71, type: 1,  name: "🕌Дворец", near: [70], builds: [6] },
-  { id: 72, type: 1,  name: "🐾Усадьба", near: [69,74,73,70], builds: [1] },
-  { id: 73, type: 1,  name: "🪚Жаровня", near: [70,72,74], builds: [3,4] },
-  { id: 74, type: 10, name: "💧Река пустыни", near: [72,73], builds: [5], fishes: true },
-  { id: 75, type: 2,  name: "🏜Опасный путь", near: [76,82,68], fight: [{name:"🐐Горный козел"}] },
-  { id: 76, type: 3,  name: "🏜Каменный песок", near: [77,75], enemies: true },
-  { id: 77, type: 1,  name: "🏜Вход в шахту", near: [78,79,76] },
-  { id: 78, type: 7,  name: "🌋Платиновая шахта", near: [77,75], hunt: true, find: true, mineItems: [112,108], starsDo: 4 },
-  { id: 79, type: 1,  name: "🍄‍🟫Гнилые стволы", near: [80,77] },
-  { id: 80, type: 8,  name: "🌾Остатки усадьбы", near: [81,79], hunt: true, find: true, starsDo: 4 },
-  { id: 81, type: 4,  name: "⚔️Долина смерти", near: [80,84,83], enemies: true },
-  { id: 82, type: 3,  name: "🌱Живая долина", near: [83,75], enemies: true },
-  { id: 83, type: 6,  name: "🌴Акация", near: [81,82], hunt: true, find: true, starsDo: 4 },
-  { id: 84, type: 2,  name: "☁️Буря", near: [85,86,81], fight: [{name:"🦊Фенек"}] },
-  { id: 85, type: 1,  name: "🛖Храм", near: [84] },
-  { id: 86, type: 5,  name: "😈Священная земля", near: [84], fight: [{name:"🦊Огненный фенек"},{name:"🐯Священный"}] }
+  { id:1, type:1, name:"🏘️Главная площадь", near:[2,3,4,5], photo:"img/campPlaces/1.jpg", builds:[6,2], timeGo:3 },
+  { id:2, type:1, name:"🏠Дом жриц", near:[1,5,10], photo:"img/campPlaces/2.jpg", builds:[], timeGo:3 },
+  { id:3, type:1, name:"🪚Ремесленная", near:[1,4,5], photo:"img/campPlaces/3.jpg", builds:[3,4], timeGo:3 },
+  { id:4, type:10, name:"💧Берег", near:[1,3], photo:"img/campPlaces/4.jpg", builds:[5], max:100, regenHour:10, starsDo:1, fishes:[[1,2,3,4],[5,6],[7]], nearFishes:[[],[8,9,10],[11,12]], waitK:1, timeGo:3 },
+  { id:5, type:1, name:"🐾Пастбище", near:[1,2,3,6], photo:"img/campPlaces/5.jpg", builds:[1], timeGo:3 },
+  { id:6, type:1, name:"🌿Поляна", near:[5,7], photo:"img/campPlaces/6.jpg", builds:[], timeGo:3 },
+  { id:7, type:8, name:"🌾Сад", near:[6,8,9], photo:"img/campPlaces/7.jpg",
+    hunt:[[[1,1],[1,3],[1,6],[1,7],[1,8]],5,3,10],
+    find:[[[2,103,3],[2,103,4],[2,103,5],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_1"],[3,34,"1_1"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_2"]],5,2,8],
+    energyDo:3, timeDo:10, maxHunt:100, regenHuntHour:20, max:150, regenHour:20, starsDo:0, timeGo:3 },
+  { id:8, type:6, name:"🌳Роща", near:[7], photo:"img/campPlaces/8.jpg",
+    hunt:[[[1,1],[1,2],[1,3],[1,6],[1,4]],5,3,10],
+    find:[[[2,101,3],[2,101,4],[2,101,5],[2,101,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_1"],[3,34,"1_1"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_2"]],5,2,8],
+    energyDo:3, timeDo:10, maxHunt:100, regenHuntHour:20, max:150, regenHour:20, starsDo:0, timeGo:3 },
+  { id:9, type:7, name:"⛰️Железный рудник", near:[7], photo:"img/campPlaces/9.jpg",
+    hunt:[[[1,1],[1,3],[1,7],[1,9],[1,4]],5,3,10],
+    find:[[[2,102,3],[2,102,4],[2,102,5],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_1"],[3,34,"1_1"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_2"]],5,2,8],
+    mineItems:[[104,0.12]], energyDo:3, timeDo:10, maxHunt:100, regenHuntHour:20, max:150, regenHour:20, starsDo:1, timeGo:3 },
+  { id:10, type:1, name:"🌿Тропинка", near:[2,11], photo:"img/campPlaces/10.jpg", builds:[], timeGo:3 },
+  { id:11, type:9, name:"⛩️Старые ворота", near:[10,12], photo:"img/campPlaces/11.jpg", key:501, timeGo:3 },
+  { id:12, type:2, name:"🌿Заросли", near:[11,13,15,17], locked:[13,15,17], photo:"img/campPlaces/12.jpg",
+    fight:[{name:"🐺Сбежавший Волк", energy: 5, hp:1000, fail:10, def: [20,10], dmg: [80,20], skill: 0, crit:[10,150], type: 0, element:"fire", stars:1, exp: [15,0], photo:"img/campEnemies/1.jpg"}],
+    awards:[[3,33,"1_5"],[3,35,"1_3"],[3,27,1]], energyFight:3, timeGo:3 },
+  { id:13, type:6, name:"🌳Осиная роща", near:[12,14], photo:"img/campPlaces/13.jpg",
+    hunt:[[[1,4],[1,6],[1,7],[1,5],[1,10]],6,3,13],
+    find:[[[2,101,5],[2,101,6],[2,101,7],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_3"]],6,2,10],
+    energyDo:3, timeDo:12, maxHunt:120, regenHuntHour:25, max:160, regenHour:20, starsDo:1, timeGo:3 },
+  { id:14, type:8, name:"🌾Пшеничное поле", near:[13], photo:"img/campPlaces/14.jpg",
+    hunt:[[[1,6],[1,7],[1,11],[1,10],[1,8]],6,3,13],
+    find:[[[2,103,5],[2,103,6],[2,103,7],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_3"]],6,2,10],
+    energyDo:3, timeDo:12, maxHunt:120, regenHuntHour:20, max:160, regenHour:20, starsDo:1, timeGo:3 },
+  { id:15, type:1, name:"🌿Тропинка", near:[12,16,17,23], photo:"img/campPlaces/15.jpg", builds:[], timeGo:3 },
+  { id:16, type:1, name:"🏚️Старый дом", near:[15], photo:"img/campPlaces/16.jpg", builds:[], timeGo:3 },
+  { id:17, type:7, name:"⛰️Серебрянный рудник", near:[12,15,18], photo:"img/campPlaces/17.jpg",
+    hunt:[[[1,9],[1,8],[1,7],[1,9],[1,11]],6,3,13],
+    find:[[[2,102,5],[2,102,6],[2,102,7],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_3"]],6,2,10],
+    mineItems:[[106,0.1],[104,0.06]], energyDo:3, timeDo:12, maxHunt:120, regenHuntHour:20, max:160, regenHour:20, starsDo:1, timeGo:3 },
+  { id:18, type:4, name:"🕸️Темная пещера", near:[17,19], photo:"img/campPlaces/18.jpg",
+    enemies:[
+      [{name:"🕷Большой паук",energy: 4,hp:1500,fail:15,def:[20,20],dmg:[100,40],skill:0,crit:[10,150],type: 0,element:"water",stars:1, exp: [15,0], photo:"img/campEnemies/2.jpg"},15,{drop:[[[2,302,1],[2,303,1]],[[2,302,2]],[[2,303,2]],[[2,302,1],[2,303,1]],[[2,302,2]],[[2,303,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
+      [{name:"🐝Оса",energy: 5,hp:1400,fail:20,def:[15,25],dmg:[90,70],skill:2,crit:[15,200],type: 1,element:"fire",stars:1, exp: [15,0], photo:"img/campEnemies/3.jpg"},15,{drop:[[[2,302,1],[2,303,1]],[[2,302,2]],[[2,303,2]],[[2,302,1],[2,303,1]],[[2,302,2]],[[2,303,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
+      [{name:"🐭Большая крыса",energy: 4,hp:1700,fail:10,def:[25,15],dmg:[120,20],skill:0,crit:[10,170],type: 0,element:"plant",stars:1, exp: [15,0], photo:"img/campEnemies/4.jpg"},15,{drop:[[[2,302,1],[2,303,1]],[[2,202,1],[2,304,1]],[[2,302,2]],[[2,304,2]],[[2,302,1],[2,303,1]],[[2,202,1],[2,304,1]],[[2,302,2]],[[2,304,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
+      [{name:"🐦Охотничья птица",energy: 5,hp:1700,fail:15,def:[30,10],dmg:[140,10],skill:0,crit:[15,200],type: 1,element:"plant",stars:1, exp: [15,0], photo:"img/campEnemies/5.jpg"},15,{drop:[[[2,301,1],[2,202,1]],[[2,202,2]],[[2,301,2]],[[2,301,1],[2,202,1]],[[2,202,2]],[[2,301,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
+      [{name:"🐝Шершень",energy: 5,hp:1600,fail:15,def:[30,20],dmg:[100,80],skill:2,crit:[15,200],type: 1,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/6.jpg"},15,{drop:[[[2,301,1],[2,302,1]],[[2,301,2]],[[2,302,2]],[[2,301,1],[2,302,1]],[[2,301,2]],[[2,302,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]},2]],
+    energyFight:5, min:5, max:100, regenHour:20, timeGo:3, sidePoints: 10 },
+  { id:19, type:3, name:"🕸️Туннель", near:[18,20], photo:"img/campPlaces/19.jpg",
+    enemies:[{name:"🕷Большой паук",energy: 4,hp:1700,fail:15,def:[50,15],dmg:[120,60],skill:0,crit:[10,150],type: 0,element:"water",stars:1, exp: [10,0], photo:"img/campEnemies/2.jpg"},{name:"🐸Большая лягушка",energy:5,hp:1800,fail:10,def:[40,25],dmg:[140,20],skill:0,crit:[10,150],type:0, element:"water", stars:1, exp: [10,0], photo:"img/campEnemies/7.jpg"}], chance:15, timeGo:3 },
+  { id:20, type:3, name:"🕸️Туннель", near:[19,21], photo:"img/campPlaces/20.jpg",
+    enemies:[{name:"🕷Большой паук",energy: 4,hp:1700,fail:15,def:[50,15],dmg:[120,60],skill:0,crit:[10,150],type: 0,element:"water",stars:1, exp: [10,0], photo:"img/campEnemies/2.jpg"},{name:"🐸Большая лягушка",energy:5,hp:1800,fail:10,def:[40,25],dmg:[140,20],skill:0,crit:[10,150],type:0, element:"water", stars:1, exp: [10,0], photo:"img/campEnemies/7.jpg"}], chance:15, timeGo:3 },
+  { id:21, type:5, name:"🕸️Подземный ручей", near:[20,22], photo:"img/campPlaces/21.jpg",
+    fight:[{name:"🐻Большой медведь", energy: 4, hp:2700, fail:5, def: [70,70], dmg: [120,50], skill: 0, crit:[15,175], type: 2, element:"fire", stars:3, exp: [25,0], photo:"img/campEnemies/17.jpg"}],
+    awardsList:[[[2,201,7],[2,304,5],[2,302,5],[3,32,"1_4"],[3,33,"1_3"],[3,34,"1_4"],[3,35,"1_3"],[3,44,"1_30"],[3,43,1]], [[2,201,5],[2,304,7],[2,302,5],[3,32,"1_4"],[3,33,"1_3"],[3,34,"1_4"],[3,35,"1_3"],[3,44,"1_30"],[3,43,1]], [[2,201,5],[2,304,5],[2,302,7],[3,32,"1_4"],[3,33,"1_3"],[3,34,"1_4"],[3,35,"1_3"],[3,44,"1_30"],[3,53,1]]],
+    quest:49, energyFight:5, timeGo:3 },
+  { id:22, type:9, name:"⛩️Таинственные руны", near:[21], photo:"img/campPlaces/22.jpg", key:503, timeGo:3 },
+  { id:23, type:9, name:"⛩️Врата в лес", near:[15,24], photo:"img/campPlaces/23.jpg", key:502, timeGo:3 },
+  { id:24, type:3, name:"🌿Вход в лес", near:[23,25], photo:"img/campPlaces/24.jpg",
+    enemies:[{name:"🐺Волк-одиночка",energy: 5,hp:3000,fail:15,def:[110,50],dmg:[180,50],skill:0,crit:[15,150],type: 0,element:"plant",stars:1, exp: [10,0], photo:"img/campEnemies/8.jpg"}], chance:15, timeGo:3 },
+  { id:25, type:2, name:"🌿Страж леса", near:[24,26], locked:[26], photo:"img/campPlaces/25.jpg",
+    fight:[{name:"🐺Волк-стражник",energy: 5,hp:3200,fail:15,def:[120,60],dmg:[200,60],skill:0,crit:[15,150],type: 0,element:"plant",stars:2, exp: [30,0], photo:"img/campEnemies/9.jpg"}],
+    awards:[[3,33,"1_7"],[3,35,"1_5"],[3,27,1]], energyFight:3, timeGo:3 },
+  { id:26, type:1, name:"🐾Лесной загон", near:[25,27,34], photo:"img/campPlaces/26.jpg", builds:[1], timeGo:3 },
+  { id:27, type:1, name:"🏘️Главное строение", near:[26,28,30,34], photo:"img/campPlaces/27.jpg", builds:[6,2], timeGo:3 },
+  { id:28, type:1, name:"🏠Домик на озере", near:[27,29,30], photo:"img/campPlaces/28.jpg", builds:[], timeGo:3 },
+  { id:29, type:10, name:"💧Озеро", near:[28], photo:"img/campPlaces/29.jpg", builds:[5], max:100, regenHour:10, starsDo:2, fishes:[[6,8,9,10],[11,12],[13]], nearFishes:[[5],[7],[]], waitK:1.25, timeGo:3 },
+  { id:30, type:6, name:"🌲Дубовая роща", near:[27,28,31,32], photo:"img/campPlaces/30.jpg",
+    hunt:[[[1,13],[1,12],[1,7],[1,4],[1,14]],7,3,16],
+    find:[[[2,101,8],[2,101,9],[2,103,10],[2,305,1],[2,306,1],[2,307,1],[2,308,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_3"],[3,44,"1_4"],[3,44,"2_1"],[3,33,"1_1"],[3,35,"1_1"]],8,2,12],
+    energyDo:4, timeDo:15, maxHunt:140, regenHuntHour:20, max:170, regenHour:20, starsDo:2, timeGo:3 },
+  { id:31, type:1, name:"⛺Палатка", near:[30,32,42], photo:"img/campPlaces/31.jpg", builds:[], timeGo:3 },
+  { id:32, type:8, name:"🌾Садовое поле", near:[30,31,33], photo:"img/campPlaces/32.jpg",
+    hunt:[[[1,7],[1,8],[1,17],[1,12],[1,13]],7,3,16],
+    find:[[[2,103,8],[2,103,9],[2,103,10],[2,305,1],[2,306,1],[2,307,1],[2,308,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_3"],[3,44,"1_4"],[3,44,"2_1"],[3,33,"1_1"],[3,35,"1_1"]],8,2,12],
+    energyDo:4, timeDo:15, maxHunt:140, regenHuntHour:20, max:170, regenHour:20, starsDo:2, timeGo:3 },
+  { id:33, type:4, name:"⚔️Опасный край", near:[32], photo:"img/campPlaces/33.jpg",
+    enemies:[
+      [{name:"🦇Летучая мышь",energy: 4,hp:3200,fail:15,def:[140,120],dmg:[200,80],skill:2,crit:[10,150],type: 1,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/10.jpg"},10,{drop:[[[2,308,1],[2,306,1]],[[2,308,1],[2,208,1]],[[2,308,2]],[[2,208,2]],[[2,308,1],[2,306,1]],[[2,308,1],[2,208,1]],[[2,308,2]],[[2,208,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
+      [{name:"🐺Волк",energy: 5,hp:3800,fail:10,def:[180,120],dmg:[220,70],skill:2,crit:[15,200],type: 0,element:"plant",stars:1, exp: [17,0], photo:"img/campEnemies/11.jpg"},10,{drop:[[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
+      [{name:"🦊Лиса",energy: 6,hp:3800,fail:15,def:[120,180],dmg:[220,70],skill:0,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/12.jpg"},10,{drop:[[[2,307,1],[2,308,1]],[[2,308,1],[2,208,1]],[[2,208,2]],[[2,308,2]],[[2,307,1],[2,308,1]],[[2,308,1],[2,208,1]],[[2,208,2]],[[2,308,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
+      [{name:"🦉Сова",energy: 5,hp:3800,fail:15,def:[140,160],dmg:[200,100],skill:0,crit:[15,200],type: 1,element:"plant",stars:1, exp: [17,0], photo:"img/campEnemies/13.jpg"},10,{drop:[[[2,305,1],[2,307,1]],[[2,305,1],[2,209,1]],[[2,305,2]],[[2,209,2]],[[2,305,1],[2,307,1]],[[2,305,1],[2,209,1]],[[2,305,2]],[[2,209,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
+      [{name:"🐺Старший волк",energy: 5,hp:3800,fail:12,def:[200,140],dmg:[230,85],skill:2,crit:[15,200],type: 0,element:"plant",stars:2, exp: [25,0], photo:"img/campEnemies/14.jpg"},10,{drop:[[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]},3]],
+    energyFight:6, min:5, max:100, regenHour:20, sidePoints:13, timeGo:3 },
+  { id:34, type:1, name:"🪚Крафтовая", near:[26,27,35], photo:"img/campPlaces/34.jpg", builds:[3,4], timeGo:3 },
+  { id:35, type:2, name:"🕸️Вход в пещеру", near:[34,36], locked:[36], photo:"img/campPlaces/35.jpg",
+    fight:[{name:"🦇Летучие мыши", energy: 4, hp:3400, fail:10, def: [140,120], dmg: [200,80], skill: 2, crit:[15,175], type: 1, element:"fire", stars:2, exp: [35,0], photo:"img/campEnemies/15.jpg"}],
+    awards:[[3,33,"1_10"],[3,35,"1_7"],[3,44,"2_7"]], energyFight:3, timeGo:3 },
+  { id:36, type:7, name:"⛰️Золотой рудник", near:[35,37,38], photo:"img/campPlaces/36.jpg",
+    hunt:[[[1,15],[1,6],[1,7],[1,17],[1,16]],7,3,16],
+    find:[[[2,102,8],[2,102,9],[2,102,10],[2,305,1],[2,306,1],[2,307,1],[2,308,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_3"],[3,44,"1_4"],[3,44,"2_1"],[3,33,"1_1"],[3,35,"1_1"]],8,2,12],
+    mineItems:[[108,0.08],[106,0.04],[104,0.04]], energyDo:4, timeDo:15, maxHunt:140, regenHuntHour:20, max:170, regenHour:20, starsDo:2, timeGo:3 },
+  { id:37, type:1, name:"🛖Поселение", near:[36], photo:"img/campPlaces/37.jpg", builds:[], timeGo:3 },
+  { id:38, type:2, name:"🕸️Глубь пещеры", near:[36,39,40], locked:[39,40], photo:"img/campPlaces/38.jpg",
+    fight:[{name:"🦊Лиса-охотник", energy: 6, hp:4000, fail:10, def: [120,180], dmg: [240,70], skill: 1, crit:[15,175], type: 0, element:"fire", stars:1, exp: [35,0], photo:"img/campEnemies/16.jpg"}],
+    awards:[[3,33,"1_10"],[3,35,"1_7"],[3,27,2]], energyFight:4, timeGo:3 },
+  { id:39, type:3, name:"🕸️Тупик", near:[38], photo:"img/campPlaces/39.jpg",
+    enemies:[{name:"🦊Лиса-охотник", energy: 6, hp:4000, fail:10, def: [120,180], dmg: [240,70], skill: 1, crit:[15,175], type: 0, element:"fire", stars:1, exp: [15,0], photo:"img/campEnemies/16.jpg"},{name:"🐺Волк",energy: 5,hp:3800,fail:10,def:[180,120],dmg:[220,70],skill:2,crit:[15,200],type: 0,element:"plant",stars:2, exp: [15,0], photo:"img/campEnemies/11.jpg"}], chance:15, timeGo:3 },
+  { id:40, type:3, name:"🕸️Туннель", near:[38,41], photo:"img/campPlaces/40.jpg",
+    enemies:[{name:"🦊Лиса-охотник", energy: 6, hp:4000, fail:10, def: [100,180], dmg: [240,70], skill: 1, crit:[15,175], type: 0, element:"fire", stars:2, exp: [15,0], photo:"img/campEnemies/16.jpg"},{name:"🐺Волк",energy: 5,hp:3800,fail:10,def:[180,120],dmg:[220,70],skill:2,crit:[15,200],type: 0,element:"plant",stars:2, exp: [15,0], photo:"img/campEnemies/11.jpg"}], chance:15, timeGo:3 },
+  { id:41, type:5, name:"🕸️Гробница эльфов", near:[40], photo:"img/campPlaces/41.jpg",
+    fight:[{name:"🧝Фантом-воин", energy: 5, hp:3100, fail:12, def: [240,120], dmg: [260,50], skill: 1, crit:[15,200], type: 0, element:"dark", stars:2, exp: [30,0], photo:"img/campEnemies/18.jpg"},{name:"🧝Фантом-маг", energy: 6, hp:2800, fail:7, def: [100,300], dmg: [60,300], skill: 2, crit:[15,200], type: 0, element:"dark", stars:2, exp: [30,0], photo:"img/campEnemies/19.jpg"}],
+    awardsList:[[[3,32,"2_2"],[3,33,"1_7"],[3,34,"2_2"],[3,35,"1_7"],[3,44,"2_10"],[3,45,"1_3"],[3,43,1]], [[3,32,"2_3"],[3,33,"1_5"],[3,34,"2_3"],[3,35,"1_5"],[3,44,"1_40"],[3,45,"1_3"],[3,53,1]]],
+    quest:88, energyFight:6, timeGo:3 },
+  { id:42, type:9, name:"⛩️Странные лианы", near:[31], photo:"img/campPlaces/42.jpg", key:504, timeGo:3 },
+  { id:43, type:3, name:"🏜Перепутье каньона", near:[59,53,44], photo:"img/campPlaces/43.jpg",
+    enemies:[
+      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
+      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
+      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
+      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
+    chance:20, timeGo:3 },
+  { id:44, type:3, name:"🏜Правый каньон", near:[43,45], photo:"img/campPlaces/44.jpg",
+    enemies:[
+      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
+      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
+      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
+      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
+    chance:20, timeGo:3 },
+  { id:45, type:2, name:"🏜Вход в шахту пустыни", near:[44,47,46], locked:[47,46], photo:"img/campPlaces/45.jpg",
+    fight:[{name:"🦂Ядовитый скорпион",energy: 6,hp:4000,fail:15,def:[120,120],dmg:[100,250],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [25,0], photo:"img/campEnemies/26.jpg"}],
+    awards:[[3,33,"2_3"],[3,44,"2_7"],[3,45,"1_10"]], energyFight:5, timeGo:3 },
+  { id:46, type:7, name:"🌋Рубиновая шахта", near:[45,48], photo:"img/campPlaces/46.jpg",
+    max:100, regenHour:10, starsDo:3, mineItems:[[114,0.03],[108,0.04],[106,0.04],[104,0.04]], energyDo:4, timeDo:20,
+    hunt:[[[1,15],[1,17],[1,18],[1,19],[1,20]],8,4,17],
+    find:[[[2,101,10],[2,101,12],[2,101,14],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_3"],[3,34,"1_3"],[3,44,"1_4"],[3,44,"1_5"],[3,44,"2_1"],[3,33,"2_1"],[3,35,"2_1"]],9,2,13],
+    maxHunt:140, regenHuntHour:20, timeGo:3 },
+  { id:47, type:3, name:"🏜Нижний проход", near:[45,48], photo:"img/campPlaces/47.jpg",
+    enemies:[
+      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
+      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
+      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
+      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
+    chance:20, timeGo:3 },
+  { id:48, type:1, name:"⛺️Убежище чужеземки", near:[47,49,46], photo:"img/campPlaces/48.jpg", timeGo:3 },
+  { id:49, type:1, name:"🏜Выход из шахты пустыни", near:[50,48], photo:"img/campPlaces/49.jpg", timeGo:3 },
+  { id:50, type:1, name:"🏜Скальный проход", near:[51,49], photo:"img/campPlaces/50.jpg", timeGo:3 },
+  { id:51, type:3, name:"🌵Кактусовое поле", near:[54,65,50,52], photo:"img/campPlaces/51.jpg",
+    enemies:[
+      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
+      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
+      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
+      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
+    chance:20, timeGo:3 },
+  { id:52, type:6, name:"🌴Оазис", near:[51,53], photo:"img/campPlaces/52.jpg",
+    energyDo:4, timeDo:15, max:150, regenHour:25, starsDo:3,
+    hunt:[[[1,16],[1,11],[1,18],[1,20],[1,22]],8,4,17],
+    find:[[[2,102,10],[2,102,12],[2,102,14],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_3"],[3,34,"1_3"],[3,44,"1_4"],[3,44,"1_5"],[3,44,"2_1"],[3,33,"2_1"],[3,35,"2_1"]],9,2,13],
+    maxHunt:140, regenHuntHour:20, timeGo:3 },
+  { id:53, type:3, name:"🏝Ручей", near:[52,43], photo:"img/campPlaces/53.jpg",
+    enemies:[
+      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
+      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
+      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
+      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
+    chance:20, timeGo:3 },
+  { id:54, type:3, name:"🏜Выход из саванны", near:[55,51], photo:"img/campPlaces/54.jpg",
+    enemies:[
+      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
+      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
+      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
+      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
+    chance:20, timeGo:3 },
+  { id:55, type:1, name:"🌵Колючки", near:[56,54], photo:"img/campPlaces/55.jpg", timeGo:3 },
+  { id:56, type:4, name:"⚔️Водопой", near:[55,57], photo:"img/campPlaces/56.jpg",
+    enemies:[
+      [{name:"🐕Малый кайот",energy: 5,hp:4600,fail:8,def:[170,150],dmg:[280,100],skill:6,crit:[15,175],type: 0,element:"fire",stars:1, exp: [30,0], photo:"img/campEnemies/27.jpg"},10,{drop:[[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
+      [{name:"🐍Гремучая змея",energy: 5,hp:4300,fail:12,def:[150,150],dmg:[100,300],skill:2,crit:[15,200],type: 0,element:"water",stars:1, exp: [30,0], photo:"img/campEnemies/28.jpg"},10,{drop:[[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
+      [{name:"🐦‍⬛Черный ворон",energy: 4,hp:4200,fail:15,def:[120,160],dmg:[260,140],skill:2,crit:[15,175],type: 1,element:"plant",stars:1, exp: [30,0], photo:"img/campEnemies/29.jpg"},10,{drop:[[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
+      [{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[150,150],dmg:[120,290],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [30,0], photo:"img/campEnemies/30.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
+      [{name:"🦂Королевский скорпион",energy: 6,hp:5000,fail:15,def:[170,170],dmg:[120,330],skill:2,crit:[15,175],type: 0,element:"fire",stars:2, exp: [30,0], photo:"img/campEnemies/31.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]},4]],
+    energyFight:6, min:5, max:100, regenHour:20, sidePoints:16, timeGo:3 },
+  { id:57, type:1, name:"🪨Скала", near:[64,56,58,61], photo:"img/campPlaces/57.jpg", timeGo:3 },
+  { id:58, type:2, name:"🪨Обвал", near:[57,59,60], locked:[57,60], photo:"img/campPlaces/58.jpg",
+    fight:[{name:"🐕Одинокий кайот",energy: 5,hp:4600,fail:12,def:[170,170],dmg:[300,120],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [25,0], photo:"img/campEnemies/32.jpg"}],
+    awards:[[3,33,"2_3"],[3,35,"2_3"],[3,13,1]], energyFight:5, timeGo:3 },
+  { id:59, type:3, name:"🏜Левый каньон", near:[58,43], photo:"img/campPlaces/59.jpg",
+    enemies:[
+      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
+      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
+      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
+      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
+    chance:20, timeGo:3 },
+  { id:60, type:1, name:"🏜Обрыв", near:[58,61], photo:"img/campPlaces/60.jpg", timeGo:3 },
+  { id:61, type:1, name:"🏜Яма", near:[57,60,62], photo:"img/campPlaces/61.jpg", timeGo:3 },
+  { id:62, type:2, name:"🏜Отверстие в яме", near:[63,61], locked:[63], photo:"img/campPlaces/62.jpg",
+    fight:[{name:"🐍Кобра",energy: 4,hp:4500,fail:12,def:[180,180],dmg:[120,350],skill:2,crit:[15,200],type: 0,element:"water",stars:2, exp: [40,0], photo:"img/campEnemies/33.jpg"}],
+    awards:[[3,32,"2_1"],[3,34,"2_1"],[3,44,"2_7"],[3,45,"1_10"]], energyFight:5, timeGo:3 },
+  { id:63, type:5, name:"🪹Логово скорпиона", near:[62], photo:"img/campPlaces/63.jpg",
+    fight:[{name:"🦂Черный скорпион",energy: 6,hp:5400,fail:15,def:[190,190],dmg:[140,360],skill:2,crit:[15,175],type: 0,element:"dark",stars:2, exp: [40,0], photo:"img/campEnemies/34.jpg"}],
+    quest:105, energyFight:6,
+    awardsList:[[[3,32,"2_4"],[3,33,"2_5"],[3,34,"2_4"],[3,35,"2_5"],[3,44,"2_15"],[3,45,"1_3"],[3,43,1]], [[3,32,"2_6"],[3,33,"2_5"],[3,34,"2_6"],[3,35,"2_5"],[3,44,"2_25"],[3,45,"1_3"],[3,53,1]]], timeGo:3 },
+  { id:64, type:8, name:"🌱Поле жизни", near:[57], photo:"img/campPlaces/64.jpg",
+    energyDo:4, timeDo:15, max:180, regenHour:25, starsDo:3,
+    hunt:[[[1,7],[1,8],[1,16],[1,20],[1,22]],8,4,17],
+    find:[[[2,103,10],[2,103,12],[2,103,14],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_3"],[3,34,"1_3"],[3,44,"1_4"],[3,44,"1_5"],[3,44,"2_1"],[3,33,"2_1"],[3,35,"2_1"]],9,2,13],
+    maxHunt:140, regenHuntHour:20, timeGo:3 },
+  { id:65, type:2, name:"🏜Ловушка в песке", near:[66,51], locked:[66], photo:"img/campPlaces/65.jpg",
+    fight:[{name:"🦎Игуанна",energy: 5,hp:4600,fail:10,def:[200,200],dmg:[300,140],skill:1,crit:[15,200],type: 0,element:"water",stars:1, exp: [25,0], photo:"img/campEnemies/35.jpg"}],
+    awards:[[3,32,"2_3"],[3,33,"2_3"],[3,13,1]], energyFight:5, timeGo:3 },
+  { id:66, type:9, name:"⛩Пустынный пропуск", near:[67,65], photo:"img/campPlaces/66.jpg", key:505, timeGo:3 },
+  { id:67, type:1, name:"🏝Пригородный ручей", near:[68,66], photo:"img/campPlaces/67.jpg", timeGo:3 },
+  { id:68, type:1, name:"🏜Развилка", near:[75,69], photo:"img/campPlaces/68.jpg", timeGo:3 },
+  { id:69, type:2, name:"🏛Врата в город", near:[72,70,68], locked:[72,70,71], photo:"img/campPlaces/69.jpg",
+    fight:[{name:"🪃Зашитница-чужеземка",energy: 5,hp:5000,fail:10,def:[220,140],dmg:[360,120],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [40,0], photo:"img/campEnemies/36.jpg"}],
+    awards:[[3,32,"2_2"],[3,33,"2_4"],[3,34,"2_2"],[3,35,"2_4"],[3,6,1]], energyFight:5, timeGo:3 },
+  { id:70, type:1, name:"🛕Вход во дворец", near:[69,72,73,71], builds:[2], photo:"img/campPlaces/70.jpg", timeGo:3 },
+  { id:71, type:1, name:"🕌Дворец", near:[70], builds:[6], photo:"img/campPlaces/71.jpg", timeGo:3 },
+  { id:72, type:1, name:"🐾Усадьба", near:[69,74,73,70], builds:[1], photo:"img/campPlaces/72.jpg", timeGo:3 },
+  { id:73, type:1, name:"🪚Жаровня", near:[70,72,74], builds:[3,4], photo:"img/campPlaces/73.jpg", timeGo:3 },
+  { id:74, type:10, name:"💧Река пустыни", near:[72,73], builds:[5], photo:"img/campPlaces/74.jpg",
+    max:100, regenHour:10, starsDo:3, fishes:[[14,15,16,12],[17,18,13],[19]], nearFishes:[[7,11],[],[]], waitK:1.35, timeGo:3 },
+  { id:75, type:2, name:"🏜Опасный путь", near:[76,82,68], locked:[76,82], photo:"img/campPlaces/75.jpg",
+    fight:[{name:"🐐Горный козел",energy: 4,hp:5200,fail:15,def:[180,180],dmg:[280,200],skill:3,crit:[15,220],type: 0,element:"fire",stars:1, exp: [40,0], photo:"img/campEnemies/37.jpg"}],
+    awards:[[3,35,"2_4"],[3,27,2]], energyFight:5, timeGo:3 },
+  { id:76, type:3, name:"🏜Каменный песок", near:[77,75], photo:"img/campPlaces/76.jpg",
+    enemies:[
+      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
+      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
+      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
+      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
+    chance:20, timeGo:3 },
+  { id:77, type:1, name:"🏜Вход в шахту", near:[78,79,76], photo:"img/campPlaces/77.jpg", timeGo:3 },
+  { id:78, type:7, name:"🌋Платиновая шахта", near:[77,75], photo:"img/campPlaces/78.jpg",
+    max:180, regenHour:25, starsDo:3, mineItems:[[112,0.07],[108,0.05]], energyDo:4, timeDo:15,
+    hunt:[[[1,22],[1,23],[1,21],[1,18],[1,17]],8,4,17],
+    find:[[[2,101,12],[2,101,14],[2,101,16],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_4"],[3,34,"1_4"],[3,44,"1_5"],[3,44,"1_6"],[3,44,"2_1"],[3,33,"2_2"],[3,35,"2_2"],[3,33,"2_1"],[3,35,"2_1"]],9,2,14],
+    maxHunt:150, regenHuntHour:20, timeGo:3 },
+  { id:79, type:1, name:"🍄‍🟫Гнилые стволы", near:[80,77], photo:"img/campPlaces/79.jpg", timeGo:3 },
+  { id:80, type:8, name:"🌾Остатки усадьбы", near:[81,79], photo:"img/campPlaces/80.jpg",
+    energyDo:4, timeDo:15, max:180, regenHour:25, starsDo:3,
+    hunt:[[[1,12],[1,13],[1,19],[1,20],[1,23]],8,4,17],
+    find:[[[2,103,12],[2,103,14],[2,103,16],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_4"],[3,34,"1_4"],[3,44,"1_5"],[3,44,"1_6"],[3,44,"2_1"],[3,33,"2_2"],[3,35,"2_2"],[3,33,"2_1"],[3,35,"2_1"]],9,2,14],
+    maxHunt:150, regenHuntHour:20, timeGo:3 },
+  { id:81, type:4, name:"⚔️Долина смерти", near:[80,84,83], photo:"img/campPlaces/81.jpg",
+    enemies:[
+      [{name:"🐦‍⬛️Чернющий ворон",energy: 5,hp:4400,fail:15,def:[120,180],dmg:[300,170],skill:2,crit:[15,175],type: 1,element:"plant",stars:1, exp: [35,0], photo:"img/campEnemies/38.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
+      [{name:"🦓Малый буйвол",energy: 5,hp:5500,fail:8,def:[230,230],dmg:[330,120],skill:4,crit:[15,175],type: 2,element:"water",stars:1, exp: [35,0], photo:"img/campEnemies/39.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
+      [{name:"🦅Пустынный орлан",energy: 6,hp:4400,fail:16,def:[120,300],dmg:[300,120],skill:5,crit:[15,200],type: 1,element:"plant",stars:1, exp: [35,0], photo:"img/campEnemies/40.jpg"},10,{drop:[[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
+      [{name:"🦘Младший кенгуру",energy: 6,hp:4800,fail:12,def:[180,180],dmg:[320,170],skill:1,crit:[15,200],type: 0,element:"fire",stars:1, exp: [35,0], photo:"img/campEnemies/41.jpg"},10,{drop:[[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
+      [{name:"🦊Фенек",energy: 5,hp:5300,fail:10,def:[160,200],dmg:[120,370],skill:7,crit:[15,175],type: 0,element:"fire",stars:2, exp: [35,0], photo:"img/campEnemies/42.jpg"},10,{drop:[[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]},5]],
+    energyFight:6, min:5, max:100, regenHour:20, sidePoints:16, timeGo:3 },
+  { id:82, type:3, name:"🌱Живая долина", near:[83,75], photo:"img/campPlaces/82.jpg",
+    enemies:[
+      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
+      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
+      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
+      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
+    chance:20, timeGo:3 },
+  { id:83, type:6, name:"🌴Акация", near:[81,82], photo:"img/campPlaces/83.jpg",
+    energyDo:4, timeDo:15, max:180, regenHour:25, starsDo:3,
+    hunt:[[[1,22],[1,23],[1,21],[1,20],[1,16]],8,4,17],
+    find:[[[2,102,12],[2,102,14],[2,102,16],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_4"],[3,34,"1_4"],[3,44,"1_5"],[3,44,"1_6"],[3,44,"2_1"],[3,33,"2_2"],[3,35,"2_2"],[3,33,"2_1"],[3,35,"2_1"]],9,2,14],
+    maxHunt:150, regenHuntHour:20, timeGo:3 },
+  { id:84, type:2, name:"☁️Буря", near:[85,86,81], locked:[85,86], photo:"img/campPlaces/84.jpg",
+    fight:[{name:"🦊Фенек",energy: 6,hp:5400,fail:10,def:[100,220],dmg:[160,370],skill:3,crit:[15,220],type: 0,element:"fire",stars:2, exp: [40,0], photo:"img/campEnemies/43.jpg"}],
+    awards:[[3,32,"2_3"],[3,34,"2_3"],[3,45,"2_5"]], energyFight:5, timeGo:3 },
+  { id:85, type:1, name:"🛖Храм", near:[84], photo:"img/campPlaces/85.jpg", timeGo:3 },
+  { id:86, type:5, name:"😈Священная земля", near:[84], photo:"img/campPlaces/86.jpg",
+    fight:[{name:"🦊Огненный фенек",energy: 6,hp:4800,fail:12,def:[100,300],dmg:[130,350],skill:2,crit:[15,200],type: 0,element:"fire",stars:2, exp: [50,0], photo:"img/campEnemies/44.jpg"},{name:"🐯Священный",energy: 5,hp:5600,fail:10,def:[250,250],dmg:[320,100],skill:1,crit:[15,200],type: 0,element:"light",stars:2, exp: [50,0], photo:"img/campEnemies/45.jpg"}],
+    awardsList:[[[3,32,"2_6"],[3,33,"2_7"],[3,34,"2_6"],[3,35,"2_7"],[3,44,"2_20"],[3,45,"1_4"],[3,43,1]], [[3,32,"2_8"],[3,33,"2_5"],[3,34,"2_8"],[3,35,"2_5"],[3,44,"2_30"],[3,45,"1_4"],[3,53,1]]],
+    quest:999, energyFight:7, timeGo:3 }
 ];
 
 /* ============================================================
-   КООРДИНАТЫ
+   СПРАВОЧНИКИ ИМЁН
    ============================================================ */
-const POS = {
-  1:  [1200, 2600],
-  2:  [ 900, 2400],
-  5:  [ 900, 2800],
-  6:  [ 700, 2900],
-  7:  [ 500, 3000],
-  8:  [ 300, 2900],
-  9:  [ 300, 3100],
-  3:  [1500, 2400],
-  4:  [1800, 2600],
-  10: [ 900, 2200],
-  11: [ 900, 2000],
-  12: [ 900, 1800],
-  13: [ 700, 1700],
-  14: [ 500, 1600],
-  15: [1100, 1700],
-  16: [1100, 1500],
-  17: [ 700, 1500],
-  18: [ 500, 1400],
-  19: [ 300, 1300],
-  20: [ 100, 1200],
-  21: [ 100, 1000],
-  22: [ 300,  900],
-  23: [1100, 1300],
-  24: [1100, 1100],
-  25: [1150,  930],
-  26: [ 950,  850],
-  27: [ 700,  800],
-  28: [ 500,  600],
-  29: [ 300,  500],
-  30: [ 900,  600],
-  31: [1100,  500],
-  32: [1300,  600],
-  33: [1500,  800],
-  34: [1250,  730],
-  35: [1500, 1000],
-  36: [1700,  800],
-  37: [1900,  600],
-  38: [1700, 1100],
-  39: [1900, 1200],
-  40: [1900, 1400],
-  41: [1700, 1500],
-  42: [1100,  300],
-  43: [ 900, 3300],
-  44: [ 700, 3400],
-  45: [ 500, 3600],
-  46: [ 300, 3800],
-  47: [ 600, 3800],
-  48: [ 700, 4000],
-  49: [ 900, 4000],
-  50: [1100, 3800],
-  51: [1300, 4000],
-  52: [1500, 4000],
-  53: [1500, 3600],
-  54: [1300, 3700],
-  55: [1100, 3500],
-  56: [ 1100, 3150],
-  57: [ 700, 3200],
-  58: [ 500, 3200],
-  59: [ 350, 3330],
-  60: [ 170, 3230],
-  61: [ 300, 3500],
-  62: [ 100, 3700],
-  63: [ 100, 3900],
-  64: [ 700, 3050],
-  65: [1500, 3800],
-  66: [1700, 4000],
-  67: [1900, 4000],
-  68: [2100, 4000],
-  69: [2300, 4200],
-  70: [2500, 4400],
-  71: [2500, 4600],
-  72: [2300, 4600],
-  73: [2300, 4400],
-  74: [2100, 4600],
-  75: [2500, 3800],
-  76: [2520, 4050],
-  77: [2500, 4200],
-  78: [2300, 4200],
-  79: [2100, 4200],
-  80: [1900, 4200],
-  81: [1700, 4500],
-  82: [3000, 4400],
-  83: [2300, 4900],
-  84: [1500, 4800],
-  85: [1300, 5000],
-  86: [1700, 5000]
+const animalsMap = {
+  1: "🐞Божья коровка", 2: "🪲Жук", 3: "🐜Муравей", 4: "🐛Гусеница",
+  5: "🪱Червь", 6: "🦔Ежик", 7: "🐭Мышь", 8: "🐝Пчела", 9: "🕷Паук",
+  10: "🐌Слизень", 11: "🐸Лягушка", 12: "🐺Волк", 13: "🦉Сова",
+  14: "🐿Белка", 15: "🦇Летучая мышь", 16: "🦆Дикий гусь", 17: "🦊Лиса",
+  18: "🦟Муха", 19: "🦂Скорпион", 20: "🐦‍⬛Черный ворон", 21: "🦘Кенгуру",
+  22: "🦛Бегемот", 23: "🐕Кайот"
+};
+
+const campItemNames = {};
+campItems.forEach(it => campItemNames[it.id] = it.name);
+
+const awardNames = {
+  1: "🥝Киви", 2: "📦", 3: "📦[🐾⭐]", 4: "📦[🐾🌟]", 5: "🍒",
+  6: "⚡Зелье энергии", 7: "🩸Зелье выносливости", 8: "💡Зелье опыта", 9: "❤Зелье регенерации",
+  10: "📗 (книга)", 11: "📘 (книга)", 12: "📙 (книга)", 13: "📦[⭐]", 14: "📦[🌟]",
+  15: "📦[🥜]", 16: "📦[🚘]", 17: "🎟", 18: "🎁Карточка", 19: "📗 (🔪)",
+  20: "📘 (🔪)", 21: "📙 (🔪)", 22: "📕 (🔪)", 23: "📦[🛠]", 24: "📦[💠]",
+  25: "🧩", 26: "🎁Случ. карточка", 27: "🛡Случ. снаряжение", 28: "📦[🛡]",
+  29: "👒Комплект", 30: "🏷Титул", 31: "🚘Машина", 32: "🔮", 33: "📗[🔮]",
+  34: "📖", 35: "📗[📖]", 36: "📚", 37: "🛠Деталь", 38: "🌾Урожай",
+  39: "🥜Семена", 40: "🖌️Скин", 41: "🖌️Случ. скин", 42: "🍊",
+  43: "📦[❔️]", 44: "🧩[🛡]", 45: "🧩[📚]", 46: "💍Случ. украшение",
+  47: "💍Украшение", 48: "🍉Зелье голода", 49: "💙Зелье маны",
+  50: "🧪Удобрение", 51: "🔑Ключ", 52: "🔷️Ядро маны", 53: "💠",
+  54: "🎲Кубик", 55: "🔖Скип"
+};
+
+function formatItemRef(type, itemId, count) {
+  // type: 2 - предмет, 3 - награда
+  if (type === 2) {
+    const name = campItemNames[itemId] || `item#${itemId}`;
+    return `${name}${count > 1 ? ` x${count}` : ''}`;
+  } else if (type === 3) {
+    // награда: [type, awardId, num]
+    const name = awardNames[itemId] || `award#${itemId}`;
+    let display = name;
+    if (itemId === 32 || itemId === 44 || itemId === 45 || itemId === 50 || itemId === 29 || itemId === 40) {
+      // разбор "X_Y"
+      if (typeof count === 'string' && count.includes('_')) {
+        const [a, b] = count.split('_');
+        if (itemId === 32) display = `${b}🔮 (${a}⭐)`;
+        else if (itemId === 44) display = `${b}🧩[🛡${'⭐'.repeat(a)}]`;
+        else if (itemId === 45) display = `${b}🧩[📚${'⭐'.repeat(a)}]`;
+        else if (itemId === 50) display = `${soilsNames(a)} x${b}`;
+        else if (itemId === 29) display = `👒Комплект ${a}`;
+        else if (itemId === 40) display = `🖌️Скин ${a}`;
+      }
+    }
+    return display;
+  }
+  return `?`;
+}
+
+const soilsNames = (a) => {
+  const names = {1:"🧪Удобрение I", 2:"🧪Удобрение II", 3:"🧪Удобрение III"};
+  return names[a] || `Удобрение ${a}`;
 };
 
 /* ============================================================
-   ПОДГОТОВКА
+   ОТРИСОВКА
    ============================================================ */
 const nodesById = {};
 campPlaces.forEach(p => { nodesById[p.id] = p; });
+
+const POS = {
+  "1": [
+    1200,
+    2600
+  ],
+  "2": [
+    900,
+    2400
+  ],
+  "3": [
+    1500,
+    2771
+  ],
+  "4": [
+    1506,
+    2423
+  ],
+  "5": [
+    900,
+    2800
+  ],
+  "6": [
+    700,
+    2900
+  ],
+  "7": [
+    500,
+    3000
+  ],
+  "8": [
+    300,
+    2900
+  ],
+  "9": [
+    300,
+    3100
+  ],
+  "10": [
+    900,
+    2200
+  ],
+  "11": [
+    900,
+    2000
+  ],
+  "12": [
+    900,
+    1800
+  ],
+  "13": [
+    700,
+    1700
+  ],
+  "14": [
+    500,
+    1600
+  ],
+  "15": [
+    1100,
+    1700
+  ],
+  "16": [
+    1100,
+    1500
+  ],
+  "17": [
+    806,
+    1504
+  ],
+  "18": [
+    500,
+    1400
+  ],
+  "19": [
+    300,
+    1300
+  ],
+  "20": [
+    100,
+    1200
+  ],
+  "21": [
+    100,
+    1000
+  ],
+  "22": [
+    300,
+    900
+  ],
+  "23": [
+    1100,
+    1300
+  ],
+  "24": [
+    1100,
+    1100
+  ],
+  "25": [
+    1150,
+    930
+  ],
+  "26": [
+    918,
+    903
+  ],
+  "27": [
+    700,
+    800
+  ],
+  "28": [
+    500,
+    600
+  ],
+  "29": [
+    300,
+    500
+  ],
+  "30": [
+    900,
+    600
+  ],
+  "31": [
+    1100,
+    500
+  ],
+  "32": [
+    1300,
+    600
+  ],
+  "33": [
+    1500,
+    800
+  ],
+  "34": [
+    1116,
+    715
+  ],
+  "35": [
+    1500,
+    1000
+  ],
+  "36": [
+    1700,
+    800
+  ],
+  "37": [
+    1900,
+    600
+  ],
+  "38": [
+    1700,
+    1100
+  ],
+  "39": [
+    1944,
+    1179
+  ],
+  "40": [
+    1900,
+    1400
+  ],
+  "41": [
+    1700,
+    1500
+  ],
+  "42": [
+    1100,
+    300
+  ],
+  "43": [
+    900,
+    3300
+  ],
+  "44": [
+    853,
+    3582
+  ],
+  "45": [
+    500,
+    3600
+  ],
+  "46": [
+    300,
+    3800
+  ],
+  "47": [
+    600,
+    3800
+  ],
+  "48": [
+    700,
+    4000
+  ],
+  "49": [
+    964,
+    3985
+  ],
+  "50": [
+    1100,
+    3800
+  ],
+  "51": [
+    1241,
+    4004
+  ],
+  "52": [
+    1506,
+    3820
+  ],
+  "53": [
+    1500,
+    3600
+  ],
+  "54": [
+    1300,
+    3700
+  ],
+  "55": [
+    1100,
+    3500
+  ],
+  "56": [
+    1100,
+    3150
+  ],
+  "57": [
+    687,
+    3215
+  ],
+  "58": [
+    400,
+    3251
+  ],
+  "59": [
+    647,
+    3409
+  ],
+  "60": [
+    170,
+    3230
+  ],
+  "61": [
+    300,
+    3500
+  ],
+  "62": [
+    100,
+    3700
+  ],
+  "63": [
+    100,
+    3900
+  ],
+  "64": [
+    700,
+    3050
+  ],
+  "65": [
+    1468,
+    3997
+  ],
+  "66": [
+    1700,
+    4000
+  ],
+  "67": [
+    1900,
+    4000
+  ],
+  "68": [
+    2100,
+    4000
+  ],
+  "69": [
+    2300,
+    4200
+  ],
+  "70": [
+    2500,
+    4400
+  ],
+  "71": [
+    2500,
+    4600
+  ],
+  "72": [
+    2135,
+    4374
+  ],
+  "73": [
+    2298,
+    4538
+  ],
+  "74": [
+    2100,
+    4600
+  ],
+  "75": [
+    2500,
+    3800
+  ],
+  "76": [
+    2520,
+    4050
+  ],
+  "77": [
+    2500,
+    4200
+  ],
+  "78": [
+    2315,
+    4026
+  ],
+  "79": [
+    2100,
+    4200
+  ],
+  "80": [
+    1900,
+    4200
+  ],
+  "81": [
+    1700,
+    4500
+  ],
+  "82": [
+    3000,
+    4400
+  ],
+  "83": [
+    2300,
+    4900
+  ],
+  "84": [
+    1566,
+    4673
+  ],
+  "85": [
+    1400,
+    4847
+  ],
+  "86": [
+    1721,
+    4862
+  ]
+};
+
+const starsStr = ["⭐️","⭐️⭐️","⭐️⭐️⭐️","⭐️⭐️⭐️⭐️","⭐️⭐️⭐️⭐️⭐️"];
+const booksIcons = ["📗","📘","📙","📕","📔"];
 
 const edgeSet = new Set();
 const edges = [];
@@ -729,9 +1350,6 @@ Object.keys(POS).forEach(k => {
 const STAGE_W = (maxX - minX) + PAD * 2;
 const STAGE_H = (maxY - minY) + PAD * 2;
 
-/* ============================================================
-   ОТРИСОВКА
-   ============================================================ */
 const stage = document.getElementById('mapStage');
 const svg = document.getElementById('mapSvg');
 const infoHost = document.getElementById('infoPanelHost');
@@ -748,8 +1366,6 @@ function iconOnly(name) {
   const m = String(name).match(/^([\p{Extended_Pictographic}\u{1F3FB}-\u{1F3FF}\u{FE0F}\u{200D}]+)/u);
   return m ? m[1] : "";
 }
-/* Формат: "3⭐" вместо "⭐⭐⭐" */
-function starsStr(n) { return n > 0 ? `${n}⭐` : ""; }
 
 function getBuildLvl(build, placeId) {
   if (!build.lvlPlaces || build.lvlPlaces.length === 0) return 1;
@@ -758,6 +1374,9 @@ function getBuildLvl(build, placeId) {
   return idx + 2;
 }
 
+/* ============================================================
+   РЕНДЕР ИНФО-ПАНЕЛИ
+   ============================================================ */
 function getMeta(p) {
   const type = TYPES[p.type] || TYPES[1];
   const { icon, text } = splitIcon(p.name);
@@ -773,11 +1392,432 @@ function getMeta(p) {
   if (p.fight) p.fight.forEach(f => f.name && enemies.push(f.name));
   if (p.enemies) enemies.push("Случайные враги");
   const keyName = p.key ? (campItems.find(i => i.id === p.key)?.name || `Ключ #${p.key}`) : null;
-  // Звёзды редкости — только для РУДНИК/ПОЛЕ/РОЩА
   const starsDo = STAR_TYPES.has(p.type) ? (p.starsDo || 0) : 0;
   return { type, icon, text, builds, npcs, mines, enemies, keyName, starsDo };
 }
 
+function renderHuntSection(p) {
+  if (!p.hunt) return '';
+  const [list, energy, times, time] = p.hunt;
+  // список: массив [type, itemId] или [type, itemId, count]
+  // type: 1 - животное (itemId - ID животного), 2 - campItem, 3 - награда
+  const items = list.map(entry => {
+    const t = entry[0];
+    const id = entry[1];
+    if (t === 1) {
+      const name = animalsMap[id] || `animal#${id}`;
+      return `<span class="loot-drop">${name}</span>`;
+    } else if (t === 2) {
+      const name = campItemNames[id] || `item#${id}`;
+      return `<span class="loot-drop">${name}</span>`;
+    } else if (t === 3) {
+      const name = awardNames[id] || `award#${id}`;
+      return `<span class="loot-drop">${name}</span>`;
+    }
+    return '';
+  }).join('');
+
+  return `
+    <div class="loot-section">
+      <div class="loot-title">🐾 Охота</div>
+      <div class="loot-item">
+        <div class="loot-subtitle">⚡${energy} · ${time}с (x${times} существ)</div>
+        <div class="loot-drops">${items || '<span class="loot-drop">—</span>'}</div>
+      </div>
+    </div>
+  `;
+}
+
+
+function renderFindSection(p) {
+  if (!p.find) return '';
+  const [list, energy, times, time] = p.find;
+  const items = list.map(entry => {
+    const t = entry[0];
+    const id = entry[1];
+    const count = entry[2];
+    if (t === 2) {
+      const name = campItemNames[id] || `item#${id}`;
+      return `<span class="loot-drop">${name} x${count}</span>`;
+    } else if (t === 3) {
+      const name = awardNames[id] || `award#${id}`;
+      let display = name;
+      if (typeof count === 'string' && count.includes('_')) {
+        const [a, b] = count.split('_');
+        if (id === 32) display = `${b}🔮 (${a}⭐)`;
+        else if (id === 44) display = `${b}🧩[🛡${'⭐'.repeat(Number(a))}]`;
+        else if (id === 45) display = `${b}🧩[📚${'⭐'.repeat(Number(a))}]`;
+        else if (id === 50) display = `${soilsNames(a)} x${b}`;
+        else if (id === 29) display = `👒Комплект ${a}`;
+        else if (id === 40) display = `🖌️Скин ${a}`;
+      } else {
+        display = `${name}${count > 1 ? ` x${count}` : ''}`;
+      }
+      return `<span class="loot-drop">${display}</span>`;
+    } else if (t === 1) {
+      const name = animalsMap[id] || `animal#${id}`;
+      return `<span class="loot-drop">${name} x${count}</span>`;
+    }
+    return '';
+  }).join('');
+
+  return `
+    <div class="loot-section">
+      <div class="loot-title">🔎 Поиск</div>
+      <div class="loot-item">
+        <div class="loot-subtitle">⚡${energy} · ${time}с (x${times} находок)</div>
+        <div class="loot-drops">${items || '<span class="loot-drop">—</span>'}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderFightSection(p) {
+  if (!p.fight) return '';
+  const fights = p.fight.map(f => {
+    const stars = f.stars || 1;
+    return `
+      <div class="loot-item">
+        <div class="loot-enemy">${f.name} <span style="color:var(--rare)">${stars}⭐</span></div>
+        <div class="loot-drops">
+          <span class="loot-drop">⚡${f.energy}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  let awardsHtml = '';
+  if (p.type === 5 && p.awardsList && p.awardsList.length > 0) {
+    const keyOf = (t, id) => `${t}_${id}`;
+
+    const parsePair = (s) => {
+      if (typeof s !== 'string' || !s.includes('_')) return null;
+      const [a, b] = s.split('_').map(Number);
+      if (isNaN(a) || isNaN(b)) return null;
+      return { stars: a, count: b };
+    };
+
+const chipHtml = (t, id, cnt, isRare) => {
+  const cls = `loot-drop${isRare ? ' rare' : ''}`;
+
+  // ===== Строковый формат "X_Y" (редкость_количество) =====
+  if (typeof cnt === 'string' && cnt.includes('_')) {
+    const a = cnt.split('_');
+    if (a.length == 1) a.push(1);
+    const b = Number(a[0]); // редкость (1-5)
+    const c = Number(a[1]); // количество
+
+    if (id === 32) return `<span class="${cls}">${c}🔮 (${b}⭐)</span>`;
+    if (id === 33) return `<span class="${cls}">${c}${booksIcons[b-1]} [🔮]</span>`;
+    if (id === 34) return `<span class="${cls}">${c}📖 (${b}⭐)</span>`;
+    if (id === 35) return `<span class="${cls}">${c}${booksIcons[b-1]} [📖]</span>`;
+    if (id === 44) return `<span class="${cls}">${c}🧩[🛡${starsStr[b-1]}]</span>`;
+    if (id === 45) return `<span class="${cls}">${c}🧩[📚${starsStr[b-1]}]</span>`;
+    if (id === 50) return `<span class="${cls}">${c}${soilsNames(b)}</span>`;
+    if (id === 29) return `<span class="${cls}">${c}👒 (${b}⭐)</span>`;
+    if (id === 40) return `<span class="${cls}">${c}🖌️ (${b}⭐)</span>`;
+
+    // fallback для строкового формата
+    const name = t === 2
+      ? (campItemNames[id] || `item#${id}`)
+      : (awardNames[id] || `award#${id}`);
+    return `<span class="${cls}">${c}${name} (${b}⭐)</span>`;
+  }
+
+  // ===== Числовой формат =====
+  const n = Number(cnt) || 1;
+
+  // Особые случаи (как в index2.js getAward)
+  if (id === 10) return `<span class="${cls}">${n}📗</span>`;
+  if (id === 11) return `<span class="${cls}">${n}📘</span>`;
+  if (id === 12) return `<span class="${cls}">${n}📙</span>`;
+  if (id === 13) return `<span class="${cls}">${n}📦[⭐]</span>`;
+  if (id === 14) return `<span class="${cls}">${n}📦[🌟]</span>`;
+  if (id === 15) return `<span class="${cls}">${n}📦[🥜]</span>`;
+  if (id === 16) return `<span class="${cls}">${n}📦[🚘]</span>`;
+  if (id === 19) return `<span class="${cls}">${n}📗 (🔪)</span>`;
+  if (id === 20) return `<span class="${cls}">${n}📘 (🔪)</span>`;
+  if (id === 21) return `<span class="${cls}">${n}📙 (🔪)</span>`;
+  if (id === 22) return `<span class="${cls}">${n}📕 (🔪)</span>`;
+  if (id === 23) return `<span class="${cls}">${n}📦[🛠]</span>`;
+  if (id === 24) return `<span class="${cls}">${n}📦[💠]</span>`;
+  if (id === 25) return `<span class="${cls}">${n}🧩</span>`;
+  if (id === 28) return `<span class="${cls}">${n}📦[🛡]</span>`;
+  if (id === 43) return `<span class="${cls}">${n}📦[❔️]</span>`;
+  if (id === 52) return `<span class="${cls}">${n}🔷️Ядро маны</span>`;
+  if (id === 51) return `<span class="${cls}">${n}🔑</span>`;
+  if (id === 54) return `<span class="${cls}">${n}🎲</span>`;
+  if (id === 55) return `<span class="${cls}">${n}🔖</span>`;
+
+  // Общий случай — берём name из awardNames/campItemNames
+  const name = t === 2
+    ? (campItemNames[id] || `item#${id}`)
+    : (awardNames[id] || `award#${id}`);
+  return `<span class="${cls}">${n}${name}</span>`;
+};
+
+    const variantsHtml = p.awardsList.map((variant, i) => {
+      const map = new Map();
+      variant.forEach(e => {
+        if (!Array.isArray(e) || e.length < 2) return;
+        const [t, id, cnt] = e;
+        const k = keyOf(t, id);
+        if (!map.has(k)) {
+          map.set(k, { t, id, cnt });
+        } else {
+          const cur = map.get(k);
+          if (typeof cnt === 'number' && typeof cur.cnt === 'number' && cnt > cur.cnt) {
+            cur.cnt = cnt;
+          }
+        }
+      });
+      const chips = Array.from(map.values()).map(({ t, id, cnt }) => chipHtml(t, id, cnt)).filter(Boolean);
+      return `
+        <div class="loot-item">
+          <div class="loot-subtitle">🎁 Вариант ${i + 1}</div>
+          <div class="loot-drops">${chips.join('')}</div>
+        </div>
+      `;
+    }).join('');
+
+    awardsHtml = `
+      <div class="loot-item" style="border-color:var(--rare)">
+        <div class="loot-subtitle">⏳ Перезарядка: 7 дней</div>
+        <div class="loot-subtitle">🎲 Выпадает один случайный вариант награды</div>
+      </div>
+      ${variantsHtml}
+    `;
+  }
+
+  return `
+    <div class="loot-section">
+      <div class="loot-title">${p.type === 5 ? '👑 Босс' : '⚔️ Сражение'}</div>
+      ${fights}
+      ${awardsHtml}
+    </div>
+  `;
+}
+
+function renderEnemiesSection(p) {
+  if (!p.enemies) return '';
+  let blocksHtml = '';
+
+  const isFight = p.energyFight !== undefined;
+  const title = isFight
+    ? `👹 Возможные враги (⚡${p.energyFight} за бой)`
+    : `👹 Возможные враги (${p.chance || 15}% шанс)`;
+
+  const parseEnemy = (raw) => {
+    if (Array.isArray(raw) && raw.length >= 3 && typeof raw[0] === 'object' && raw[0].name) {
+      return { enemy: raw[0], dropData: raw[2] };
+    }
+    if (raw && typeof raw === 'object' && raw.name) {
+      return { enemy: raw, dropData: { drop: raw.drop, rare: raw.rare } };
+    }
+    return null;
+  };
+
+  // Форматирует один чип [t, id, cnt]
+  // t: 2 - предмет (campItems), 3 - награда (awardNames)
+  // cnt: число или "X_Y"
+  const chipHtml = (t, id, cnt, isRare) => {
+    const cls = `loot-drop${isRare ? ' rare' : ''}`;
+    let name = '';
+    if (t === 2) name = campItemNames[id] || `item#${id}`;
+    else if (t === 3) name = awardNames[id] || `award#${id}`;
+    else return '';
+
+    // Строковый формат "X_Y"
+    if (typeof cnt === 'string' && cnt.includes('_')) {
+      const [a, b] = cnt.split('_').map(Number);
+      if (id === 32) return `<span class="${cls}">🔮 x${b} (${a}⭐)</span>`;
+      if (id === 44) return `<span class="${cls}">🧩 x${b} [🛡${starsStr[a-1]}⭐]</span>`;
+      if (id === 45) return `<span class="${cls}">🧩 x${b} [📚${starsStr[a-1]}⭐]</span>`;
+      return `<span class="${cls}">${name} x${b} (${a})</span>`;
+    }
+
+    // Числовой формат
+    const n = Number(cnt) || 1;
+    return `<span class="${cls}">${name} x${n}</span>`;
+  };
+
+  // Собираем уникальные предметы из всех вариантов drop
+  // и объединяем количество: min..max
+  const collectDrops = (dropArr, isRare) => {
+    if (!Array.isArray(dropArr) || dropArr.length === 0) return '';
+    const map = new Map(); // key -> { t, id, min, max, raw }
+    dropArr.forEach(variant => {
+      if (!Array.isArray(variant)) return;
+      variant.forEach(e => {
+        if (!Array.isArray(e) || e.length < 2) return;
+        const [t, id, cnt] = e;
+        const key = `${t}_${id}`;
+        const cur = map.get(key);
+        if (!cur) {
+          map.set(key, { t, id, min: cnt, max: cnt, raw: cnt });
+        } else {
+          if (typeof cnt === 'number') {
+            if (typeof cur.min === 'number') cur.min = Math.min(cur.min, cnt); else cur.min = cnt;
+            if (typeof cur.max === 'number') cur.max = Math.max(cur.max, cnt); else cur.max = cnt;
+          }
+        }
+      });
+    });
+
+    const chips = [];
+    for (const { t, id, min, max, raw } of map.values()) {
+      if (typeof min === 'number' && typeof max === 'number' && min !== max) {
+        // диапазон
+        let name = t === 2 ? (campItemNames[id] || `item#${id}`) : (awardNames[id] || `award#${id}`);
+        chips.push(`<span class="loot-drop${isRare ? ' rare' : ''}">${name} x${min}–${max}</span>`);
+      } else {
+        chips.push(chipHtml(t, id, raw, isRare));
+      }
+    }
+    return chips.join('');
+  };
+
+  blocksHtml = p.enemies.map(raw => {
+    const parsed = parseEnemy(raw);
+    if (!parsed) return '';
+    const { enemy, dropData } = parsed;
+
+    const dropsHtml = dropData ? collectDrops(dropData.drop, false) : '';
+    const rareHtml = dropData ? collectDrops(dropData.rare, true) : '';
+
+    return `
+      <div class="loot-item">
+        <div class="loot-enemy">${enemy.name} <span style="color:var(--rare)">${enemy.stars || 1}⭐</span></div>
+        ${dropsHtml ? `<div class="loot-subtitle">🎁 Лут:</div><div class="loot-drops">${dropsHtml}</div>` : ''}
+        ${rareHtml ? `<div class="loot-subtitle">💎 Редкий лут:</div><div class="loot-drops">${rareHtml}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  if (!blocksHtml) {
+    blocksHtml = '<div class="loot-item"><div class="loot-subtitle">Нет данных о луте</div></div>';
+  }
+
+  return `
+    <div class="loot-section">
+      <div class="loot-title">${title}</div>
+      ${blocksHtml}
+    </div>
+  `;
+}
+
+function renderMineSection(p) {
+  if (!p.mineItems) return '';
+  const items = p.mineItems.map(([id, chance]) => {
+    const name = campItemNames[id] || `item#${id}`;
+    return `<span class="loot-drop">${name} <span class="chance">${(chance * 100).toFixed(0)}%</span></span>`;
+  }).join('');
+
+  return `
+    <div class="loot-section">
+      <div class="loot-title">⛏️ Добыча в руднике</div>
+      <div class="loot-item">
+        <div class="loot-subtitle">⚡${p.energyDo} · ${p.timeDo}с · ⭐${p.starsDo || 0}</div>
+        <div class="loot-drops">${items}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderFishSection(p) {
+  if (!p.fishes) return '';
+  const tiers = p.fishes.map((tier, i) => {
+    const names = tier.map(id => fishesMap[id] || `fish#${id}`).join(', ');
+    return `<div class="loot-subtitle">${'⭐'.repeat(i+1)} Редкость:</div><div class="loot-drops">${names.split(', ').map(n => `<span class="loot-drop">${n}</span>`).join('')}</div>`;
+  }).join('');
+  return `
+    <div class="loot-section">
+      <div class="loot-title">🎣 Рыбалка</div>
+      <div class="loot-item">
+        ${tiers}
+      </div>
+    </div>
+  `;
+}
+
+const fishesMap = {
+  1: "🐟Плотва", 2: "🐡Карась", 3: "🐡Окунь", 4: "🐠Ёрш", 5: "🦞Рак",
+  6: "🐟Голавль", 7: "🐟Жерех", 8: "🐟Лещ", 9: "🐡Линь", 10: "🐠Краснопёрка",
+  11: "🦈Щука", 12: "🐟Сом", 13: "🦞Большой рак",
+  14: "🐟Пустынный голомянчик", 15: "🦞Фарангский рак",
+  16: "🐟Песчаный угорь-землекоп", 17: "🦈Соляной охотник",
+  18: "🐢Шипастая черепаха Сайха", 19: "🐡Оазисный протоптер-страж"
+};
+
+function renderInfo(id) {
+  const p = nodesById[id];
+  if (!p) return;
+  const meta = getMeta(p);
+
+  const buildsHtml = meta.builds.length
+    ? meta.builds.map(b => {
+        const { icon, text } = splitIcon(b.name);
+        const lvl = b.lvl ? `<span class="lvl">Lv.${b.lvl}</span>` : '';
+        return `<span class="info-tag">${icon} ${text} ${lvl}</span>`;
+      }).join('') : '';
+  const npcsHtml = meta.npcs.length
+    ? meta.npcs.map(n => {
+        const { icon, text } = splitIcon(n.name);
+        return `<span class="info-tag">${icon} ${text}</span>`;
+      }).join('') : '';
+  const minesHtml = meta.mines.length
+    ? meta.mines.map(it => {
+        const { icon, text } = splitIcon(it.name);
+        return `<span class="info-tag">${icon} ${text}</span>`;
+      }).join('') : '';
+  const huntHtml = p.hunt ? `<span class="info-tag">🐾 Охота</span>` : '';
+  const findHtml = p.find ? `<span class="info-tag">🔎 Поиск</span>` : '';
+  const fishHtml = p.fishes ? `<span class="info-tag">🎣 Рыбалка</span>` : '';
+  const resourcesHtml = minesHtml + huntHtml + findHtml + fishHtml;
+  const enemiesHtml = meta.enemies.length
+    ? meta.enemies.map(e => `<span class="info-tag">⚔️ ${e}</span>`).join('') : '';
+  const keyHtml = meta.keyName
+    ? `<span class="info-tag">🗝️ ${meta.keyName}</span>` : '';
+
+  let blocks = '';
+  if (buildsHtml)    blocks += `<div class="info-block"><div class="info-block-label">🏠 Здания</div><div class="info-tags">${buildsHtml}</div></div>`;
+  if (npcsHtml)      blocks += `<div class="info-block"><div class="info-block-label">🧙 НПС</div><div class="info-tags">${npcsHtml}</div></div>`;
+  if (resourcesHtml) blocks += `<div class="info-block"><div class="info-block-label">🎁 Добыча</div><div class="info-tags">${resourcesHtml}</div></div>`;
+  if (enemiesHtml)   blocks += `<div class="info-block"><div class="info-block-label">⚔️ Противники</div><div class="info-tags">${enemiesHtml}</div></div>`;
+  if (keyHtml)       blocks += `<div class="info-block"><div class="info-block-label">🗝️ Ключ</div><div class="info-tags">${keyHtml}</div></div>`;
+
+    // Подробные разделы лута
+  blocks += renderHuntSection(p);
+  blocks += renderFindSection(p);
+  if (p.type === 2 || p.type === 5) {
+    blocks += renderFightSection(p);
+  } else if (p.type === 3 || p.type === 4) {
+    blocks += renderEnemiesSection(p);
+  }
+  blocks += renderMineSection(p);
+  blocks += renderFishSection(p);
+
+  if (!blocks) blocks = `<div class="info-block"><div class="info-tags"><span class="info-tag" style="opacity:.5">Пустая локация</span></div></div>`;
+
+  const typeStars = meta.starsDo > 0 ? `<span class="type-stars">${starsStr[meta.starsDo-1]}</span>` : '';
+
+  infoHost.innerHTML = `
+    <div class="info-panel" style="--type-color:${meta.type.color}">
+      <div class="info-panel-head">
+        <div class="info-icon">${meta.icon}</div>
+        <div>
+          <div class="info-name">${meta.text}</div>
+          <div class="info-type">${meta.type.label}${typeStars}</div>
+        </div>
+      </div>
+      ${blocks}
+    </div>
+  `;
+}
+
+/* ============================================================
+   ОТРИСОВКА КАРТЫ
+   ============================================================ */
 function renderEdges() {
   svg.setAttribute('viewBox', `0 0 ${STAGE_W} ${STAGE_H}`);
   svg.innerHTML = '';
@@ -822,6 +1862,8 @@ function renderNodes() {
   });
 }
 
+
+
 function selectNode(id) {
   stage.querySelectorAll('.node').forEach(n => {
     n.classList.toggle('selected', Number(n.dataset.id) === id);
@@ -833,65 +1875,13 @@ function selectNode(id) {
   renderInfo(id);
 }
 
-function renderInfo(id) {
-  const p = nodesById[id];
-  if (!p) return;
-  const meta = getMeta(p);
-
-  const buildsHtml = meta.builds.length
-    ? meta.builds.map(b => {
-        const { icon, text } = splitIcon(b.name);
-        const lvl = b.lvl ? `<span class="lvl">Lv.${b.lvl}</span>` : '';
-        return `<span class="info-tag">${icon} ${text} ${lvl}</span>`;
-      }).join('') : '';
-  const npcsHtml = meta.npcs.length
-    ? meta.npcs.map(n => {
-        const { icon, text } = splitIcon(n.name);
-        return `<span class="info-tag">${icon} ${text}</span>`;
-      }).join('') : '';
-  const minesHtml = meta.mines.length
-    ? meta.mines.map(it => {
-        const { icon, text } = splitIcon(it.name);
-        return `<span class="info-tag">${icon} ${text}</span>`;
-      }).join('') : '';
-  const huntHtml = p.hunt ? `<span class="info-tag">🐾 Охота</span>` : '';
-  const findHtml = p.find ? `<span class="info-tag">🔎 Поиск</span>` : '';
-  const fishHtml = p.fishes ? `<span class="info-tag">🎣 Рыбалка</span>` : '';
-  const resourcesHtml = minesHtml + huntHtml + findHtml + fishHtml;
-  const enemiesHtml = meta.enemies.length
-    ? meta.enemies.map(e => `<span class="info-tag">⚔️ ${e}</span>`).join('') : '';
-  const keyHtml = meta.keyName
-    ? `<span class="info-tag">🗝️ ${meta.keyName}</span>` : '';
-
-  let blocks = '';
-  if (buildsHtml)    blocks += `<div class="info-block"><div class="info-block-label">🏠 Здания</div><div class="info-tags">${buildsHtml}</div></div>`;
-  if (npcsHtml)      blocks += `<div class="info-block"><div class="info-block-label">🧙 НПС</div><div class="info-tags">${npcsHtml}</div></div>`;
-  if (resourcesHtml) blocks += `<div class="info-block"><div class="info-block-label">🎁 Добыча</div><div class="info-tags">${resourcesHtml}</div></div>`;
-  if (enemiesHtml)   blocks += `<div class="info-block"><div class="info-block-label">⚔️ Противники</div><div class="info-tags">${enemiesHtml}</div></div>`;
-  if (keyHtml)       blocks += `<div class="info-block"><div class="info-block-label">🗝️ Ключ</div><div class="info-tags">${keyHtml}</div></div>`;
-  if (!blocks) blocks = `<div class="info-block"><div class="info-tags"><span class="info-tag" style="opacity:.5">Пустая локация</span></div></div>`;
-
-  const typeStars = meta.starsDo > 0 ? `<span class="type-stars">${starsStr(meta.starsDo)}</span>` : '';
-
-  infoHost.innerHTML = `
-    <div class="info-panel" style="--type-color:${meta.type.color}">
-      <div class="info-panel-head">
-        <div class="info-icon">${meta.icon}</div>
-        <div>
-          <div class="info-name">${meta.text}</div>
-          <div class="info-type">${meta.type.label}${typeStars}</div>
-        </div>
-      </div>
-      ${blocks}
-    </div>
-  `;
-}
-
 /* ============================================================
    ПАН И ЗУМ
    ============================================================ */
 const wrap = document.getElementById('mapWrap');
 const viewport = document.getElementById('mapViewport');
+
+
 
 let scale = 1;
 let tx = 0, ty = 0;
@@ -900,7 +1890,7 @@ let panMoved = false;
 let panStart = null;
 let activePointer = null;
 let pinchStart = null;
-let didInitialCenter = false; // <-- первичное центрирование только 1 раз
+let didInitialCenter = false;
 
 const MIN_SCALE = 0.3;
 const MAX_SCALE = 2.0;
@@ -954,9 +1944,8 @@ document.getElementById('zoomReset').addEventListener('click', () => {
   centerOnNode(1, 1);
 });
 
-let pointerDownOn = null;
-
 viewport.addEventListener('pointerdown', (e) => {
+   if (window._editDragging) return; 
   if (e.target.closest('.zoom-btn')) return;
   const nodeEl = e.target.closest('.node');
   pointerDownOn = nodeEl ? Number(nodeEl.dataset.id) : null;
@@ -967,6 +1956,8 @@ viewport.addEventListener('pointerdown', (e) => {
   try { viewport.setPointerCapture(e.pointerId); } catch(_) {}
   wrap.classList.add('grabbing');
 });
+
+let pointerDownOn = null;
 
 viewport.addEventListener('pointermove', (e) => {
   if (!isPanning || e.pointerId !== activePointer) return;
@@ -1046,7 +2037,6 @@ viewport.addEventListener('wheel', (e) => {
   zoomAt(px, py, factor);
 }, { passive: false });
 
-/* ВАЖНО: при resize сохраняем текущий вид, а не центрируем заново */
 window.addEventListener('resize', () => {
   clampTransform();
   applyTransform();
@@ -1111,6 +2101,226 @@ mql.addEventListener('change', (e) => { if (!getStoredTheme()) applyTheme(e.matc
 initTheme();
 renderEdges();
 renderNodes();
+
+/* ============================================================
+   РЕЖИМ РЕДАКТИРОВАНИЯ ПОЗИЦИЙ + АВТООБНОВЛЕНИЕ СВЯЗЕЙ
+   Активация: долгое нажатие (500 мс) на узел
+   ============================================================ */
+const EDIT_MODE = false;
+
+if (EDIT_MODE) {
+  const editPositions = {};
+  campPlaces.forEach(p => {
+    const pos = NORM_POS[p.id];
+    if (pos) editPositions[p.id] = [pos[0], pos[1]];
+  });
+
+  let editNodeId = null;
+  let isDragging = false;
+  let dragOffset = { x: 0, y: 0 };
+  let longPressTimer = null;
+  let pointerStartPos = null;
+
+  const LONG_PRESS_MS = 500;
+
+  function nodeElById(id) {
+    return stage.querySelector(`.node[data-id="${id}"]`);
+  }
+
+  /* ---------- АВТООБНОВЛЕНИЕ СВЯЗЕЙ ---------- */
+  function updateEdgesForNode(nodeId, x, y) {
+    svg.querySelectorAll('.map-edge').forEach(line => {
+      const a = Number(line.dataset.a);
+      const b = Number(line.dataset.b);
+      if (a === nodeId) {
+        line.setAttribute('x1', x);
+        line.setAttribute('y1', y);
+      }
+      if (b === nodeId) {
+        line.setAttribute('x2', x);
+        line.setAttribute('y2', y);
+      }
+    });
+  }
+
+  /* ---------- ВХОД/ВЫХОД ИЗ РЕЖИМА ---------- */
+  function enterEditMode(id) {
+    if (editNodeId !== null && editNodeId !== id) exitEditMode();
+    editNodeId = id;
+    const el = nodeElById(id);
+    if (!el) return;
+
+    el.style.cursor = 'move';
+    el.style.zIndex = 100;
+    el.style.boxShadow = '0 0 0 5px #ffa94d, 0 14px 36px rgba(0,0,0,.7)';
+    el.style.borderColor = '#ffa94d';
+
+    console.log(`✏️ EDIT: узел #${id} (${nodesById[id]?.name || ''}) — тащи`);
+  }
+
+  function exitEditMode() {
+    if (editNodeId === null) return;
+    const el = nodeElById(editNodeId);
+    if (el) {
+      el.style.cursor = '';
+      el.style.zIndex = '';
+      el.style.boxShadow = '';
+      el.style.borderColor = '';
+    }
+    editNodeId = null;
+    isDragging = false;
+    window._editDragging = false;
+    dumpPositions();
+  }
+
+  /* ---------- НАЖАТИЕ ---------- */
+  stage.addEventListener('pointerdown', (e) => {
+    const nodeEl = e.target.closest('.node');
+    if (!nodeEl) return;
+
+    const id = Number(nodeEl.dataset.id);
+
+    if (editNodeId === id) {
+      e.stopPropagation();
+      e.preventDefault();
+      startDrag(e, nodeEl, id);
+      return;
+    }
+
+    pointerStartPos = { x: e.clientX, y: e.clientY };
+    longPressTimer = setTimeout(() => {
+      longPressTimer = null;
+      enterEditMode(id);
+      startDrag(e, nodeEl, id);
+    }, LONG_PRESS_MS);
+  }, true);
+
+  function startDrag(e, nodeEl, id) {
+    isDragging = true;
+    window._editDragging = true;
+
+    const stageRect = stage.getBoundingClientRect();
+    const sx = (e.clientX - stageRect.left) / scale;
+    const sy = (e.clientY - stageRect.top) / scale;
+
+    const cur = editPositions[id];
+    dragOffset.x = sx - cur[0];
+    dragOffset.y = sy - cur[1];
+
+    try { nodeEl.setPointerCapture(e.pointerId); } catch (_) {}
+    nodeEl.style.boxShadow = '0 0 0 7px #ffa94d, 0 14px 36px rgba(0,0,0,.8)';
+  }
+
+  /* ---------- ДВИЖЕНИЕ ---------- */
+  stage.addEventListener('pointermove', (e) => {
+    if (longPressTimer && pointerStartPos) {
+      const dx = e.clientX - pointerStartPos.x;
+      const dy = e.clientY - pointerStartPos.y;
+      if (Math.hypot(dx, dy) > 8) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+    }
+
+    if (!isDragging || editNodeId === null) return;
+
+    const nodeEl = nodeElById(editNodeId);
+    if (!nodeEl) return;
+
+    const stageRect = stage.getBoundingClientRect();
+    const sx = (e.clientX - stageRect.left) / scale;
+    const sy = (e.clientY - stageRect.top) / scale;
+
+    const nx = Math.round(sx - dragOffset.x);
+    const ny = Math.round(sy - dragOffset.y);
+
+    editPositions[editNodeId] = [nx, ny];
+    nodeEl.style.left = nx + 'px';
+    nodeEl.style.top = ny + 'px';
+
+    // ← АВТООБНОВЛЕНИЕ СВЯЗЕЙ В РЕАЛЬНОМ ВРЕМЕНИ
+    updateEdgesForNode(editNodeId, nx, ny);
+  }, true);
+
+  /* ---------- ОТПУСКАНИЕ ---------- */
+  stage.addEventListener('pointerup', (e) => {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    if (!isDragging) return;
+
+    isDragging = false;
+    window._editDragging = false;
+
+    // фиксируем позицию в NORM_POS (чтобы centerOnNode работал корректно)
+    if (editNodeId !== null && editPositions[editNodeId]) {
+      NORM_POS[editNodeId] = [...editPositions[editNodeId]];
+    }
+
+    const nodeEl = editNodeId !== null ? nodeElById(editNodeId) : null;
+    if (nodeEl) {
+      nodeEl.style.boxShadow = '0 0 0 5px #ffa94d, 0 14px 36px rgba(0,0,0,.7)';
+      try { nodeEl.releasePointerCapture(e.pointerId); } catch (_) {}
+    }
+    dumpPositions();
+  }, true);
+
+  stage.addEventListener('pointercancel', (e) => {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    if (!isDragging) return;
+    isDragging = false;
+    window._editDragging = false;
+  }, true);
+
+  /* ---------- ВЫХОД ПО КЛИКУ ВНЕ УЗЛА ---------- */
+  viewport.addEventListener('pointerdown', (e) => {
+    if (editNodeId === null) return;
+    if (e.target.closest('.node')) return;
+    exitEditMode();
+  }, true);
+
+  /* ---------- ДАМП POS ---------- */
+  function dumpPositions() {
+    const out = {};
+    Object.keys(editPositions).sort((a, b) => Number(a) - Number(b)).forEach(k => {
+      const [x, y] = editPositions[k];
+      out[k] = [Math.round(x + minX - PAD), Math.round(y + minY - PAD)];
+    });
+    console.clear();
+    console.log('%c=== POS ===', 'color:#ffa94d;font-weight:bold;font-size:14px');
+    console.log('const POS = ' + JSON.stringify(out, null, 2) + ';');
+    console.log('%c=== /POS ===', 'color:#ffa94d;font-weight:bold;font-size:14px');
+    return out;
+  }
+
+  setTimeout(dumpPositions, 200);
+
+  /* ---------- КНОПКА POS ---------- */
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = '📋 POS';
+  copyBtn.style.cssText = `
+    position: absolute; top: 14px; left: 14px; z-index: 30;
+    padding: 10px 14px; border-radius: 12px;
+    background: #161d27; color: #ffa94d;
+    border: 1px solid #ffa94d; cursor: pointer;
+    font-weight: 800; font-family: inherit; font-size: 0.85rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,.5);
+  `;
+  copyBtn.onclick = (ev) => {
+    ev.stopPropagation();
+    const out = dumpPositions();
+    const text = 'const POS = ' + JSON.stringify(out, null, 2) + ';';
+    navigator.clipboard.writeText(text).then(() => {
+      copyBtn.textContent = '✅ Скопировано!';
+      setTimeout(() => copyBtn.textContent = '📋 POS', 1500);
+    }).catch(() => {
+      copyBtn.textContent = '❌ Ctrl+C в консоли';
+      setTimeout(() => copyBtn.textContent = '📋 POS', 2000);
+    });
+  };
+  document.getElementById('mapWrap').appendChild(copyBtn);
+
+  console.log('%c🛠 РЕЖИМ РЕДАКТИРОВАНИЯ ВКЛЮЧЁН', 'color:#a3e635;font-weight:bold;font-size:16px');
+}
+
 requestAnimationFrame(() => {
   if (!didInitialCenter) {
     didInitialCenter = true;
