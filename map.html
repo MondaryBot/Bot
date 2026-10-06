@@ -253,9 +253,12 @@
     box-shadow: 0 3px 10px var(--shadow);
     transition: all 0.2s ease;
     font-family: inherit;
+    padding: 0;
   }
   .zoom-btn:hover { border-color: var(--accent); color: var(--accent); }
   .zoom-btn:active { transform: scale(0.94); }
+  .zoom-btn svg { width: 20px; height: 20px; display: block; }
+  .zoom-btn.reset-btn svg { width: 22px; height: 22px; }
 
   .info-panel {
     background: linear-gradient(160deg, var(--card), var(--card-2));
@@ -342,6 +345,12 @@
     .node-icon { font-size: 1.55rem; }
     .node-name { font-size: 0.8rem; }
     .node-mark { font-size: 0.78rem; }
+
+    /* Кнопки зума чуть крупнее и иконки больше на телефоне */
+    .zoom-controls { top: 10px; right: 10px; gap: 7px; }
+    .zoom-btn { width: 46px; height: 46px; font-size: 1.5rem; border-radius: 13px; }
+    .zoom-btn svg { width: 22px; height: 22px; }
+    .zoom-btn.reset-btn svg { width: 25px; height: 25px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -377,7 +386,7 @@
 
   <div class="header">
     <a href="index.html" class="back-link">← На главную</a>
-    <h1 class="title">🗺️Карта мира</h1>
+    <h1 class="title">🗺️ Карта мира</h1>
     <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему" type="button">
       <span class="toggle-knob">
         <span class="k-ico moon">🌙</span>
@@ -396,9 +405,25 @@
           </div>
         </div>
         <div class="zoom-controls">
-          <button class="zoom-btn" id="zoomIn"  aria-label="Приблизить">＋</button>
-          <button class="zoom-btn" id="zoomOut" aria-label="Отдалить">－</button>
-          <button class="zoom-btn" id="zoomReset" aria-label="Сбросить">⤢</button>
+          <button class="zoom-btn" id="zoomIn" aria-label="Приблизить">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <button class="zoom-btn" id="zoomOut" aria-label="Отдалить">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <button class="zoom-btn reset-btn" id="zoomReset" aria-label="Сбросить">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 3 21 3 21 9"/>
+              <polyline points="9 21 3 21 3 15"/>
+              <line x1="21" y1="3" x2="14" y2="10"/>
+              <line x1="3" y1="21" x2="10" y2="14"/>
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -875,6 +900,7 @@ let panMoved = false;
 let panStart = null;
 let activePointer = null;
 let pinchStart = null;
+let didInitialCenter = false; // <-- первичное центрирование только 1 раз
 
 const MIN_SCALE = 0.3;
 const MAX_SCALE = 2.0;
@@ -1020,7 +1046,11 @@ viewport.addEventListener('wheel', (e) => {
   zoomAt(px, py, factor);
 }, { passive: false });
 
-window.addEventListener('resize', () => { centerOnNode(1, scale); });
+/* ВАЖНО: при resize сохраняем текущий вид, а не центрируем заново */
+window.addEventListener('resize', () => {
+  clampTransform();
+  applyTransform();
+});
 
 /* ============ ПРОГРЕСС-БАР ============ */
 const progressFill = document.getElementById('progressFill');
@@ -1082,7 +1112,10 @@ initTheme();
 renderEdges();
 renderNodes();
 requestAnimationFrame(() => {
-  centerOnNode(1, 1);
+  if (!didInitialCenter) {
+    didInitialCenter = true;
+    centerOnNode(1, 1);
+  }
 });
 </script>
 </body>
