@@ -643,267 +643,926 @@ const campItems = [
   { id: 506, name: "🗝Ключ в ?", type: 5 }
 ];
 
-const campPlaces = [
-  { id:1, type:1, name:"🏘️Главная площадь", near:[2,3,4,5], photo:"img/campPlaces/1.jpg", builds:[6,2], timeGo:3 },
-  { id:2, type:1, name:"🏠Дом жриц", near:[1,5,10], photo:"img/campPlaces/2.jpg", builds:[], timeGo:3 },
-  { id:3, type:1, name:"🪚Ремесленная", near:[1,4,5], photo:"img/campPlaces/3.jpg", builds:[3,4], timeGo:3 },
-  { id:4, type:10, name:"💧Берег", near:[1,3], photo:"img/campPlaces/4.jpg", builds:[5], max:100, regenHour:10, starsDo:1, fishes:[[1,2,3,4],[5,6],[7]], nearFishes:[[],[8,9,10],[11,12]], waitK:1, timeGo:3 },
-  { id:5, type:1, name:"🐾Пастбище", near:[1,2,3,6], photo:"img/campPlaces/5.jpg", builds:[1], timeGo:3 },
-  { id:6, type:1, name:"🌿Поляна", near:[5,7], photo:"img/campPlaces/6.jpg", builds:[], timeGo:3 },
-  { id:7, type:8, name:"🌾Сад", near:[6,8,9], photo:"img/campPlaces/7.jpg",
-    hunt:[[[1,1],[1,3],[1,6],[1,7],[1,8]],5,3,10],
-    find:[[[2,103,3],[2,103,4],[2,103,5],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_1"],[3,34,"1_1"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_2"]],5,2,8],
-    energyDo:3, timeDo:10, maxHunt:100, regenHuntHour:20, max:150, regenHour:20, starsDo:0, timeGo:3 },
-  { id:8, type:6, name:"🌳Роща", near:[7], photo:"img/campPlaces/8.jpg",
-    hunt:[[[1,1],[1,2],[1,3],[1,6],[1,4]],5,3,10],
-    find:[[[2,101,3],[2,101,4],[2,101,5],[2,101,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_1"],[3,34,"1_1"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_2"]],5,2,8],
-    energyDo:3, timeDo:10, maxHunt:100, regenHuntHour:20, max:150, regenHour:20, starsDo:0, timeGo:3 },
-  { id:9, type:7, name:"⛰️Железный рудник", near:[7], photo:"img/campPlaces/9.jpg",
-    hunt:[[[1,1],[1,3],[1,7],[1,9],[1,4]],5,3,10],
-    find:[[[2,102,3],[2,102,4],[2,102,5],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_1"],[3,34,"1_1"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_2"]],5,2,8],
-    mineItems:[[104,0.12]], energyDo:3, timeDo:10, maxHunt:100, regenHuntHour:20, max:150, regenHour:20, starsDo:1, timeGo:3 },
-  { id:10, type:1, name:"🌿Тропинка", near:[2,11], photo:"img/campPlaces/10.jpg", builds:[], timeGo:3 },
-  { id:11, type:9, name:"⛩️Старые ворота", near:[10,12], photo:"img/campPlaces/11.jpg", key:501, timeGo:3 },
-  { id:12, type:2, name:"🌿Заросли", near:[11,13,15,17], locked:[13,15,17], photo:"img/campPlaces/12.jpg",
+ const campPlaces = [
+    {
+    id:1,
+    type:1,
+    name:"🏘️Главная площадь",
+    near:[2,3,4,5],
+    photo:"img/campPlaces/1.jpg",
+    builds:[6,2],
+    timeGo:3
+},{
+    id:2,
+    type:1,
+    name:"🏠Дом жриц",
+    near:[1,5,10],
+    photo:"img/campPlaces/2.jpg",
+    builds:[],
+    timeGo:3
+},{
+    id:3,
+    type:1,
+    name:"🪚Ремесленная",
+    near:[1,4,5],
+    photo:"img/campPlaces/3.jpg",
+    builds:[3,4],
+    timeGo:3
+},{
+    id:4,
+    type:10,
+    name:"💧Берег",
+    near:[1,3],
+    photo:"img/campPlaces/4.jpg",
+    builds:[5],
+    max:100,
+    regenHour:10,
+    starsDo:1,
+    fishes:[[1,2,3,4],[5,6],[7]],
+    nearFishes:[[],[8,9,10],[11,12]],
+    waitK:1,
+    timeGo:3
+},{
+    id:5,
+    type:1,
+    name:"🐾Пастбище",
+    near:[1,2,3,6],
+    photo:"img/campPlaces/5.jpg",
+    builds:[1],
+    timeGo:3
+},{
+    id:6,
+    type:1,
+    name:"🌿Поляна",
+    near:[5,7],
+    photo:"img/campPlaces/6.jpg",
+    builds:[],
+    timeGo:3
+},{
+    id:7,
+    type:8,
+    name:"🌾Сад",
+    near:[6,8,9],
+    photo:"img/campPlaces/7.jpg",
+    hunt:[[[1,1],[1,3],[1,6],[1,7],[1,8]],5,3,10], // awards energy times time: [1,1,5] - животное id1 5 траты, 2 - campItem, 3 - claimAward
+    find:[[[2,103,3],[2,103,4],[2,103,5],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_1"],[3,34,"1_1"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_2"]],5,2,8], // awards energy times timeL: awards животные не тратят maxHunt
+    energyDo:3,
+    timeDo:10,
+    maxHunt:100,
+    regenHuntHour:20,
+    max:100,
+    regenHour:20,
+    starsDo:0,
+    timeGo:3
+},{
+    id:8,
+    type:6,
+    name:"🌳Роща",
+    near:[7],
+    photo:"img/campPlaces/8.jpg",
+    hunt:[[[1,1],[1,2],[1,3],[1,6],[1,4]],5,3,10], // awards energy times time: [1,1,5] - животное id1 5 траты, 2 - campItem, 3 - claimAward
+    find:[[[2,101,3],[2,101,4],[2,101,5],[2,101,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_1"],[3,34,"1_1"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_2"]],5,2,8], // awards energy times timeL: awards животные не тратят maxHunt
+    energyDo:3,
+    timeDo:10,
+    maxHunt:100,
+    regenHuntHour:20,
+    max:100,
+    regenHour:20,
+    starsDo:0,
+    timeGo:3
+},{
+    id:9,
+    type:7,
+    name:"⛰️Железный рудник",
+    near:[7],
+    photo:"img/campPlaces/9.jpg",
+    hunt:[[[1,1],[1,3],[1,7],[1,9],[1,4]],5,3,10], // awards energy times time: [1,1,5] - животное id1 5 траты, 2 - campItem, 3 - claimAward
+    find:[[[2,102,3],[2,102,4],[2,102,5],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_1"],[3,34,"1_1"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_2"]],5,2,8], // awards energy times timeL: awards животные не тратят maxHunt
+    mineItems:[[104,0.15]],
+    energyDo:3,
+    timeDo:10,
+    maxHunt:100,
+    regenHuntHour:20,
+    max:100,
+    regenHour:20,
+    starsDo:1,
+    timeGo:3
+},{
+    id:10,
+    type:1,
+    name:"🌿Тропинка",
+    near:[2,11],
+    photo:"img/campPlaces/10.jpg",
+    builds:[],
+    timeGo:3
+},{
+    id:11,
+    type:9,
+    name:"⛩️Старые ворота",
+    near:[10,12],
+    photo:"img/campPlaces/11.jpg",
+    key:501,
+    timeGo:3
+},{
+    id:12,
+    type:2,
+    name:"🌿Заросли",
+    near:[11,13,15,17],
+    locked:[13,15,17],
+    photo:"img/campPlaces/12.jpg",
     fight:[{name:"🐺Сбежавший Волк", energy: 5, hp:1000, fail:10, def: [20,10], dmg: [80,20], skill: 0, crit:[10,150], type: 0, element:"fire", stars:1, exp: [15,0], photo:"img/campEnemies/1.jpg"}],
-    awards:[[3,33,"1_5"],[3,35,"1_3"],[3,27,1]], energyFight:3, timeGo:3 },
-  { id:13, type:6, name:"🌳Осиная роща", near:[12,14], photo:"img/campPlaces/13.jpg",
-    hunt:[[[1,4],[1,6],[1,7],[1,5],[1,10]],6,3,13],
-    find:[[[2,101,5],[2,101,6],[2,101,7],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_3"]],6,2,10],
-    energyDo:3, timeDo:12, maxHunt:120, regenHuntHour:25, max:160, regenHour:20, starsDo:1, timeGo:3 },
-  { id:14, type:8, name:"🌾Пшеничное поле", near:[13], photo:"img/campPlaces/14.jpg",
-    hunt:[[[1,6],[1,7],[1,11],[1,10],[1,8]],6,3,13],
-    find:[[[2,103,5],[2,103,6],[2,103,7],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_3"]],6,2,10],
-    energyDo:3, timeDo:12, maxHunt:120, regenHuntHour:20, max:160, regenHour:20, starsDo:1, timeGo:3 },
-  { id:15, type:1, name:"🌿Тропинка", near:[12,16,17,23], photo:"img/campPlaces/15.jpg", builds:[], timeGo:3 },
-  { id:16, type:1, name:"🏚️Старый дом", near:[15], photo:"img/campPlaces/16.jpg", builds:[], timeGo:3 },
-  { id:17, type:7, name:"⛰️Серебрянный рудник", near:[12,15,18], photo:"img/campPlaces/17.jpg",
-    hunt:[[[1,9],[1,8],[1,7],[1,9],[1,11]],6,3,13],
-    find:[[[2,102,5],[2,102,6],[2,102,7],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_3"]],6,2,10],
-    mineItems:[[106,0.1],[104,0.06]], energyDo:3, timeDo:12, maxHunt:120, regenHuntHour:20, max:160, regenHour:20, starsDo:1, timeGo:3 },
-  { id:18, type:4, name:"🕸️Темная пещера", near:[17,19], photo:"img/campPlaces/18.jpg",
-    enemies:[
-      [{name:"🕷Большой паук",energy: 4,hp:1500,fail:15,def:[20,20],dmg:[100,40],skill:0,crit:[10,150],type: 0,element:"water",stars:1, exp: [15,0], photo:"img/campEnemies/2.jpg"},15,{drop:[[[2,302,1],[2,303,1]],[[2,302,2]],[[2,303,2]],[[2,302,1],[2,303,1]],[[2,302,2]],[[2,303,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
-      [{name:"🐝Оса",energy: 5,hp:1400,fail:20,def:[15,25],dmg:[90,70],skill:2,crit:[15,200],type: 1,element:"fire",stars:1, exp: [15,0], photo:"img/campEnemies/3.jpg"},15,{drop:[[[2,302,1],[2,303,1]],[[2,302,2]],[[2,303,2]],[[2,302,1],[2,303,1]],[[2,302,2]],[[2,303,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
-      [{name:"🐭Большая крыса",energy: 4,hp:1700,fail:10,def:[25,15],dmg:[120,20],skill:0,crit:[10,170],type: 0,element:"plant",stars:1, exp: [15,0], photo:"img/campEnemies/4.jpg"},15,{drop:[[[2,302,1],[2,303,1]],[[2,202,1],[2,304,1]],[[2,302,2]],[[2,304,2]],[[2,302,1],[2,303,1]],[[2,202,1],[2,304,1]],[[2,302,2]],[[2,304,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
-      [{name:"🐦Охотничья птица",energy: 5,hp:1700,fail:15,def:[30,10],dmg:[140,10],skill:0,crit:[15,200],type: 1,element:"plant",stars:1, exp: [15,0], photo:"img/campEnemies/5.jpg"},15,{drop:[[[2,301,1],[2,202,1]],[[2,202,2]],[[2,301,2]],[[2,301,1],[2,202,1]],[[2,202,2]],[[2,301,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
-      [{name:"🐝Шершень",energy: 5,hp:1600,fail:15,def:[30,20],dmg:[100,80],skill:2,crit:[15,200],type: 1,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/6.jpg"},15,{drop:[[[2,301,1],[2,302,1]],[[2,301,2]],[[2,302,2]],[[2,301,1],[2,302,1]],[[2,301,2]],[[2,302,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]},2]],
-    energyFight:5, min:5, max:100, regenHour:20, timeGo:3, sidePoints: 10 },
-  { id:19, type:3, name:"🕸️Туннель", near:[18,20], photo:"img/campPlaces/19.jpg",
-    enemies:[{name:"🕷Большой паук",energy: 4,hp:1700,fail:15,def:[50,15],dmg:[120,60],skill:0,crit:[10,150],type: 0,element:"water",stars:1, exp: [10,0], photo:"img/campEnemies/2.jpg"},{name:"🐸Большая лягушка",energy:5,hp:1800,fail:10,def:[40,25],dmg:[140,20],skill:0,crit:[10,150],type:0, element:"water", stars:1, exp: [10,0], photo:"img/campEnemies/7.jpg"}], chance:15, timeGo:3 },
-  { id:20, type:3, name:"🕸️Туннель", near:[19,21], photo:"img/campPlaces/20.jpg",
-    enemies:[{name:"🕷Большой паук",energy: 4,hp:1700,fail:15,def:[50,15],dmg:[120,60],skill:0,crit:[10,150],type: 0,element:"water",stars:1, exp: [10,0], photo:"img/campEnemies/2.jpg"},{name:"🐸Большая лягушка",energy:5,hp:1800,fail:10,def:[40,25],dmg:[140,20],skill:0,crit:[10,150],type:0, element:"water", stars:1, exp: [10,0], photo:"img/campEnemies/7.jpg"}], chance:15, timeGo:3 },
-  { id:21, type:5, name:"🕸️Подземный ручей", near:[20,22], photo:"img/campPlaces/21.jpg",
+    awards:[[3,33,"1_5"],[3,35,"1_3"],[3,27,1]],
+    energyFight:3,
+    timeGo:3
+},{
+    id:13,
+    type:6,
+    name:"🌳Осиная роща",
+    near:[12,14],
+    photo:"img/campPlaces/13.jpg",
+    hunt:[[[1,4],[1,6],[1,7],[1,5],[1,10]],6,3,13], // awards energy times time: [1,1,5] - животное id1 5 траты, 2 - campItem, 3 - claimAward
+    find:[[[2,101,5],[2,101,6],[2,101,7],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_3"]],6,2,10], // awards energy times timeL: awards животные не тратят maxHunt
+    energyDo:3,
+    timeDo:12,
+    maxHunt:120,
+    regenHuntHour:25,
+    max:130,
+    regenHour:20,
+    starsDo:1,
+    timeGo:3
+},{
+    id:14,
+    type:8,
+    name:"🌾Пшеничное поле",
+    near:[13],
+    photo:"img/campPlaces/14.jpg",
+    hunt:[[[1,6],[1,7],[1,11],[1,10],[1,8]],6,3,13], // awards energy times time: [1,1,5] - животное id1 5 траты, 2 - campItem, 3 - claimAward
+    find:[[[2,103,5],[2,103,6],[2,103,7],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_3"]],6,2,10], // awards energy times timeL: awards животные не тратят maxHunt
+    energyDo:3,
+    timeDo:12,
+    maxHunt:120,
+    regenHuntHour:20,
+    max:130,
+    regenHour:20,
+    starsDo:1,
+    timeGo:3
+},{
+    id:15,
+    type:1,
+    name:"🌿Тропинка",
+    near:[12,16,17,23],
+    photo:"img/campPlaces/15.jpg",
+    builds:[],
+    timeGo:3
+},{
+    id:16,
+    type:1,
+    name:"🏚️Старый дом",
+    near:[15],
+    photo:"img/campPlaces/16.jpg",
+    builds:[],
+    timeGo:3
+},{
+    id:17,
+    type:7,
+    name:"⛰️Серебрянный рудник",
+    near:[12,15,18],
+    photo:"img/campPlaces/17.jpg",
+    hunt:[[[1,9],[1,8],[1,7],[1,9],[1,11]],6,3,13], // awards energy times time: [1,1,5] - животное id1 5 траты, 2 - campItem, 3 - claimAward
+    find:[[[2,102,5],[2,102,6],[2,102,7],[2,301,1],[2,302,1],[2,303,1],[2,304,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_2"],[3,44,"1_2"],[3,44,"1_3"]],6,2,10], // awards energy times timeL: awards животные не тратят maxHunt
+    mineItems:[[106,0.12],[104,0.05]],
+    energyDo:3,
+    timeDo:12,
+    maxHunt:120,
+    regenHuntHour:20,
+    max:130,
+    regenHour:20,
+    starsDo:1,
+    timeGo:3
+},{
+    id:18,
+    type:4,
+    name:"🕸️Темная пещера",
+    near:[17,19],
+    photo:"img/campPlaces/18.jpg",
+    enemies:[[{name:"🕷Большой паук",energy: 4,hp:1500,fail:15,def:[20,20],dmg:[100,40],skill:0,crit:[10,150],type: 0,element:"water",stars:1, exp: [15,0], photo:"img/campEnemies/2.jpg"},15,{drop:[[[2,201,1],[2,303,1]],[[2,201,2]],[[2,303,2]],[[2,201,1],[2,303,1]],[[2,201,2]],[[2,303,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
+    [{name:"🐝Оса",energy: 5,hp:1400,fail:20,def:[15,25],dmg:[90,70],skill:2,crit:[15,200],type: 1,element:"fire",stars:1, exp: [15,0], photo:"img/campEnemies/3.jpg"},15,{drop:[[[2,302,1],[2,303,1]],[[2,302,2]],[[2,303,2]],[[2,302,1],[2,303,1]],[[2,302,2]],[[2,303,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
+    [{name:"🐭Большая крыса",energy: 4,hp:1700,fail:10,def:[25,15],dmg:[120,20],skill:0,crit:[10,170],type: 0,element:"plant",stars:1, exp: [15,0], photo:"img/campEnemies/4.jpg"},15,{drop:[[[2,302,1],[2,303,1]],[[2,201,1],[2,304,1]],[[2,302,2]],[[2,304,2]],[[2,302,1],[2,303,1]],[[2,201,1],[2,304,1]],[[2,302,2]],[[2,304,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
+    [{name:"🐦Охотничья птица",energy: 5,hp:1700,fail:15,def:[30,10],dmg:[140,10],skill:0,crit:[15,200],type: 1,element:"plant",stars:1, exp: [15,0], photo:"img/campEnemies/5.jpg"},15,{drop:[[[2,301,1],[2,202,1]],[[2,202,2]],[[2,301,2]],[[2,301,1],[2,202,1]],[[2,202,2]],[[2,301,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]}],
+    [{name:"🐝Шершень",energy: 5,hp:1600,fail:15,def:[30,20],dmg:[100,80],skill:2,crit:[15,200],type: 1,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/6.jpg"},15,{drop:[[[2,301,1],[2,302,1]],[[2,301,2]],[[2,302,2]],[[2,301,1],[2,302,1]],[[2,301,2]],[[2,302,2]],[[3,33,"1_2"]],[[3,32,"1_2"],[3,33,"1_1"]],[[3,35,"1_2"]],[[3,34,"1_2"],[3,35,"1_1"]],[[3,44,"1_2"]]],rare:[[10,3,32,"1_2"],[7,3,34,"1_2"],[10,3,33,"1_2"],[7,3,35,"1_1"],[7,3,44,"1_2"]]},2]], //fight pros awards biganimalId
+    energyFight:5,
+    min:5,
+    max:100,
+    regenHour:20,
+    timeGo:3,
+    sidePoints: 10
+},{
+    id:19,
+    type:3,
+    name:"🕸️Туннель",
+    near:[18,20],
+    photo:"img/campPlaces/19.jpg",
+    enemies:[{name:"🕷Большой паук",energy: 4,hp:1700,fail:15,def:[50,15],dmg:[120,60],skill:0,crit:[10,150],type: 0,element:"water",stars:1, exp: [10,0], photo:"img/campEnemies/2.jpg",drop:[[302,1],[303,1]]},{name:"🐸Большая лягушка",energy:5,hp:1800,fail:10,def:[40,25],dmg:[140,20],skill:0,crit:[10,150],type:0, element:"water", stars:1, exp: [10,0], photo:"img/campEnemies/7.jpg",drop:[[201,1],[303,1]]}], 
+    chance:15,//%
+    timeGo:3
+},{
+    id:20,
+    type:3,
+    name:"🕸️Туннель",
+    near:[19,21],
+    photo:"img/campPlaces/20.jpg",
+    enemies:[{name:"🕷Большой паук",energy: 4,hp:1700,fail:15,def:[50,15],dmg:[120,60],skill:0,crit:[10,150],type: 0,element:"water",stars:1, exp: [10,0], photo:"img/campEnemies/2.jpg",drop:[[302,1],[303,1]]},{name:"🐸Большая лягушка",energy:5,hp:1800,fail:10,def:[40,25],dmg:[140,20],skill:0,crit:[10,150],type:0, element:"water", stars:1, exp: [10,0], photo:"img/campEnemies/7.jpg",drop:[[201,1],[303,1]]}],
+    chance:15,//%
+    timeGo:3
+},{
+    id:21,
+    type:5,
+    name:"🕸️Подземный ручей",
+    near:[20,22],
+    photo:"img/campPlaces/21.jpg",
     fight:[{name:"🐻Большой медведь", energy: 4, hp:2700, fail:5, def: [70,70], dmg: [120,50], skill: 0, crit:[15,175], type: 2, element:"fire", stars:3, exp: [25,0], photo:"img/campEnemies/17.jpg"}],
     awardsList:[[[2,201,7],[2,304,5],[2,302,5],[3,32,"1_4"],[3,33,"1_3"],[3,34,"1_4"],[3,35,"1_3"],[3,44,"1_30"],[3,43,1]], [[2,201,5],[2,304,7],[2,302,5],[3,32,"1_4"],[3,33,"1_3"],[3,34,"1_4"],[3,35,"1_3"],[3,44,"1_30"],[3,43,1]], [[2,201,5],[2,304,5],[2,302,7],[3,32,"1_4"],[3,33,"1_3"],[3,34,"1_4"],[3,35,"1_3"],[3,44,"1_30"],[3,53,1]]],
-    quest:49, energyFight:5, timeGo:3 },
-  { id:22, type:9, name:"⛩️Таинственные руны", near:[21], photo:"img/campPlaces/22.jpg", key:503, timeGo:3 },
-  { id:23, type:9, name:"⛩️Врата в лес", near:[15,24], photo:"img/campPlaces/23.jpg", key:502, timeGo:3 },
-  { id:24, type:3, name:"🌿Вход в лес", near:[23,25], photo:"img/campPlaces/24.jpg",
-    enemies:[{name:"🐺Волк-одиночка",energy: 5,hp:3000,fail:15,def:[110,50],dmg:[180,50],skill:0,crit:[15,150],type: 0,element:"plant",stars:1, exp: [10,0], photo:"img/campEnemies/8.jpg"}], chance:15, timeGo:3 },
-  { id:25, type:2, name:"🌿Страж леса", near:[24,26], locked:[26], photo:"img/campPlaces/25.jpg",
+    quest:49,
+    energyFight:5,
+    timeGo:3
+},{
+    id:22,
+    type:9,
+    name:"⛩️Таинственные руны",
+    near:[21],
+    photo:"img/campPlaces/22.jpg",
+    key:503,
+    timeGo:3
+},{
+    id:23,
+    type:9,
+    name:"⛩️Врата в лес",
+    near:[15,24],
+    photo:"img/campPlaces/23.jpg",
+    key:502,
+    timeGo:3
+},{
+    id:24,
+    type:3,
+    name:"🌿Вход в лес",
+    near:[23,25],
+    photo:"img/campPlaces/24.jpg",
+    enemies:[{name:"🐺Волк-одиночка",energy: 5,hp:3000,fail:15,def:[110,50],dmg:[180,50],skill:0,crit:[15,150],type: 0,element:"plant",stars:1, exp: [10,0], photo:"img/campEnemies/8.jpg",drop:[[301,1],[302,1],[303,1]]}], 
+    chance:15,
+    timeGo:3
+},{
+    id:25,
+    type:2,
+    name:"🌿Страж леса",
+    near:[24,26],
+    locked:[26],
+    photo:"img/campPlaces/25.jpg",
     fight:[{name:"🐺Волк-стражник",energy: 5,hp:3200,fail:15,def:[120,60],dmg:[200,60],skill:0,crit:[15,150],type: 0,element:"plant",stars:2, exp: [30,0], photo:"img/campEnemies/9.jpg"}],
-    awards:[[3,33,"1_7"],[3,35,"1_5"],[3,27,1]], energyFight:3, timeGo:3 },
-  { id:26, type:1, name:"🐾Лесной загон", near:[25,27,34], photo:"img/campPlaces/26.jpg", builds:[1], timeGo:3 },
-  { id:27, type:1, name:"🏘️Главное строение", near:[26,28,30,34], photo:"img/campPlaces/27.jpg", builds:[6,2], timeGo:3 },
-  { id:28, type:1, name:"🏠Домик на озере", near:[27,29,30], photo:"img/campPlaces/28.jpg", builds:[], timeGo:3 },
-  { id:29, type:10, name:"💧Озеро", near:[28], photo:"img/campPlaces/29.jpg", builds:[5], max:100, regenHour:10, starsDo:2, fishes:[[6,8,9,10],[11,12],[13]], nearFishes:[[5],[7],[]], waitK:1.25, timeGo:3 },
-  { id:30, type:6, name:"🌲Дубовая роща", near:[27,28,31,32], photo:"img/campPlaces/30.jpg",
-    hunt:[[[1,13],[1,12],[1,7],[1,4],[1,14]],7,3,16],
-    find:[[[2,101,8],[2,101,9],[2,103,10],[2,305,1],[2,306,1],[2,307,1],[2,308,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_3"],[3,44,"1_4"],[3,44,"2_1"],[3,33,"1_1"],[3,35,"1_1"]],8,2,12],
-    energyDo:4, timeDo:15, maxHunt:140, regenHuntHour:20, max:170, regenHour:20, starsDo:2, timeGo:3 },
-  { id:31, type:1, name:"⛺Палатка", near:[30,32,42], photo:"img/campPlaces/31.jpg", builds:[], timeGo:3 },
-  { id:32, type:8, name:"🌾Садовое поле", near:[30,31,33], photo:"img/campPlaces/32.jpg",
-    hunt:[[[1,7],[1,8],[1,17],[1,12],[1,13]],7,3,16],
-    find:[[[2,103,8],[2,103,9],[2,103,10],[2,305,1],[2,306,1],[2,307,1],[2,308,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_3"],[3,44,"1_4"],[3,44,"2_1"],[3,33,"1_1"],[3,35,"1_1"]],8,2,12],
-    energyDo:4, timeDo:15, maxHunt:140, regenHuntHour:20, max:170, regenHour:20, starsDo:2, timeGo:3 },
-  { id:33, type:4, name:"⚔️Опасный край", near:[32], photo:"img/campPlaces/33.jpg",
-    enemies:[
-      [{name:"🦇Летучая мышь",energy: 4,hp:3200,fail:15,def:[140,120],dmg:[200,80],skill:2,crit:[10,150],type: 1,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/10.jpg"},10,{drop:[[[2,308,1],[2,306,1]],[[2,308,1],[2,208,1]],[[2,308,2]],[[2,208,2]],[[2,308,1],[2,306,1]],[[2,308,1],[2,208,1]],[[2,308,2]],[[2,208,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
-      [{name:"🐺Волк",energy: 5,hp:3800,fail:10,def:[180,120],dmg:[220,70],skill:2,crit:[15,200],type: 0,element:"plant",stars:1, exp: [17,0], photo:"img/campEnemies/11.jpg"},10,{drop:[[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
-      [{name:"🦊Лиса",energy: 6,hp:3800,fail:15,def:[120,180],dmg:[220,70],skill:0,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/12.jpg"},10,{drop:[[[2,307,1],[2,308,1]],[[2,308,1],[2,208,1]],[[2,208,2]],[[2,308,2]],[[2,307,1],[2,308,1]],[[2,308,1],[2,208,1]],[[2,208,2]],[[2,308,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
-      [{name:"🦉Сова",energy: 5,hp:3800,fail:15,def:[140,160],dmg:[200,100],skill:0,crit:[15,200],type: 1,element:"plant",stars:1, exp: [17,0], photo:"img/campEnemies/13.jpg"},10,{drop:[[[2,305,1],[2,307,1]],[[2,305,1],[2,209,1]],[[2,305,2]],[[2,209,2]],[[2,305,1],[2,307,1]],[[2,305,1],[2,209,1]],[[2,305,2]],[[2,209,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
-      [{name:"🐺Старший волк",energy: 5,hp:3800,fail:12,def:[200,140],dmg:[230,85],skill:2,crit:[15,200],type: 0,element:"plant",stars:2, exp: [25,0], photo:"img/campEnemies/14.jpg"},10,{drop:[[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]},3]],
-    energyFight:6, min:5, max:100, regenHour:20, sidePoints:13, timeGo:3 },
-  { id:34, type:1, name:"🪚Крафтовая", near:[26,27,35], photo:"img/campPlaces/34.jpg", builds:[3,4], timeGo:3 },
-  { id:35, type:2, name:"🕸️Вход в пещеру", near:[34,36], locked:[36], photo:"img/campPlaces/35.jpg",
+    awards:[[3,33,"1_7"],[3,35,"1_5"],[3,27,1]],
+    energyFight:3,
+    timeGo:3
+},{
+    id:26,
+    type:1,
+    name:"🐾Лесной загон",
+    near:[25,27,34],
+    photo:"img/campPlaces/26.jpg",
+    builds:[1],
+    timeGo:3
+},{
+    id:27,
+    type:1,
+    name:"🏘️Главное строение",
+    near:[26,28,30,34],
+    photo:"img/campPlaces/27.jpg",
+    builds:[6,2],
+    timeGo:3
+},{
+    id:28,
+    type:1,
+    name:"🏠Домик на озере",
+    near:[27,29,30],
+    photo:"img/campPlaces/28.jpg",
+    builds:[],
+    timeGo:3
+},{
+    id:29,
+    type:10,
+    name:"💧Озеро",
+    near:[28],
+    photo:"img/campPlaces/29.jpg",
+    builds:[5],
+    max:100,
+    regenHour:10,
+    starsDo:2,
+    fishes:[[6,8,9,10],[11,12],[13]],
+    nearFishes:[[5],[7],[]],
+    waitK:1.25,
+    timeGo:3
+},{
+    id:30,
+    type:6,
+    name:"🌲Дубовая роща",
+    near:[27,28,31,32],
+    photo:"img/campPlaces/30.jpg",
+    hunt:[[[1,13],[1,12],[1,7],[1,4],[1,14]],7,3,16], // awards energy times time: [1,1,5] - животное id1 5 траты, 2 - campItem, 3 - claimAward
+    find:[[[2,101,8],[2,101,9],[2,103,10],[2,305,1],[2,306,1],[2,307,1],[2,308,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_3"],[3,44,"1_4"],[3,44,"2_1"],[3,33,"1_1"],[3,35,"1_1"]],8,2,12], // awards energy times timeL: awards животные не тратят maxHunt
+    energyDo:4,
+    timeDo:15,
+    maxHunt:140,
+    regenHuntHour:20,
+    max:160,
+    regenHour:20,
+    starsDo:2,
+    timeGo:3
+},{
+    id:31,
+    type:1,
+    name:"⛺Палатка",
+    near:[30,32,42],
+    photo:"img/campPlaces/31.jpg",
+    builds:[],
+    timeGo:3
+},{
+    id:32,
+    type:8,
+    name:"🌾Садовое поле",
+    near:[30,31,33],
+    photo:"img/campPlaces/32.jpg",
+    hunt:[[[1,7],[1,8],[1,17],[1,12],[1,13]],7,3,16], // awards energy times time: [1,1,5] - животное id1 5 траты, 2 - campItem, 3 - claimAward
+    find:[[[2,103,8],[2,103,9],[2,103,10],[2,305,1],[2,306,1],[2,307,1],[2,308,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_3"],[3,44,"1_4"],[3,44,"2_1"],[3,33,"1_1"],[3,35,"1_1"]],8,2,12], // awards energy times timeL: awards животные не тратят maxHunt
+    energyDo:4,
+    timeDo:15,
+    maxHunt:140,
+    regenHuntHour:20,
+    max:160,
+    regenHour:20,
+    starsDo:2,
+    timeGo:3
+},{
+    id:33,
+    type:4,
+    name:"⚔️Опасный край",
+    near:[32],
+    photo:"img/campPlaces/33.jpg",
+    enemies:[[{name:"🦇Летучая мышь",energy: 4,hp:3200,fail:15,def:[140,120],dmg:[200,80],skill:2,crit:[10,150],type: 1,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/10.jpg"},10,{drop:[[[2,308,1],[2,306,1]],[[2,308,1],[2,209,1]],[[2,308,2]],[[2,209,2]],[[2,308,1],[2,306,1]],[[2,308,1],[2,209,1]],[[2,308,2]],[[2,209,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
+    [{name:"🐺Волк",energy: 5,hp:3800,fail:10,def:[180,120],dmg:[220,70],skill:2,crit:[15,200],type: 0,element:"plant",stars:1, exp: [17,0], photo:"img/campEnemies/11.jpg"},10,{drop:[[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
+    [{name:"🦊Лиса",energy: 6,hp:3800,fail:15,def:[120,180],dmg:[220,70],skill:0,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/12.jpg"},10,{drop:[[[2,307,1],[2,308,1]],[[2,308,1],[2,208,1]],[[2,208,2]],[[2,308,2]],[[2,307,1],[2,308,1]],[[2,308,1],[2,208,1]],[[2,208,2]],[[2,308,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
+    [{name:"🦉Сова",energy: 5,hp:3800,fail:15,def:[140,160],dmg:[200,100],skill:0,crit:[15,200],type: 1,element:"plant",stars:1, exp: [17,0], photo:"img/campEnemies/13.jpg"},10,{drop:[[[2,305,1],[2,307,1]],[[2,305,1],[2,209,1]],[[2,305,2]],[[2,209,2]],[[2,305,1],[2,307,1]],[[2,305,1],[2,209,1]],[[2,305,2]],[[2,209,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]}],
+    [{name:"🐺Старший волк",energy: 5,hp:3800,fail:12,def:[200,140],dmg:[230,85],skill:2,crit:[15,200],type: 0,element:"plant",stars:2, exp: [25,0], photo:"img/campEnemies/14.jpg"},10,{drop:[[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[2,306,1],[2,307,1]],[[2,208,1],[2,307,1]],[[2,306,2]],[[2,307,2]],[[2,208,2]],[[3,33,"1_4"]],[[3,32,"1_4"],[3,33,"1_2"]],[[3,35,"1_3"]],[[3,34,"1_4"],[3,35,"1_2"]],[[3,44,"1_5"]]],rare:[[10,3,32,"1_3"],[7,3,34,"1_3"],[10,3,33,"1_3"],[7,3,35,"1_2"],[7,3,44,"1_5"]]},3]], //fight pros awards biganimalId
+    energyFight:6,
+    min:5,
+    max:100,
+    regenHour:20,
+    sidePoints: 13,
+     timeGo:3
+},{
+    id:34,
+    type:1,
+    name:"🪚Крафтовая",
+    near:[26,27,35],
+    photo:"img/campPlaces/34.jpg",
+    builds:[3,4],
+    timeGo:3
+},{
+    id:35,
+    type:2,
+    name:"🕸️Вход в пещеру",
+    near:[34,36],
+    locked:[36],
+    photo:"img/campPlaces/35.jpg",
     fight:[{name:"🦇Летучие мыши", energy: 4, hp:3400, fail:10, def: [140,120], dmg: [200,80], skill: 2, crit:[15,175], type: 1, element:"fire", stars:2, exp: [35,0], photo:"img/campEnemies/15.jpg"}],
-    awards:[[3,33,"1_10"],[3,35,"1_7"],[3,44,"2_7"]], energyFight:3, timeGo:3 },
-  { id:36, type:7, name:"⛰️Золотой рудник", near:[35,37,38], photo:"img/campPlaces/36.jpg",
-    hunt:[[[1,15],[1,6],[1,7],[1,17],[1,16]],7,3,16],
-    find:[[[2,102,8],[2,102,9],[2,102,10],[2,305,1],[2,306,1],[2,307,1],[2,308,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_3"],[3,44,"1_4"],[3,44,"2_1"],[3,33,"1_1"],[3,35,"1_1"]],8,2,12],
-    mineItems:[[108,0.08],[106,0.04],[104,0.04]], energyDo:4, timeDo:15, maxHunt:140, regenHuntHour:20, max:170, regenHour:20, starsDo:2, timeGo:3 },
-  { id:37, type:1, name:"🛖Поселение", near:[36], photo:"img/campPlaces/37.jpg", builds:[], timeGo:3 },
-  { id:38, type:2, name:"🕸️Глубь пещеры", near:[36,39,40], locked:[39,40], photo:"img/campPlaces/38.jpg",
+    awards:[[3,33,"1_10"],[3,35,"1_7"],[3,44,"2_7"]],
+    energyFight:3,
+    timeGo:3
+},{
+    id:36,
+    type:7,
+    name:"⛰️Золотой рудник",
+    near:[35,37,38],
+    photo:"img/campPlaces/36.jpg",
+    hunt:[[[1,15],[1,6],[1,7],[1,17],[1,16]],7,3,16], // awards energy times time: [1,1,5] - животное id1 5 траты, 2 - campItem, 3 - claimAward
+    find:[[[2,102,8],[2,102,9],[2,102,10],[2,305,1],[2,306,1],[2,307,1],[2,308,1], [3,32,"1_2"],[3,34,"1_2"],[3,44,"1_3"],[3,44,"1_4"],[3,44,"2_1"],[3,33,"1_1"],[3,35,"1_1"]],8,2,12], // awards energy times timeL: awards животные не тратят maxHunt
+    mineItems:[[108,0.08],[106,0.04],[104,0.04]],
+    energyDo:4,
+    timeDo:15,
+    maxHunt:140,
+    regenHuntHour:20,
+    max:160,
+    regenHour:20,
+    starsDo:2,
+    timeGo:3
+},{
+    id:37,
+    type:1,
+    name:"🛖Поселение",
+    near:[36],
+    photo:"img/campPlaces/37.jpg",
+    builds:[],
+    timeGo:3
+},{
+    id:38,
+    type:2,
+    name:"🕸️Глубь пещеры",
+    near:[36,39,40],
+    locked:[39,40],
+    photo:"img/campPlaces/38.jpg",
     fight:[{name:"🦊Лиса-охотник", energy: 6, hp:4000, fail:10, def: [120,180], dmg: [240,70], skill: 1, crit:[15,175], type: 0, element:"fire", stars:1, exp: [35,0], photo:"img/campEnemies/16.jpg"}],
-    awards:[[3,33,"1_10"],[3,35,"1_7"],[3,27,2]], energyFight:4, timeGo:3 },
-  { id:39, type:3, name:"🕸️Тупик", near:[38], photo:"img/campPlaces/39.jpg",
-    enemies:[{name:"🦊Лиса-охотник", energy: 6, hp:4000, fail:10, def: [120,180], dmg: [240,70], skill: 1, crit:[15,175], type: 0, element:"fire", stars:1, exp: [15,0], photo:"img/campEnemies/16.jpg"},{name:"🐺Волк",energy: 5,hp:3800,fail:10,def:[180,120],dmg:[220,70],skill:2,crit:[15,200],type: 0,element:"plant",stars:2, exp: [15,0], photo:"img/campEnemies/11.jpg"}], chance:15, timeGo:3 },
-  { id:40, type:3, name:"🕸️Туннель", near:[38,41], photo:"img/campPlaces/40.jpg",
-    enemies:[{name:"🦊Лиса-охотник", energy: 6, hp:4000, fail:10, def: [100,180], dmg: [240,70], skill: 1, crit:[15,175], type: 0, element:"fire", stars:2, exp: [15,0], photo:"img/campEnemies/16.jpg"},{name:"🐺Волк",energy: 5,hp:3800,fail:10,def:[180,120],dmg:[220,70],skill:2,crit:[15,200],type: 0,element:"plant",stars:2, exp: [15,0], photo:"img/campEnemies/11.jpg"}], chance:15, timeGo:3 },
-  { id:41, type:5, name:"🕸️Гробница эльфов", near:[40], photo:"img/campPlaces/41.jpg",
+    awards:[[3,33,"1_10"],[3,35,"1_7"],[3,27,2]],
+    energyFight:4,
+    timeGo:3
+},{
+    id:39,
+    type:3,
+    name:"🕸️Тупик",
+    near:[38],
+    photo:"img/campPlaces/39.jpg",
+    enemies:[{name:"🦊Лиса-охотник", energy: 6, hp:4000, fail:10, def: [120,180], dmg: [240,70], skill: 1, crit:[15,175], type: 0, element:"fire", stars:1, exp: [15,0], photo:"img/campEnemies/16.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🐺Волк",energy: 5,hp:3800,fail:10,def:[180,120],dmg:[220,70],skill:2,crit:[15,200],type: 0,element:"plant",stars:2, exp: [15,0], photo:"img/campEnemies/11.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+    chance:15,
+    timeGo:3
+},{
+    id:40,
+    type:3,
+    name:"🕸️Туннель",
+    near:[38,41],
+    photo:"img/campPlaces/40.jpg",
+    enemies:[{name:"🦊Лиса-охотник", energy: 6, hp:4000, fail:10, def: [120,180], dmg: [240,70], skill: 1, crit:[15,175], type: 0, element:"fire", stars:1, exp: [15,0], photo:"img/campEnemies/16.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🐺Волк",energy: 5,hp:3800,fail:10,def:[180,120],dmg:[220,70],skill:2,crit:[15,200],type: 0,element:"plant",stars:2, exp: [15,0], photo:"img/campEnemies/11.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+    chance:15,
+    timeGo:3
+},{
+    id:41,
+    type:5,
+    name:"🕸️Гробница эльфов",
+    near:[40],
+    photo:"img/campPlaces/41.jpg",
     fight:[{name:"🧝Фантом-воин", energy: 5, hp:3100, fail:12, def: [240,120], dmg: [260,50], skill: 1, crit:[15,200], type: 0, element:"dark", stars:2, exp: [30,0], photo:"img/campEnemies/18.jpg"},{name:"🧝Фантом-маг", energy: 6, hp:2800, fail:7, def: [100,300], dmg: [60,300], skill: 2, crit:[15,200], type: 0, element:"dark", stars:2, exp: [30,0], photo:"img/campEnemies/19.jpg"}],
     awardsList:[[[3,32,"2_2"],[3,33,"1_7"],[3,34,"2_2"],[3,35,"1_7"],[3,44,"2_10"],[3,45,"1_3"],[3,43,1]], [[3,32,"2_3"],[3,33,"1_5"],[3,34,"2_3"],[3,35,"1_5"],[3,44,"1_40"],[3,45,"1_3"],[3,53,1]]],
-    quest:88, energyFight:6, timeGo:3 },
-  { id:42, type:9, name:"⛩️Странные лианы", near:[31], photo:"img/campPlaces/42.jpg", key:504, timeGo:3 },
-  { id:43, type:3, name:"🏜Перепутье каньона", near:[59,53,44], photo:"img/campPlaces/43.jpg",
-    enemies:[
-      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
-      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
-      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
-      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
-    chance:20, timeGo:3 },
-  { id:44, type:3, name:"🏜Правый каньон", near:[43,45], photo:"img/campPlaces/44.jpg",
-    enemies:[
-      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
-      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
-      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
-      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
-    chance:20, timeGo:3 },
-  { id:45, type:2, name:"🏜Вход в шахту пустыни", near:[44,47,46], locked:[47,46], photo:"img/campPlaces/45.jpg",
-    fight:[{name:"🦂Ядовитый скорпион",energy: 6,hp:4000,fail:15,def:[120,120],dmg:[100,250],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [25,0], photo:"img/campEnemies/26.jpg"}],
-    awards:[[3,33,"2_3"],[3,44,"2_7"],[3,45,"1_10"]], energyFight:5, timeGo:3 },
-  { id:46, type:7, name:"🌋Рубиновая шахта", near:[45,48], photo:"img/campPlaces/46.jpg",
-    max:100, regenHour:10, starsDo:3, mineItems:[[114,0.03],[108,0.04],[106,0.04],[104,0.04]], energyDo:4, timeDo:20,
-    hunt:[[[1,15],[1,17],[1,18],[1,19],[1,20]],8,4,17],
-    find:[[[2,101,10],[2,101,12],[2,101,14],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_3"],[3,34,"1_3"],[3,44,"1_4"],[3,44,"1_5"],[3,44,"2_1"],[3,33,"2_1"],[3,35,"2_1"]],9,2,13],
-    maxHunt:140, regenHuntHour:20, timeGo:3 },
-  { id:47, type:3, name:"🏜Нижний проход", near:[45,48], photo:"img/campPlaces/47.jpg",
-    enemies:[
-      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
-      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
-      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
-      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
-    chance:20, timeGo:3 },
-  { id:48, type:1, name:"⛺️Убежище чужеземки", near:[47,49,46], photo:"img/campPlaces/48.jpg", timeGo:3 },
-  { id:49, type:1, name:"🏜Выход из шахты пустыни", near:[50,48], photo:"img/campPlaces/49.jpg", timeGo:3 },
-  { id:50, type:1, name:"🏜Скальный проход", near:[51,49], photo:"img/campPlaces/50.jpg", timeGo:3 },
-  { id:51, type:3, name:"🌵Кактусовое поле", near:[54,65,50,52], photo:"img/campPlaces/51.jpg",
-    enemies:[
-      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
-      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
-      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
-      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
-    chance:20, timeGo:3 },
-  { id:52, type:6, name:"🌴Оазис", near:[51,53], photo:"img/campPlaces/52.jpg",
-    energyDo:4, timeDo:15, max:150, regenHour:25, starsDo:3,
-    hunt:[[[1,16],[1,11],[1,18],[1,20],[1,22]],8,4,17],
-    find:[[[2,102,10],[2,102,12],[2,102,14],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_3"],[3,34,"1_3"],[3,44,"1_4"],[3,44,"1_5"],[3,44,"2_1"],[3,33,"2_1"],[3,35,"2_1"]],9,2,13],
-    maxHunt:140, regenHuntHour:20, timeGo:3 },
-  { id:53, type:3, name:"🏝Ручей", near:[52,43], photo:"img/campPlaces/53.jpg",
-    enemies:[
-      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
-      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
-      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
-      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
-    chance:20, timeGo:3 },
-  { id:54, type:3, name:"🏜Выход из саванны", near:[55,51], photo:"img/campPlaces/54.jpg",
-    enemies:[
-      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
-      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
-      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
-      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
-    chance:20, timeGo:3 },
-  { id:55, type:1, name:"🌵Колючки", near:[56,54], photo:"img/campPlaces/55.jpg", timeGo:3 },
-  { id:56, type:4, name:"⚔️Водопой", near:[55,57], photo:"img/campPlaces/56.jpg",
-    enemies:[
-      [{name:"🐕Малый кайот",energy: 5,hp:4600,fail:8,def:[170,150],dmg:[280,100],skill:6,crit:[15,175],type: 0,element:"fire",stars:1, exp: [30,0], photo:"img/campEnemies/27.jpg"},10,{drop:[[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
-      [{name:"🐍Гремучая змея",energy: 5,hp:4300,fail:12,def:[150,150],dmg:[100,300],skill:2,crit:[15,200],type: 0,element:"water",stars:1, exp: [30,0], photo:"img/campEnemies/28.jpg"},10,{drop:[[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
-      [{name:"🐦‍⬛Черный ворон",energy: 4,hp:4200,fail:15,def:[120,160],dmg:[260,140],skill:2,crit:[15,175],type: 1,element:"plant",stars:1, exp: [30,0], photo:"img/campEnemies/29.jpg"},10,{drop:[[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
-      [{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[150,150],dmg:[120,290],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [30,0], photo:"img/campEnemies/30.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
-      [{name:"🦂Королевский скорпион",energy: 6,hp:5000,fail:15,def:[170,170],dmg:[120,330],skill:2,crit:[15,175],type: 0,element:"fire",stars:2, exp: [30,0], photo:"img/campEnemies/31.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]},4]],
-    energyFight:6, min:5, max:100, regenHour:20, sidePoints:16, timeGo:3 },
-  { id:57, type:1, name:"🪨Скала", near:[64,56,58,61], photo:"img/campPlaces/57.jpg", timeGo:3 },
-  { id:58, type:2, name:"🪨Обвал", near:[57,59,60], locked:[57,60], photo:"img/campPlaces/58.jpg",
-    fight:[{name:"🐕Одинокий кайот",energy: 5,hp:4600,fail:12,def:[170,170],dmg:[300,120],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [25,0], photo:"img/campEnemies/32.jpg"}],
-    awards:[[3,33,"2_3"],[3,35,"2_3"],[3,13,1]], energyFight:5, timeGo:3 },
-  { id:59, type:3, name:"🏜Левый каньон", near:[58,43], photo:"img/campPlaces/59.jpg",
-    enemies:[
-      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
-      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
-      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
-      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
-    chance:20, timeGo:3 },
-  { id:60, type:1, name:"🏜Обрыв", near:[58,61], photo:"img/campPlaces/60.jpg", timeGo:3 },
-  { id:61, type:1, name:"🏜Яма", near:[57,60,62], photo:"img/campPlaces/61.jpg", timeGo:3 },
-  { id:62, type:2, name:"🏜Отверстие в яме", near:[63,61], locked:[63], photo:"img/campPlaces/62.jpg",
-    fight:[{name:"🐍Кобра",energy: 4,hp:4500,fail:12,def:[180,180],dmg:[120,350],skill:2,crit:[15,200],type: 0,element:"water",stars:2, exp: [40,0], photo:"img/campEnemies/33.jpg"}],
-    awards:[[3,32,"2_1"],[3,34,"2_1"],[3,44,"2_7"],[3,45,"1_10"]], energyFight:5, timeGo:3 },
-  { id:63, type:5, name:"🪹Логово скорпиона", near:[62], photo:"img/campPlaces/63.jpg",
-    fight:[{name:"🦂Черный скорпион",energy: 6,hp:5400,fail:15,def:[190,190],dmg:[140,360],skill:2,crit:[15,175],type: 0,element:"dark",stars:2, exp: [40,0], photo:"img/campEnemies/34.jpg"}],
-    quest:105, energyFight:6,
-    awardsList:[[[3,32,"2_4"],[3,33,"2_5"],[3,34,"2_4"],[3,35,"2_5"],[3,44,"2_15"],[3,45,"1_3"],[3,43,1]], [[3,32,"2_6"],[3,33,"2_5"],[3,34,"2_6"],[3,35,"2_5"],[3,44,"2_25"],[3,45,"1_3"],[3,53,1]]], timeGo:3 },
-  { id:64, type:8, name:"🌱Поле жизни", near:[57], photo:"img/campPlaces/64.jpg",
-    energyDo:4, timeDo:15, max:180, regenHour:25, starsDo:3,
-    hunt:[[[1,7],[1,8],[1,16],[1,20],[1,22]],8,4,17],
-    find:[[[2,103,10],[2,103,12],[2,103,14],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_3"],[3,34,"1_3"],[3,44,"1_4"],[3,44,"1_5"],[3,44,"2_1"],[3,33,"2_1"],[3,35,"2_1"]],9,2,13],
-    maxHunt:140, regenHuntHour:20, timeGo:3 },
-  { id:65, type:2, name:"🏜Ловушка в песке", near:[66,51], locked:[66], photo:"img/campPlaces/65.jpg",
-    fight:[{name:"🦎Игуанна",energy: 5,hp:4600,fail:10,def:[200,200],dmg:[300,140],skill:1,crit:[15,200],type: 0,element:"water",stars:1, exp: [25,0], photo:"img/campEnemies/35.jpg"}],
-    awards:[[3,32,"2_3"],[3,33,"2_3"],[3,13,1]], energyFight:5, timeGo:3 },
-  { id:66, type:9, name:"⛩Пустынный пропуск", near:[67,65], photo:"img/campPlaces/66.jpg", key:505, timeGo:3 },
-  { id:67, type:1, name:"🏝Пригородный ручей", near:[68,66], photo:"img/campPlaces/67.jpg", timeGo:3 },
-  { id:68, type:1, name:"🏜Развилка", near:[75,69], photo:"img/campPlaces/68.jpg", timeGo:3 },
-  { id:69, type:2, name:"🏛Врата в город", near:[72,70,68], locked:[72,70,71], photo:"img/campPlaces/69.jpg",
-    fight:[{name:"🪃Зашитница-чужеземка",energy: 5,hp:5000,fail:10,def:[220,140],dmg:[360,120],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [40,0], photo:"img/campEnemies/36.jpg"}],
-    awards:[[3,32,"2_2"],[3,33,"2_4"],[3,34,"2_2"],[3,35,"2_4"],[3,6,1]], energyFight:5, timeGo:3 },
-  { id:70, type:1, name:"🛕Вход во дворец", near:[69,72,73,71], builds:[2], photo:"img/campPlaces/70.jpg", timeGo:3 },
-  { id:71, type:1, name:"🕌Дворец", near:[70], builds:[6], photo:"img/campPlaces/71.jpg", timeGo:3 },
-  { id:72, type:1, name:"🐾Усадьба", near:[69,74,73,70], builds:[1], photo:"img/campPlaces/72.jpg", timeGo:3 },
-  { id:73, type:1, name:"🪚Жаровня", near:[70,72,74], builds:[3,4], photo:"img/campPlaces/73.jpg", timeGo:3 },
-  { id:74, type:10, name:"💧Река пустыни", near:[72,73], builds:[5], photo:"img/campPlaces/74.jpg",
-    max:100, regenHour:10, starsDo:3, fishes:[[14,15,16,12],[17,18,13],[19]], nearFishes:[[7,11],[],[]], waitK:1.35, timeGo:3 },
-  { id:75, type:2, name:"🏜Опасный путь", near:[76,82,68], locked:[76,82], photo:"img/campPlaces/75.jpg",
-    fight:[{name:"🐐Горный козел",energy: 4,hp:5200,fail:15,def:[180,180],dmg:[280,200],skill:3,crit:[15,220],type: 0,element:"fire",stars:1, exp: [40,0], photo:"img/campEnemies/37.jpg"}],
-    awards:[[3,35,"2_4"],[3,27,2]], energyFight:5, timeGo:3 },
-  { id:76, type:3, name:"🏜Каменный песок", near:[77,75], photo:"img/campPlaces/76.jpg",
-    enemies:[
-      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
-      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
-      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
-      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
-    chance:20, timeGo:3 },
-  { id:77, type:1, name:"🏜Вход в шахту", near:[78,79,76], photo:"img/campPlaces/77.jpg", timeGo:3 },
-  { id:78, type:7, name:"🌋Платиновая шахта", near:[77,75], photo:"img/campPlaces/78.jpg",
-    max:180, regenHour:25, starsDo:3, mineItems:[[112,0.07],[108,0.05]], energyDo:4, timeDo:15,
-    hunt:[[[1,22],[1,23],[1,21],[1,18],[1,17]],8,4,17],
-    find:[[[2,101,12],[2,101,14],[2,101,16],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_4"],[3,34,"1_4"],[3,44,"1_5"],[3,44,"1_6"],[3,44,"2_1"],[3,33,"2_2"],[3,35,"2_2"],[3,33,"2_1"],[3,35,"2_1"]],9,2,14],
-    maxHunt:150, regenHuntHour:20, timeGo:3 },
-  { id:79, type:1, name:"🍄‍🟫Гнилые стволы", near:[80,77], photo:"img/campPlaces/79.jpg", timeGo:3 },
-  { id:80, type:8, name:"🌾Остатки усадьбы", near:[81,79], photo:"img/campPlaces/80.jpg",
-    energyDo:4, timeDo:15, max:180, regenHour:25, starsDo:3,
-    hunt:[[[1,12],[1,13],[1,19],[1,20],[1,23]],8,4,17],
-    find:[[[2,103,12],[2,103,14],[2,103,16],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_4"],[3,34,"1_4"],[3,44,"1_5"],[3,44,"1_6"],[3,44,"2_1"],[3,33,"2_2"],[3,35,"2_2"],[3,33,"2_1"],[3,35,"2_1"]],9,2,14],
-    maxHunt:150, regenHuntHour:20, timeGo:3 },
-  { id:81, type:4, name:"⚔️Долина смерти", near:[80,84,83], photo:"img/campPlaces/81.jpg",
-    enemies:[
-      [{name:"🐦‍⬛️Чернющий ворон",energy: 5,hp:4400,fail:15,def:[120,180],dmg:[300,170],skill:2,crit:[15,175],type: 1,element:"plant",stars:1, exp: [35,0], photo:"img/campEnemies/38.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
-      [{name:"🦓Малый буйвол",energy: 5,hp:5500,fail:8,def:[230,230],dmg:[330,120],skill:4,crit:[15,175],type: 2,element:"water",stars:1, exp: [35,0], photo:"img/campEnemies/39.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
-      [{name:"🦅Пустынный орлан",energy: 6,hp:4400,fail:16,def:[120,300],dmg:[300,120],skill:5,crit:[15,200],type: 1,element:"plant",stars:1, exp: [35,0], photo:"img/campEnemies/40.jpg"},10,{drop:[[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
-      [{name:"🦘Младший кенгуру",energy: 6,hp:4800,fail:12,def:[180,180],dmg:[320,170],skill:1,crit:[15,200],type: 0,element:"fire",stars:1, exp: [35,0], photo:"img/campEnemies/41.jpg"},10,{drop:[[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
-      [{name:"🦊Фенек",energy: 5,hp:5300,fail:10,def:[160,200],dmg:[120,370],skill:7,crit:[15,175],type: 0,element:"fire",stars:2, exp: [35,0], photo:"img/campEnemies/42.jpg"},10,{drop:[[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]},5]],
-    energyFight:6, min:5, max:100, regenHour:20, sidePoints:16, timeGo:3 },
-  { id:82, type:3, name:"🌱Живая долина", near:[83,75], photo:"img/campPlaces/82.jpg",
-    enemies:[
-      {name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg"},
-      {name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg"},
-      {name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg"},
-      {name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg"}],
-    chance:20, timeGo:3 },
-  { id:83, type:6, name:"🌴Акация", near:[81,82], photo:"img/campPlaces/83.jpg",
-    energyDo:4, timeDo:15, max:180, regenHour:25, starsDo:3,
-    hunt:[[[1,22],[1,23],[1,21],[1,20],[1,16]],8,4,17],
-    find:[[[2,102,12],[2,102,14],[2,102,16],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_4"],[3,34,"1_4"],[3,44,"1_5"],[3,44,"1_6"],[3,44,"2_1"],[3,33,"2_2"],[3,35,"2_2"],[3,33,"2_1"],[3,35,"2_1"]],9,2,14],
-    maxHunt:150, regenHuntHour:20, timeGo:3 },
-  { id:84, type:2, name:"☁️Буря", near:[85,86,81], locked:[85,86], photo:"img/campPlaces/84.jpg",
-    fight:[{name:"🦊Фенек",energy: 6,hp:5400,fail:10,def:[100,220],dmg:[160,370],skill:3,crit:[15,220],type: 0,element:"fire",stars:2, exp: [40,0], photo:"img/campEnemies/43.jpg"}],
-    awards:[[3,32,"2_3"],[3,34,"2_3"],[3,45,"2_5"]], energyFight:5, timeGo:3 },
-  { id:85, type:1, name:"🛖Храм", near:[84], photo:"img/campPlaces/85.jpg", timeGo:3 },
-  { id:86, type:5, name:"😈Священная земля", near:[84], photo:"img/campPlaces/86.jpg",
-    fight:[{name:"🦊Огненный фенек",energy: 6,hp:4800,fail:12,def:[100,300],dmg:[130,350],skill:2,crit:[15,200],type: 0,element:"fire",stars:2, exp: [50,0], photo:"img/campEnemies/44.jpg"},{name:"🐯Священный",energy: 5,hp:5600,fail:10,def:[250,250],dmg:[320,100],skill:1,crit:[15,200],type: 0,element:"light",stars:2, exp: [50,0], photo:"img/campEnemies/45.jpg"}],
-    awardsList:[[[3,32,"2_6"],[3,33,"2_7"],[3,34,"2_6"],[3,35,"2_7"],[3,44,"2_20"],[3,45,"1_4"],[3,43,1]], [[3,32,"2_8"],[3,33,"2_5"],[3,34,"2_8"],[3,35,"2_5"],[3,44,"2_30"],[3,45,"1_4"],[3,53,1]]],
-    quest:999, energyFight:7, timeGo:3 }
-];
+    quest:88,
+    energyFight:6,
+    timeGo:3
+},{
+    id:42,
+    type:9,
+    name:"⛩️Странные лианы",
+    near:[31],
+    photo:"img/campPlaces/42.jpg",
+    key:504,
+    timeGo:3
+},{
+ id:43,
+ type:3,
+ name:"🏜Перепутье каньона",
+ near:[59,53,44],
+ photo:"img/campPlaces/43.jpg",
+ enemies:[{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg",drop:[[306,1],[307,1],[308,1]]},{name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg",drop:[[208,1],[306,1],[307,1]]},{name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+ chance:20,
+ timeGo:3
+},{
+ id:44,
+ type:3,
+ name:"🏜Правый каньон",
+ near:[43,45],
+ photo:"img/campPlaces/44.jpg",
+ enemies:[{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg",drop:[[306,1],[307,1],[308,1]]},{name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg",drop:[[208,1],[306,1],[307,1]]},{name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+ chance:20,
+ timeGo:3
+},{
+ id:45,
+ type:2,
+ name:"🏜Вход в шахту пустыни",
+ near:[44,47,46],
+ locked:[47,46],
+ photo:"img/campPlaces/45.jpg",
+ fight:[{name:"🦂Ядовитый скорпион",energy: 6,hp:4000,fail:15,def:[120,120],dmg:[100,250],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [25,0], photo:"img/campEnemies/26.jpg"}],
+ awards:[[3,33,"2_3"],[3,44,"2_7"],[3,45,"1_10"]],
+ energyFight:5,
+ timeGo:3
+},{
+ id:46,
+ type:7,
+ name:"🌋Рубиновая шахта",
+ near:[45,48],
+ photo:"img/campPlaces/46.jpg",
+max:100,
+regenHour:10,
+starsDo:3,
+mineItems:[[114,0.03],[108,0.04],[106,0.04],[104,0.04]],
+energyDo:4,
+timeDo:20,
+hunt:[[[1,15],[1,17],[1,18],[1,19],[1,20]],8,4,17], // awards energy times time: [1,1,5] - животное id1 5 траты, 2 - campItem, 3 - claimAward
+find:[[[2,101,10],[2,101,12],[2,101,14],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_3"],[3,34,"1_3"],[3,44,"1_4"],[3,44,"1_5"],[3,44,"2_1"],[3,33,"2_1"],[3,35,"2_1"]],9,2,13], // awards energy times timeL: awards животные не тратят maxHunt
+maxHunt:140,
+regenHuntHour:20,
+ timeGo:3
+},{
+ id:47,
+ type:3,
+ name:"🏜Нижний проход",
+ near:[45,48],
+ photo:"img/campPlaces/47.jpg",
+ enemies:[{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg",drop:[[306,1],[307,1],[308,1]]},{name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg",drop:[[208,1],[306,1],[307,1]]},{name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+ chance:20,
+ timeGo:3
+},{
+ id:48,
+ type:1,
+ name:"⛺️Убежище чужеземки",
+ near:[47,49,46],
+ photo:"img/campPlaces/48.jpg",
+ timeGo:3
+},{
+ id:49,
+ type:1,
+ name:"🏜Выход из шахты пустыни",
+ near:[50,48],
+ photo:"img/campPlaces/49.jpg",
+ timeGo:3
+},{
+ id:50,
+ type:1,
+ name:"🏜Скальный проход",
+ near:[51,49],
+ photo:"img/campPlaces/50.jpg",
+ timeGo:3
+},{
+ id:51,
+ type:3,
+ name:"🌵Кактусовое поле",
+ near:[54,65,50,52],
+ photo:"img/campPlaces/51.jpg",
+ enemies:[{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg",drop:[[306,1],[307,1],[308,1]]},{name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg",drop:[[208,1],[306,1],[307,1]]},{name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+ chance:20,
+ timeGo:3
+},{
+ id:52,
+ type:6,
+ name:"🌴Оазис",
+ near:[51,53],
+ photo:"img/campPlaces/52.jpg",
+ energyDo:4,
+ timeDo:15,
+ max:160,
+ regenHour:25,
+ starsDo:3,
+hunt:[[[1,16],[1,11],[1,18],[1,20],[1,22]],8,4,17],
+find:[[[2,102,10],[2,102,12],[2,102,14],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_3"],[3,34,"1_3"],[3,44,"1_4"],[3,44,"1_5"],[3,44,"2_1"],[3,33,"2_1"],[3,35,"2_1"]],9,2,13],
+maxHunt:140,
+regenHuntHour:20,
+ timeGo:3
+},{
+ id:53,
+ type:3,
+ name:"🏝Ручей",
+ near:[52,43],
+ photo:"img/campPlaces/53.jpg",
+ enemies:[{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg",drop:[[306,1],[307,1],[308,1]]},{name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg",drop:[[208,1],[306,1],[307,1]]},{name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+ chance:20,
+ timeGo:3
+},{
+ id:54,
+ type:3,
+ name:"🏜Выход из саванны",
+ near:[55,51],
+ photo:"img/campPlaces/54.jpg",
+ enemies:[{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg",drop:[[306,1],[307,1],[308,1]]},{name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg",drop:[[208,1],[306,1],[307,1]]},{name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+ chance:20,
+ timeGo:3
+},{
+ id:55,
+ type:1,
+ name:"🌵Колючки",
+ near:[56,54],
+ photo:"img/campPlaces/55.jpg",
+ timeGo:3
+},{
+ id:56,
+ type:4,
+ name:"⚔️Водопой",
+ near:[55,57],
+ photo:"img/campPlaces/56.jpg",
+     enemies:[
+    [{name:"🐕Малый кайот",energy: 5,hp:4600,fail:8,def:[170,150],dmg:[280,100],skill:6,crit:[15,175],type: 0,element:"fire",stars:1, exp: [30,0], photo:"img/campEnemies/27.jpg"},10,{drop:[[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
+    [{name:"🐍Гремучая змея",energy: 5,hp:4300,fail:12,def:[150,150],dmg:[100,300],skill:2,crit:[15,200],type: 0,element:"water",stars:1, exp: [30,0], photo:"img/campEnemies/28.jpg"},10,{drop:[[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
+    [{name:"🐦‍⬛Черный ворон",energy: 4,hp:4200,fail:15,def:[120,160],dmg:[260,140],skill:2,crit:[15,175],type: 1,element:"plant",stars:1, exp: [30,0], photo:"img/campEnemies/29.jpg"},10,{drop:[[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
+    [{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[150,150],dmg:[120,290],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [30,0], photo:"img/campEnemies/30.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]}],
+    [{name:"🦂Королевский скорпион",energy: 6,hp:5000,fail:15,def:[170,170],dmg:[120,330],skill:2,crit:[15,175],type: 0,element:"fire",stars:2, exp: [30,0], photo:"img/campEnemies/31.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_2"]],[[3,32,"2_1"],[3,33,"1_5"]],[[3,35,"2_1"]],[[3,34,"2_2"],[3,35,"1_4"]],[[3,44,"2_1"]]],rare:[[10,3,32,"1_4"],[7,3,34,"1_4"],[10,3,33,"2_1"],[7,3,35,"1_2"],[7,3,44,"2_1"]]},4]],
+ energyFight:6,
+ min:5,
+ max:100,
+ regenHour:20,
+ sidePoints: 16,
+ timeGo:3
+},{
+ id:57,
+ type:1,
+ name:"🪨Скала",
+ near:[64,56,58,61],
+ photo:"img/campPlaces/57.jpg",
+ timeGo:3
+},{
+ id:58,
+ type:2,
+ name:"🪨Обвал",
+ near:[57,59,60],
+ locked:[57,60],
+ photo:"img/campPlaces/58.jpg",
+  fight:[{name:"🐕Одинокий кайот",energy: 5,hp:4600,fail:12,def:[170,170],dmg:[300,120],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [25,0], photo:"img/campEnemies/32.jpg"}],
+ awards:[[3,33,"2_3"],[3,35,"2_3"],[3,13,1]],
+ energyFight:5,
+ timeGo:3
+},{
+ id:59,
+ type:3,
+ name:"🏜Левый каньон",
+ near:[58,43],
+ photo:"img/campPlaces/59.jpg",
+ enemies:[{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg",drop:[[306,1],[307,1],[308,1]]},{name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg",drop:[[208,1],[306,1],[307,1]]},{name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+ chance:20,
+ timeGo:3
+},{
+ id:60,
+ type:1,
+ name:"🏜Обрыв",
+ near:[58,61],
+ photo:"img/campPlaces/60.jpg",
+ timeGo:3
+},{
+ id:61,
+ type:1,
+ name:"🏜Яма",
+ near:[57,60,62],
+ photo:"img/campPlaces/61.jpg",
+ timeGo:3
+},{
+ id:62,
+ type:2,
+ name:"🏜Отверстие в яме",
+ near:[63,61],
+ locked:[63],
+ photo:"img/campPlaces/62.jpg",
+  fight:[{name:"🐍Кобра",energy: 4,hp:4500,fail:12,def:[180,180],dmg:[120,350],skill:2,crit:[15,200],type: 0,element:"water",stars:2, exp: [40,0], photo:"img/campEnemies/33.jpg"}],
+ awards:[[3,32,"2_1"],[3,34,"2_1"],[3,44,"2_7"],[3,45,"1_10"]],
+ energyFight:5,
+ timeGo:3
+},{
+ id:63,
+ type:5,
+ name:"🪹Логово скорпиона",
+ near:[62],
+ photo:"img/campPlaces/63.jpg",
+ fight:[{name:"🦂Черный скорпион",energy: 6,hp:5400,fail:15,def:[190,190],dmg:[140,360],skill:2,crit:[15,175],type: 0,element:"dark",stars:2, exp: [40,0], photo:"img/campEnemies/34.jpg"}],
+ quest:105,
+ energyFight:6,
+ awardsList:[[[3,32,"2_4"],[3,33,"2_5"],[3,34,"2_4"],[3,35,"2_5"],[3,44,"2_15"],[3,45,"1_3"],[3,43,1]], [[3,32,"2_6"],[3,33,"2_5"],[3,34,"2_6"],[3,35,"2_5"],[3,44,"2_25"],[3,45,"1_3"],[3,53,1]]],
+ timeGo:3
+},{
+ id:64,
+ type:8,
+ name:"🌱Поле жизни",
+ near:[57],
+ photo:"img/campPlaces/64.jpg",
+ energyDo:4,
+ timeDo:15,
+ max:180,
+ regenHour:25,
+ starsDo:3,
+hunt:[[[1,7],[1,8],[1,16],[1,20],[1,22]],8,4,17],
+find:[[[2,103,10],[2,103,12],[2,103,14],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_3"],[3,34,"1_3"],[3,44,"1_4"],[3,44,"1_5"],[3,44,"2_1"],[3,33,"2_1"],[3,35,"2_1"]],9,2,13],
+maxHunt:140,
+regenHuntHour:20,
+ timeGo:3
+},{
+ id:65,
+ type:2,
+ name:"🏜Ловушка в песке",
+ near:[66,51],
+ locked:[66],
+ photo:"img/campPlaces/65.jpg",
+  fight:[{name:"🦎Игуанна",energy: 5,hp:4600,fail:10,def:[200,200],dmg:[300,140],skill:1,crit:[15,200],type: 0,element:"water",stars:1, exp: [25,0], photo:"img/campEnemies/35.jpg"}],
+ awards:[[3,32,"2_3"],[3,33,"2_3"],[3,13,1]],
+ energyFight:5,
+ timeGo:3
+},{
+ id:66,
+ type:9,
+ name:"⛩Пустынный пропуск",
+ near:[67,65],
+ photo:"img/campPlaces/66.jpg",
+ key:505,
+ timeGo:3
+},{
+ id:67,
+ type:1,
+ name:"🏝Пригородный ручей",
+ near:[68,66],
+ photo:"img/campPlaces/67.jpg",
+ timeGo:3
+},{
+ id:68,
+ type:1,
+ name:"🏜Развилка",
+ near:[75,69],
+ photo:"img/campPlaces/68.jpg",
+ timeGo:3
+},{
+ id:69,
+ type:2,
+ name:"🏛Врата в город",
+ near:[72,70,68],
+ locked:[72,70,71],
+ photo:"img/campPlaces/69.jpg",
+  fight:[{name:"🪃Зашитница-чужеземка",energy: 5,hp:5000,fail:10,def:[220,140],dmg:[360,120],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [40,0], photo:"img/campEnemies/36.jpg"}],
+ awards:[[3,32,"2_2"],[3,33,"2_4"],[3,34,"2_2"],[3,35,"2_4"],[3,6,1]],
+ energyFight:5,
+ timeGo:3
+},{
+ id:70,
+ type:1,
+ name:"🛕Вход во дворец",
+ near:[69,72,73,71],
+ builds:[2],
+ photo:"img/campPlaces/70.jpg",
+ timeGo:3
+},{
+ id:71,
+ type:1,
+ name:"🕌Дворец",
+ near:[70],
+ builds:[6],
+ photo:"img/campPlaces/71.jpg",
+ timeGo:3
+},{
+ id:72,
+ type:1,
+ name:"🐾Усадьба",
+ near:[69,74,73,70],
+ builds:[1],
+ photo:"img/campPlaces/72.jpg",
+ timeGo:3
+},{
+ id:73,
+ type:1,
+ name:"🪚Жаровня",
+ near:[70,72,74],
+ builds:[3,4],
+ photo:"img/campPlaces/73.jpg",
+ timeGo:3
+},{
+ id:74,
+ type:10,
+ name:"💧Река пустыни",
+ near:[72,73],
+ builds:[5],
+ photo:"img/campPlaces/74.jpg",
+ max:100,
+regenHour:10,
+starsDo:3,
+fishes:[[14,15,16,12],[17,18,13],[19]],
+nearFishes:[[7,11],[],[]],
+waitK:1.35,
+ timeGo:3
+},{
+ id:75,
+ type:2,
+ name:"🏜Опасный путь",
+ near:[76,82,68],
+ locked:[76,82],
+ photo:"img/campPlaces/75.jpg",
+  fight:[{name:"🐐Горный козел",energy: 4,hp:5200,fail:15,def:[180,180],dmg:[280,200],skill:3,crit:[15,220],type: 0,element:"fire",stars:1, exp: [40,0], photo:"img/campEnemies/37.jpg"}],
+ awards:[[3,35,"2_4"],[3,27,2]],
+ energyFight:5,
+ timeGo:3
+},{
+ id:76,
+ type:3,
+ name:"🏜Каменный песок",
+ near:[77,75],
+ photo:"img/campPlaces/76.jpg",
+ enemies:[{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg",drop:[[306,1],[307,1],[308,1]]},{name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg",drop:[[208,1],[306,1],[307,1]]},{name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+ chance:20,
+ timeGo:3
+},{
+ id:77,
+ type:1,
+ name:"🏜Вход в шахту",
+ near:[78,79,76],
+ photo:"img/campPlaces/77.jpg",
+ timeGo:3
+},{
+ id:78,
+ type:7,
+ name:"🌋Платиновая шахта",
+ near:[77,75],
+ photo:"img/campPlaces/78.jpg",
+ max:180,
+regenHour:25,
+starsDo:3,
+mineItems:[[112,0.07],[108,0.05]],
+energyDo:4,
+timeDo:15,
+hunt:[[[1,22],[1,23],[1,21],[1,18],[1,17]],8,4,17],
+find:[[[2,101,12],[2,101,14],[2,101,16],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_4"],[3,34,"1_4"],[3,44,"1_5"],[3,44,"1_6"],[3,44,"2_1"],[3,33,"2_2"],[3,35,"2_2"],[3,33,"2_1"],[3,35,"2_1"]],9,2,14],
+maxHunt:150,
+regenHuntHour:20,
+ timeGo:3
+},{
+ id:79,
+ type:1,
+ name:"🍄‍🟫Гнилые стволы",
+ near:[80,77],
+ photo:"img/campPlaces/79.jpg",
+ timeGo:3
+},{
+ id:80,
+ type:8,
+ name:"🌾Остатки усадьбы",
+ near:[81,79],
+ photo:"img/campPlaces/80.jpg",
+energyDo:4,
+ timeDo:15,
+ max:180,
+ regenHour:25,
+ starsDo:3,
+hunt:[[[1,12],[1,13],[1,19],[1,20],[1,23]],8,4,17],
+find:[[[2,103,12],[2,103,14],[2,103,16],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_4"],[3,34,"1_4"],[3,44,"1_5"],[3,44,"1_6"],[3,44,"2_1"],[3,33,"2_2"],[3,35,"2_2"],[3,33,"2_1"],[3,35,"2_1"]],9,2,14],
+maxHunt:150,
+regenHuntHour:20,
+ timeGo:3
+},{
+ id:81,
+ type:4,
+ name:"⚔️Долина смерти",
+ near:[80,84,83],
+ photo:"img/campPlaces/81.jpg",
+ enemies:[
+    [{name:"🐦‍⬛️Чернющий ворон",energy: 5,hp:4400,fail:15,def:[120,180],dmg:[300,170],skill:2,crit:[15,175],type: 1,element:"plant",stars:1, exp: [35,0], photo:"img/campEnemies/38.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
+    [{name:"🦓Малый буйвол",energy: 5,hp:5500,fail:8,def:[230,230],dmg:[330,120],skill:4,crit:[15,175],type: 2,element:"water",stars:1, exp: [35,0], photo:"img/campEnemies/39.jpg"},10,{drop:[[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[2,310,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,310,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
+    [{name:"🦅Пустынный орлан",energy: 6,hp:4400,fail:16,def:[120,300],dmg:[300,120],skill:5,crit:[15,200],type: 1,element:"plant",stars:1, exp: [35,0], photo:"img/campEnemies/40.jpg"},10,{drop:[[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[2,309,1],[2,311,1]],[[2,217,1],[2,311,1]],[[2,309,2]],[[2,311,2]],[[2,217,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
+    [{name:"🦘Младший кенгуру",energy: 6,hp:4800,fail:12,def:[180,180],dmg:[320,170],skill:1,crit:[15,200],type: 0,element:"fire",stars:1, exp: [35,0], photo:"img/campEnemies/41.jpg"},10,{drop:[[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[2,312,1],[2,311,1]],[[2,216,1],[2,311,1]],[[2,312,2]],[[2,311,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]}],
+    [{name:"🦊Фенек",energy: 5,hp:5300,fail:10,def:[160,200],dmg:[120,370],skill:7,crit:[15,175],type: 0,element:"fire",stars:2, exp: [35,0], photo:"img/campEnemies/42.jpg"},10,{drop:[[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[2,312,1],[2,310,1]],[[2,216,1],[2,310,1]],[[2,312,2]],[[2,310,2]],[[2,216,2]],[[3,33,"2_3"]],[[3,32,"2_2"],[3,33,"1_8"]],[[3,35,"2_2"]],[[3,34,"2_3"],[3,35,"1_6"]],[[3,44,"2_2"]]],rare:[[10,3,32,"1_6"],[7,3,34,"1_6"],[10,3,33,"2_2"],[7,3,35,"1_3"],[7,3,44,"2_2"]]},5],
+ ], //fight pros awards biganimalId
+ energyFight:6,
+ min:5,
+ max:100,
+ regenHour:20,
+ sidePoints: 16,
+ timeGo:3
+},{
+ id:82,
+ type:3,
+ name:"🌱Живая долина",
+ near:[83,75],
+ photo:"img/campPlaces/82.jpg",
+ enemies:[{name:"🦂Скорпион",energy: 6,hp:4400,fail:15,def:[160,160],dmg:[120,300],skill:2,crit:[15,175],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/21.jpg",drop:[[306,1],[307,1],[308,1]]},{name:"🐕Кайот",energy: 5,hp:4800,fail:10,def:[180,190],dmg:[320,160],skill:1,crit:[15,150],type: 0,element:"fire",stars:1, exp: [17,0], photo:"img/campEnemies/22.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]},{name:"🦛Бегемот",energy: 4,hp:6000,fail:5,def:[250,250],dmg:[280,200],skill:5,crit:[15,150],type: 2,element:"water",stars:2, exp: [20,0], photo:"img/campEnemies/23.jpg",drop:[[208,1],[306,1],[307,1]]},{name:"🦘Кенгуру",energy: 6,hp:5100,fail:12,def:[220,220],dmg:[350,180],skill:1,crit:[15,200],type: 0,element:"fire",stars:2, exp: [20,0], photo:"img/campEnemies/24.jpg",drop:[[208,1],[306,1],[307,1],[308,1]]}], 
+ chance:20,
+ timeGo:3
+},{
+ id:83,
+ type:6,
+ name:"🌴Акация",
+ near:[81,82],
+ photo:"img/campPlaces/83.jpg",
+  energyDo:4,
+ timeDo:15,
+ max:180,
+ regenHour:25,
+ starsDo:3,
+hunt:[[[1,22],[1,23],[1,21],[1,20],[1,16]],8,4,17],
+find:[[[2,102,12],[2,102,14],[2,102,16],[2,309,1],[2,310,1],[2,311,1],[2,312,1], [3,32,"1_4"],[3,34,"1_4"],[3,44,"1_5"],[3,44,"1_6"],[3,44,"2_1"],[3,33,"2_2"],[3,35,"2_2"],[3,33,"2_1"],[3,35,"2_1"]],9,2,14],
+maxHunt:150,
+regenHuntHour:20,
+ timeGo:3
+},{
+ id:84,
+ type:2,
+ name:"☁️Буря",
+ near:[85,86,81],
+ locked:[85,86],
+ photo:"img/campPlaces/84.jpg",
+  fight:[{name:"🦊Фенек",energy: 6,hp:5400,fail:10,def:[100,220],dmg:[160,370],skill:3,crit:[15,220],type: 0,element:"fire",stars:2, exp: [40,0], photo:"img/campEnemies/43.jpg"}],
+ awards:[[3,32,"2_3"],[3,34,"2_3"],[3,45,"2_5"]],
+ energyFight:5,
+ timeGo:3
+},{
+ id:85,
+ type:1,
+ name:"🛖Храм",
+ near:[84],
+ photo:"img/campPlaces/85.jpg",
+ timeGo:3
+},{
+ id:86,
+ type:5,
+ name:"😈Священная земля",
+ near:[84],
+ photo:"img/campPlaces/86.jpg",
+ fight:[{name:"🦊Огненный фенек",energy: 6,hp:4800,fail:12,def:[100,300],dmg:[130,350],skill:2,crit:[15,200],type: 0,element:"fire",stars:2, exp: [50,0], photo:"img/campEnemies/44.jpg"},{name:"🐯Священный",energy: 5,hp:5600,fail:10,def:[250,250],dmg:[320,100],skill:1,crit:[15,200],type: 0,element:"light",stars:2, exp: [50,0], photo:"img/campEnemies/45.jpg"}],
+ awardsList:[[[3,32,"2_6"],[3,33,"2_7"],[3,34,"2_6"],[3,35,"2_7"],[3,44,"2_20"],[3,45,"1_4"],[3,43,1]], [[3,32,"2_8"],[3,33,"2_5"],[3,34,"2_8"],[3,35,"2_5"],[3,44,"2_30"],[3,45,"1_4"],[3,53,1]]],
+ quest:999,
+ energyFight:7,
+ timeGo:3
+}
+]
 
 /* ============================================================
    СПРАВОЧНИКИ ИМЁН
@@ -945,16 +1604,18 @@ function formatItemRef(type, itemId, count) {
     // награда: [type, awardId, num]
     const name = awardNames[itemId] || `award#${itemId}`;
     let display = name;
-    if (itemId === 32 || itemId === 44 || itemId === 45 || itemId === 50 || itemId === 29 || itemId === 40) {
+    if (itemId == 33 || itemId === 34 || itemId === 35 || itemId === 36 || itemId === 32 || itemId === 44 || itemId === 45 || itemId === 50 || itemId === 29 || itemId === 40) {
       // разбор "X_Y"
       if (typeof count === 'string' && count.includes('_')) {
         const [a, b] = count.split('_');
         if (itemId === 32) display = `${b}🔮 (${a}⭐)`;
+        else if (itemId === 33) display = `${b}${booksIcons[a-1]}[🔮]`;
+        else if (itemId === 34) display = `${b}📖 (${a}⭐)`;
+        else if (itemId === 35) display = `${b}${booksIcons[a-1]}[📖]`;
+        else if (itemId === 36) display = `${b}📚 (${a}⭐)`;
         else if (itemId === 44) display = `${b}🧩[🛡${'⭐'.repeat(a)}]`;
         else if (itemId === 45) display = `${b}🧩[📚${'⭐'.repeat(a)}]`;
         else if (itemId === 50) display = `${soilsNames(a)} x${b}`;
-        else if (itemId === 29) display = `👒Комплект ${a}`;
-        else if (itemId === 40) display = `🖌️Скин ${a}`;
       }
     }
     return display;
@@ -1445,11 +2106,13 @@ function renderFindSection(p) {
       if (typeof count === 'string' && count.includes('_')) {
         const [a, b] = count.split('_');
         if (id === 32) display = `${b}🔮 (${a}⭐)`;
-        else if (id === 44) display = `${b}🧩[🛡${'⭐'.repeat(Number(a))}]`;
-        else if (id === 45) display = `${b}🧩[📚${'⭐'.repeat(Number(a))}]`;
+        else if (id === 33) display = `${b}${booksIcons[a-1]}[🔮]`;
+        else if (id === 34) display = `${b}📖 (${a}⭐)`;
+        else if (id === 35) display = `${b}${booksIcons[a-1]}[📖]`;
+        else if (id === 36) display = `${b}📚 (${a}⭐)`;
+        else if (id === 44) display = `${b}🧩[🛡${'⭐'.repeat(a)}]`;
+        else if (id === 45) display = `${b}🧩[📚${'⭐'.repeat(a)}]`;
         else if (id === 50) display = `${soilsNames(a)} x${b}`;
-        else if (id === 29) display = `👒Комплект ${a}`;
-        else if (id === 40) display = `🖌️Скин ${a}`;
       } else {
         display = `${name}${count > 1 ? ` x${count}` : ''}`;
       }
@@ -1508,14 +2171,12 @@ const chipHtml = (t, id, cnt, isRare) => {
     const c = Number(a[1]); // количество
 
     if (id === 32) return `<span class="${cls}">${c}🔮 (${b}⭐)</span>`;
-    if (id === 33) return `<span class="${cls}">${c}${booksIcons[b-1]} [🔮]</span>`;
+    if (id === 33) return `<span class="${cls}">${c}${booksIcons[b-1]}[🔮]</span>`;
     if (id === 34) return `<span class="${cls}">${c}📖 (${b}⭐)</span>`;
-    if (id === 35) return `<span class="${cls}">${c}${booksIcons[b-1]} [📖]</span>`;
+    if (id === 35) return `<span class="${cls}">${c}${booksIcons[b-1]}[📖]</span>`;
+    if (id === 36) return `<span class="${cls}">${c}📚 (${b}⭐)</span>`;
     if (id === 44) return `<span class="${cls}">${c}🧩[🛡${starsStr[b-1]}]</span>`;
     if (id === 45) return `<span class="${cls}">${c}🧩[📚${starsStr[b-1]}]</span>`;
-    if (id === 50) return `<span class="${cls}">${c}${soilsNames(b)}</span>`;
-    if (id === 29) return `<span class="${cls}">${c}👒 (${b}⭐)</span>`;
-    if (id === 40) return `<span class="${cls}">${c}🖌️ (${b}⭐)</span>`;
 
     // fallback для строкового формата
     const name = t === 2
