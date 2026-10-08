@@ -2266,7 +2266,7 @@ function renderEnemiesSection(p) {
   const isFight = p.energyFight !== undefined;
   const title = isFight
     ? `👹 Возможные враги (⚡${p.energyFight} за бой)`
-    : `👹 Возможные враги (${p.chance || 15}% шанс)`;
+    : `👹 Возможные враги (${p.chance || 15}% шанс, раз в 30м)`;
 
   const parseEnemy = (raw) => {
     if (Array.isArray(raw) && raw.length >= 3 && typeof raw[0] === 'object' && raw[0].name) {
