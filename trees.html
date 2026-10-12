@@ -1,0 +1,1493 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<meta name="color-scheme" content="dark light">
+<title>Древо талантов</title>
+<style>
+  :root {
+    --bg-1: #0f1419;
+    --bg-2: #0a0d12;
+    --card: #161d27;
+    --card-2: #131a23;
+    --border: #263140;
+    --text: #e8eef6;
+    --text-dim: #93a3b8;
+    --text-mut: #5f7086;
+    --accent: #d99a5c;
+    --accent-2: #c98850;
+    --accent-glow: rgba(217, 154, 92, 0.12);
+    --accent-glow-strong: rgba(217, 154, 92, 0.25);
+    --grad: linear-gradient(135deg, #d99a5c 0%, #c98850 100%);
+    --grad-soft: linear-gradient(135deg, rgba(217,154,92,0.10), rgba(201,136,80,0.03));
+    --shadow: rgba(0, 0, 0, 0.45);
+    --radius: 16px;
+    --divider: #2a3644;
+    --toggle-bg: #1f2a36;
+    --toggle-border: #2f3d4f;
+    --glow-1: rgba(217, 154, 92, 0.06);
+    --glow-2: rgba(201, 136, 80, 0.03);
+    --inset: rgba(255, 255, 255, 0.04);
+    --line: #34424f;
+    --line-hi: rgba(217, 154, 92, 0.85);
+    --node-bg: #1c2533;
+    --node-bg-hover: #222e3e;
+    --node-border: #3a4a5e;
+    --node-icon-bg: rgba(255,255,255,0.06);
+    --node-icon-border: rgba(255,255,255,0.1);
+    --price-bg: rgba(255,255,255,0.08);
+    --price-text: #ffd700;
+    --tooltip-bg: #1a2332;
+    --tooltip-border: #3a4a5e;
+    --tooltip-shadow: rgba(0,0,0,0.8);
+    --level-line: #4a5a6e;
+    --level-text: #93a3b8;
+  }
+  html.light {
+    --bg-1: #e8dfd1;
+    --bg-2: #d9cdb9;
+    --card: #ffffff;
+    --card-2: #fdfaf4;
+    --border: #c1a880;
+    --text: #120c04;
+    --text-dim: #3f3122;
+    --text-mut: #6e5b41;
+    --accent: #c98850;
+    --accent-2: #a35d28;
+    --accent-glow: rgba(201, 136, 80, 0.28);
+    --accent-glow-strong: rgba(201, 136, 80, 0.5);
+    --grad: linear-gradient(135deg, #d99a5c 0%, #c98850 55%, #b07340 100%);
+    --grad-soft: linear-gradient(135deg, rgba(201,136,80,0.18), rgba(176,115,64,0.06));
+    --shadow: rgba(70, 45, 15, 0.22);
+    --shadow-soft: rgba(70, 45, 15, 0.12);
+    --divider: #c9b189;
+    --toggle-bg: #d6c3a5;
+    --toggle-border: #a58a60;
+    --glow-1: rgba(201, 136, 80, 0.16);
+    --glow-2: rgba(176, 115, 64, 0.09);
+    --inset: rgba(255, 255, 255, 1);
+    --line: #b8a181;
+    --line-hi: rgba(201, 136, 80, 0.9);
+    --node-bg: #fbf3e5;
+    --node-bg-hover: #f5ebdc;
+    --node-border: #d4c0a0;
+    --node-icon-bg: rgba(0,0,0,0.04);
+    --node-icon-border: rgba(0,0,0,0.08);
+    --price-bg: rgba(0,0,0,0.06);
+    --price-text: #8b6914;
+    --tooltip-bg: #ffffff;
+    --tooltip-border: #d4c0a0;
+    --tooltip-shadow: rgba(70, 45, 15, 0.25);
+    --level-line: #c9b189;
+    --level-text: #6e5b41;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 50% -10%, var(--glow-1), transparent 60%),
+      radial-gradient(700px 400px at 90% 110%, var(--glow-2), transparent 70%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    background-attachment: fixed;
+    color: var(--text);
+    padding: 20px 12px calc(30px + env(safe-area-inset-bottom));
+    padding-top: calc(20px + env(safe-area-inset-top));
+    min-height: 100vh;
+    min-height: 100dvh;
+    line-height: 1.5;
+    overflow-x: hidden;
+    transition: background 0.5s ease, color 0.35s ease;
+  }
+  .mandarins-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .mandarin-float {
+    position: absolute; font-size: 1.5rem; opacity: 0;
+    animation: mandarinFloat linear infinite;
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+  }
+  @keyframes mandarinFloat {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.16; }
+    90% { opacity: 0.16; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+  .progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 1000; }
+  .progress-fill { height: 100%; width: 0%; background: var(--grad); box-shadow: 0 0 14px var(--accent-glow-strong); transition: width 0.1s linear; }
+
+  .header {
+    position: relative; max-width: 1400px; margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 50px; z-index: 10;
+  }
+  h1.title {
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
+    font-weight: 900; letter-spacing: -0.04em;
+    background: var(--grad);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; text-align: center;
+    animation: titleIn 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+  @keyframes titleIn {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .back-link {
+    position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 12px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text-dim); text-decoration: none;
+    font-size: 0.78rem; font-weight: 700;
+    transition: all 0.25s ease; z-index: 10;
+  }
+  .back-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-50%) translateX(-3px); }
+  .theme-toggle {
+    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    width: 56px; height: 30px; border-radius: 30px;
+    background: var(--toggle-bg); border: 1px solid var(--toggle-border);
+    cursor: pointer; transition: all 0.35s ease; z-index: 10;
+  }
+  .theme-toggle:hover { border-color: var(--accent); }
+  .toggle-knob {
+    position: absolute; top: 2px; left: 2px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--grad);
+    box-shadow: 0 2px 8px var(--accent-glow-strong);
+    transition: left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+  }
+  html.light .toggle-knob { left: calc(100% - 26px); }
+  .toggle-knob .k-ico { position: absolute; transition: opacity 0.3s, transform 0.4s; }
+  .k-ico.moon { opacity: 1; } .k-ico.sun { opacity: 0; transform: rotate(-90deg); }
+  html.light .k-ico.moon { opacity: 0; transform: rotate(90deg); }
+  html.light .k-ico.sun { opacity: 1; transform: rotate(0deg); }
+
+  .container { max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* ===== ПЕРЕКЛЮЧАТЕЛЬ ===== */
+  .tabs {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .tab {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border-radius: 12px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text-dim); cursor: pointer;
+    font-size: 0.85rem; font-weight: 700;
+    transition: all 0.25s ease;
+    font-family: inherit;
+    user-select: none;
+  }
+  .tab:hover { border-color: var(--accent); color: var(--text); }
+  .tab.active {
+    background: var(--grad);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px var(--accent-glow-strong);
+  }
+  .tab .tab-ico { font-size: 1.1rem; }
+
+  /* ===== ИНФО-ПАНЕЛЬ ===== */
+  .info-panel {
+    background: linear-gradient(160deg, var(--card), var(--card-2));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    box-shadow: 0 6px 20px var(--shadow), inset 0 1px 0 var(--inset);
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    animation: cardIn 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .info-icon {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: var(--grad-soft); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; flex-shrink: 0;
+  }
+  .info-text { flex: 1; min-width: 200px; }
+  .info-name { font-size: 1.2rem; font-weight: 800; color: var(--text); }
+  .info-desc { font-size: 0.85rem; color: var(--text-dim); margin-top: 2px; }
+  .info-stats {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .stat-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 10px;
+    background: var(--node-icon-bg);
+    border: 1px solid var(--node-icon-border);
+    font-size: 0.8rem; font-weight: 700;
+    color: var(--text-dim);
+  }
+  .stat-chip .val { color: var(--accent); }
+
+  /* ===== ДЕРЕВО ===== */
+  .tree-wrapper {
+    position: relative;
+    background:
+      radial-gradient(900px 500px at 20% 15%, rgba(139,92,246,0.04), transparent 60%),
+      radial-gradient(700px 500px at 85% 80%, rgba(34,197,94,0.04), transparent 60%),
+      linear-gradient(160deg, var(--card), var(--card-2));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 6px 20px var(--shadow), inset 0 1px 0 var(--inset);
+    overflow: hidden;
+    animation: cardIn 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+    min-height: 500px;
+  }
+  .tree-viewport {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    min-height: 500px;
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+  }
+  .tree-viewport.grabbing { cursor: grabbing; }
+  .tree-stage {
+    position: absolute;
+    top: 0; left: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+  .tree-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 1;
+  }
+
+  /* ===== SVG СВЯЗИ ===== */
+  .tree-edge {
+    stroke: var(--line);
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke 0.3s ease, stroke-width 0.3s ease, opacity 0.3s ease;
+  }
+  .tree-edge.active {
+    stroke: var(--line-hi);
+    stroke-width: 5;
+    filter: drop-shadow(0 0 8px var(--accent-glow-strong));
+  }
+
+  /* ===== ЛИНИИ УРОВНЕЙ ===== */
+  .level-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: var(--level-line);
+    opacity: 0.35;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .level-line::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: -1px;
+    height: 4px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--level-line) 0px,
+      var(--level-line) 8px,
+      transparent 8px,
+      transparent 16px
+    );
+    opacity: 0.5;
+  }
+  .level-label {
+    position: absolute;
+    left: 20px;
+    top: -14px;
+    padding: 4px 14px;
+    background: var(--card);
+    border: 1px solid var(--level-line);
+    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--level-text);
+    z-index: 3;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .level-label .lvl-num {
+    color: var(--accent);
+  }
+
+  /* ===== УЗЛЫ ===== */
+  .tree-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 140px;
+    min-height: 100px;
+    padding: 12px 10px 10px;
+    background: var(--node-bg);
+    border: 3px solid var(--node-border);
+    border-radius: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 4px 14px var(--shadow);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .tree-node:hover {
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 8px 24px var(--shadow), 0 0 20px var(--accent-glow);
+    border-color: var(--accent);
+    z-index: 5;
+  }
+  .tree-node.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-glow-strong), 0 8px 24px var(--shadow);
+    z-index: 6;
+  }
+  .tree-node.skill {
+    border-color: #a78bfa;
+    background: linear-gradient(160deg, #2a1f4a, #1f1838);
+  }
+  html.light .tree-node.skill {
+    background: linear-gradient(160deg, #f3e8ff, #ede9fe);
+  }
+  .tree-node.buff {
+    border-color: #4ade80;
+    background: linear-gradient(160deg, #1a3a2a, #142a1f);
+  }
+  html.light .tree-node.buff {
+    background: linear-gradient(160deg, #ecfdf5, #d1fae5);
+  }
+
+  .node-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    display: block;
+  }
+  .node-name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+  .node-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3px;
+    margin-top: 2px;
+  }
+  .node-stat {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--node-icon-bg);
+    border: 1px solid var(--node-icon-border);
+    color: var(--text-dim);
+  }
+  .node-price {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 4px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: var(--price-bg);
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--price-text);
+  }
+  .node-price .price-ico { font-size: 0.8rem; }
+
+  /* ===== ТУЛТИП ===== */
+  .tooltip {
+    position: fixed;
+    z-index: 9999;
+    max-width: 300px;
+    padding: 14px 16px;
+    background: var(--tooltip-bg);
+    border: 1px solid var(--tooltip-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px var(--tooltip-shadow);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--text);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip-title {
+    font-weight: 800;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: var(--accent);
+  }
+  .tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 3px;
+  }
+  .tooltip-row .label { color: var(--text-mut); }
+  .tooltip-row .value { font-weight: 700; color: var(--text); }
+  .tooltip-desc {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--divider);
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+
+  /* ===== ФУТЕР ===== */
+  .footer {
+    max-width: 1400px; margin: 40px auto 0;
+    padding: 30px 16px 20px;
+    border-top: 1px solid var(--divider);
+    text-align: center; color: var(--text-mut); font-size: 0.85rem;
+  }
+  .footer-links { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-bottom: 18px; }
+  .footer-links a { color: var(--text-dim); text-decoration: none; font-weight: 600; transition: color 0.2s ease; }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-dev { margin-top: 12px; padding-top: 16px; border-top: 1px dashed var(--divider); font-size: 0.82rem; }
+  .footer-dev a { color: var(--accent); text-decoration: none; font-weight: 700; }
+
+  @media (max-width: 560px) {
+    body { padding: 14px 8px calc(20px + env(safe-area-inset-bottom)); }
+    .header { min-height: 44px; margin-bottom: 14px; }
+    .theme-toggle { width: 50px; height: 28px; }
+    .toggle-knob { width: 22px; height: 22px; font-size: 0.72rem; }
+    html.light .toggle-knob { left: calc(100% - 24px); }
+    .back-link { padding: 6px 10px; font-size: 0.72rem; }
+    .tab { padding: 8px 14px; font-size: 0.78rem; }
+    .tree-viewport { height: 70vh; min-height: 420px; }
+    .tree-node { width: 110px; min-height: 85px; padding: 8px 6px 8px; }
+    .node-icon { font-size: 1.3rem; }
+    .node-name { font-size: 0.65rem; }
+    .node-price { font-size: 0.65rem; padding: 2px 6px; }
+    .info-panel { padding: 14px 16px; }
+    .info-icon { width: 46px; height: 46px; font-size: 1.5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+  html.light body {
+    background:
+      radial-gradient(1000px 500px at 50% -10%, var(--glow-1), transparent 60%),
+      radial-gradient(700px 400px at 90% 110%, var(--glow-2), transparent 70%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  }
+  html.light .tree-wrapper,
+  html.light .info-panel {
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 1) inset, 0 6px 20px var(--shadow-soft), 0 2px 6px rgba(70, 45, 15, 0.08);
+  }
+</style>
+</head>
+<body>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="mandarins-bg" id="mandarinsBg"></div>
+
+  <div class="header">
+    <a href="index.html" class="back-link">← На главную</a>
+    <h1 class="title">🌳 Древо талантов</h1>
+    <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему" type="button">
+      <span class="toggle-knob">
+        <span class="k-ico moon">🌙</span>
+        <span class="k-ico sun">☀️</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="container">
+
+    <!-- ПЕРЕКЛЮЧАТЕЛЬ -->
+    <div class="tabs" id="tabs"></div>
+
+    <!-- ИНФО-ПАНЕЛЬ -->
+    <div class="info-panel" id="infoPanel">
+      <div class="info-icon" id="infoIcon">🌳</div>
+      <div class="info-text">
+        <div class="info-name" id="infoName">Выберите древо</div>
+        <div class="info-desc" id="infoDesc">Нажмите на вкладку выше</div>
+      </div>
+      <div class="info-stats" id="infoStats"></div>
+    </div>
+
+    <!-- ДЕРЕВО -->
+    <div class="tree-wrapper" id="treeWrapper">
+      <div class="tree-viewport" id="treeViewport">
+        <div class="tree-stage" id="treeStage">
+          <svg class="tree-svg" id="treeSvg"></svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="index.html">🏠 Главная</a>
+      <a href="map.html">🗺️ Карта</a>
+      <a href="trees.html">🌳 Древо талантов</a>
+      <a href="recipes.html">🍳 Рецепты</a>
+      <a href="guide.html">📖 Гайды</a>
+      <a href="wall.html">🏆 Стена славы</a>
+    </div>
+    <div>© 2020-2026 Мандарин Бот · Все права защищены</div>
+    <div class="footer-dev">
+      Разработчик: <a href="https://t.me/eltyss" target="_blank" rel="noopener">@eltyss</a>
+      · <a href="https://vk.com/eltys" target="_blank" rel="noopener">@eltys</a>
+    </div>
+  </div>
+
+<script>
+/* ============================================================
+   ДАННЫЕ (взяты из data.js)
+   ============================================================ */
+
+// stTree - дерево для Пустого отряда
+const stTree = [{id:1,type:0,lvl:1,stats:[],next:[2,3,4,5]},
+{id:2,type:1,lvl:1,points:1,stats:[12,300],next:[6]},
+{id:3,type:1,lvl:1,points:1,stats:[13,5],next:[7]},
+{id:4,type:1,lvl:1,points:1,stats:[14,15],next:[8]},
+{id:5,type:1,lvl:1,points:1,stats:[15,7],next:[9]},
+{id:6,type:3,lvl:1,points:1,stats:[1],next:[10,11]},
+{id:7,type:3,lvl:1,points:1,stats:[2],next:[12]},
+{id:8,type:3,lvl:1,points:1,stats:[3],next:[12]},
+{id:9,type:3,lvl:1,points:1,stats:[4],next:[13,14]},
+{id:10,type:1,lvl:1,points:1,stats:[12,400],next:[15]},
+{id:11,type:1,lvl:1,points:1,stats:[13,10],next:[15]},
+{id:12,type:1,lvl:1,points:1,stats:[1,2],next:[16,17]},
+{id:13,type:1,lvl:1,points:1,stats:[14,20],next:[18]},
+{id:14,type:1,lvl:1,points:1,stats:[16,2],next:[18]},
+
+{id:15,type:3,lvl:10,points:1,stats:[1],next:[19]},
+{id:16,type:3,lvl:10,points:1,stats:[2],next:[20]},
+{id:17,type:3,lvl:10,points:1,stats:[3],next:[21]},
+{id:18,type:3,lvl:10,points:1,stats:[4],next:[22]},
+{id:19,type:1,lvl:10,points:1,stats:[12,500],next:[23,24]},
+{id:20,type:1,lvl:10,points:1,stats:[13,15],next:[25]},
+{id:21,type:1,lvl:10,points:1,stats:[14,30],next:[25]},
+{id:22,type:1,lvl:10,points:1,stats:[15,10],next:[26,27]},
+{id:23,type:1,lvl:10,points:1,stats:[12,650],next:[28]},
+{id:24,type:1,lvl:10,points:1,stats:[13,15],next:[28]},
+{id:25,type:1,lvl:10,points:1,stats:[1,3],next:[29,30]},
+{id:26,type:1,lvl:10,points:1,stats:[14,30],next:[31]},
+{id:27,type:1,lvl:10,points:1,stats:[16,3],next:[31]},
+
+{id:28,type:3,lvl:20,points:2,stats:[1],next:[32]},
+{id:29,type:3,lvl:20,points:2,stats:[2],next:[33]},
+{id:30,type:3,lvl:20,points:2,stats:[3],next:[34]},
+{id:31,type:3,lvl:20,points:2,stats:[4],next:[35]},
+{id:32,type:1,lvl:20,points:1,stats:[12,800],next:[36]},
+{id:33,type:1,lvl:20,points:1,stats:[13,25],next:[37]},
+{id:34,type:1,lvl:20,points:1,stats:[14,35],next:[38]},
+{id:35,type:1,lvl:20,points:1,stats:[15,14],next:[39]},
+
+{id:36,type:3,lvl:30,points:2,stats:[1],next:[]},
+{id:37,type:3,lvl:30,points:2,stats:[2],next:[]},
+{id:38,type:3,lvl:30,points:2,stats:[3],next:[]},
+{id:39,type:3,lvl:30,points:2,stats:[4],next:[]}];
+
+// waifuSkills - скиллы (для отображения имён)
+const waifuSkills = [
+{id:1,type:2,name:"🗡Разящий удар",txts:["Наносит ","💥, игнорируя броню противника"],stats:[[400],[800],[1600],[3000]],mana:[120,135,150,170],use:[[3,6],[3,6],[3,6],[3,6]]},
+{id:2,type:1,name:"⚔️Метка Воина",txts:["Дает +","%💥"],stats:[[12],[12],[16],[17]],mana:[150,165,180,200],use:[[12,7],[12,7],[12,7],[12,7]],times:[[8,4],[10,5],[12,5],[14,6]]},
+{id:3,type:1,name:"💢Слабые места",txts:["Дает +","%💢"],stats:[[20],[22],[24],[27]],mana:[160,175,190,205],use:[[14,8],[14,8],[14,8],[14,8]],times:[[10,5],[12,6],[14,7],[16,8]]},
+{id:4,type:1,name:"🛡Боевая стойка",txts:["Дает +","%🛡"],stats:[[70],[78],[83],[90]],mana:[100,110,120,130],use:[[12,7],[12,7],[12,7],[12,7]],times:[[8,4],[10,5],[12,5],[14,6]]},
+
+{id:5,type:2,name:"⚔️Последний шанс",txts:["Наносит ","💥 (💧) за каждые ваши недостающие 10%❤️"],stats:[[100],[200],[300],[450],[650]],mana:[120,135,150,165,180],use:[[12,7],[12,7],[12,7],[12,7],[12,7]]},
+{id:6,type:3,name:"❤️Исцеление",txts:["Восстановит ","❤️"],stats:[[200],[350],[500],[750],[1000]],mana:[150,165,180,200,220],use:[[20,10],[20,10],[20,10],[20,10],[20,10]]},
+{id:7,type:1,name:"💢Точное попадание",txts:["Дает +","%💢 и +","%💥 (💢)"],stats:[[12,35],[14,40],[15,45],[17,50],[19,55]],mana:[150,165,180,200,220],use:[[14,8],[14,8],[14,8],[14,8],[14,8]],times:[[8,4],[10,5],[12,6],[14,7],[16,8]]},
+{id:8,type:1,name:"🛡Щит-мандарин",txts:["Дает +","%🛡"],stats:[[60],[67],[75],[82],[90]],mana:[120,135,150,165,180],use:[[12,7],[12,7],[12,7],[12,7],[12,7]],times:[[8,4],[10,5],[12,5],[14,6],[16,7]]},
+
+{id:9,type:2,name:"🗡Мощный удар",txts:["Наносит ","💥 + сила атаки "],stats:[[300],[700],[1200],[2000],[3000]],mana:[120,135,150,165,180],use:[[12,7],[12,7],[12,7],[12,7],[12,7]]},
+{id:10,type:1,name:"🔥Поджог",txts:["Наносит дополнительно ","🔥"],stats:[[100],[175],[275],[400],[600]],mana:[150,165,180,200,220],use:[[12,5],[12,5],[12,5],[12,5],[12,5]],times:[[6,3],[7,3],[8,4],[9,4],[10,5]]},
+{id:11,type:1,name:"⚔️Прирост силы",txts:["Дает +","%💥"],stats:[[20],[22],[24],[26],[29]],mana:[150,165,180,200,220],use:[[12,7],[12,7],[12,7],[12,7],[12,7]],times:[[6,3],[7,3],[8,4],[9,4],[10,5]]},
+{id:12,type:1,name:"🛡Парирование",txts:["Заблокирует 90%💥"],stats:[[],[],[],[]],mana:[80,75,70,65,60],use:[[14,6],[13,6],[12,5],[11,5],[10,5]],times:[[5,2],[5,2],[5,2],[5,2],[5,2]]},
+
+{id:13,type:2,name:"🎲Каст удачи",txts:["Наносит 💥 как сила атаки + ","💥 с изменением +-","%"],stats:[[300,15],[700,20],[1200,25],[2000,30],[3000,36]],mana:[120,135,150,165,180],use:[[12,7],[12,7],[12,7],[12,7],[12,7]]},
+{id:14,type:1,name:"🪬Невидимка",txts:["Дает +","%💢 и +","%💨"],stats:[[12,10],[15,10],[15,13],[16,16],[19,18]],mana:[150,165,180,200,220],use:[[14,8],[14,8],[14,8],[14,8],[14,8]],times:[[6,3],[7,3],[8,4],[9,4],[10,5]]},
+{id:15,type:4,name:"🔮Магический берсерк",txts:["Восстановит %💙 от макс. как ","% от недостающего ❤️"],stats:[[50],[55],[60],[65],[70]],mana:[0,0,0,0],use:[[12,7],[12,7],[12,7],[12,7],[12,7]]},
+{id:16,type:1,name:"🌿Сила природы",txts:["Наносит дополнительно 🌱 как ","% от маг. урона 🔮 (🗡) атаки"],stats:[[30],[33],[36],[39],[45]],mana:[150,165,180,200,220],use:[[12,6],[12,6],[12,6],[12,6],[12,6]],times:[[6,3],[7,4],[8,4],[9,4],[10,5]]},
+
+{id:17,type:3,name:"🍯Медовое здоровье",txts:["Восстанавливает ❤️ как ","% от суммарной 🛡"],stats:[[70],[90],[90],[100],[110]],mana:[150,165,180,200,220],use:[[20,10],[20,10],[20,10],[20,10],[20,10]]},
+{id:18,type:1,name:"🛡Концентрация",txts:["Дает +","🛡%, но -","💥%"],stats:[[70,10],[77,10],[85,10],[92,10],[100,10]],mana:[110,120,130,140,150],use:[[12,7],[12,7],[12,7],[12,7],[12,7]],times:[[8,4],[10,5],[12,5],[14,6],[16,7]]},
+{id:19,type:2,name:"🪃Возврат",txts:["Наносит 💥, равный ","% от суммарного 💥 и 🛡 врага"],stats:[[120],[140],[165],[195],[230]],mana:[120,135,150,165,180],use:[[12,7],[12,7],[12,7],[12,7],[12,7]]},
+{id:20,type:1,name:"🔮Магический барьер",txts:["Дает +","% к 🛡 (🔮)"],stats:[[85],[93],[104],[118],[135]],mana:[120,135,150,165,180],use:[[12,7],[12,7],[12,7],[12,7],[12,7]],times:[[8,4],[10,5],[12,5],[14,6],[16,7]]},
+
+{id:21,type:1,name:"💨Теневой шаг",txts:["Дает +","%💨"],stats:[[8],[12],[15],[18],[22]],mana:[160,175,190,205,220],use:[[12,6],[12,6],[12,6],[12,6],[12,6]],times:[[6,3],[7,3],[8,4],[9,4],[10,5]]},
+{id:22,type:1,name:"💢Ярость",txts:["Дает +","%💥 (💢), но -","%💢"],stats:[[20,8],[24,10],[28,12],[32,14],[36,16]],mana:[180,195,210,225,240],use:[[12,6],[12,6],[12,6],[12,6],[12,6]],times:[[6,3],[7,3],[8,4],[9,4],[10,5]]},
+{id:23,type:1,name:"⚖️Жертва",txts:["Превращает ","%🛡 в 💥, но -","%🛡"],stats:[[45,16],[53,20],[62,24],[70,28],[80,32]],mana:[170,185,200,215,230],use:[[12,6],[12,6],[12,6],[12,6],[12,6]],times:[[6,3],[7,3],[8,4],[9,4],[10,5]]},
+{id:24,type:1,name:"🛡Авантюрист",txts:["Дает +","%🛡, если надето не всё снаряжение"],stats:[[30],[34],[38],[42],[46]],mana:[150,165,180,195,210],use:[[12,6],[12,6],[12,6],[12,6],[12,6]],times:[[6,3],[7,3],[8,4],[9,4],[10,5]]},
+{id:25,type:1,name:"🗡Сосредоточение",txts:["Дает +","%💢, но -","%💥"],stats:[[20,12],[24,14],[28,18],[32,20],[36,24]],mana:[155,170,185,200,215],use:[[12,6],[12,6],[12,6],[12,6],[12,6]],times:[[6,3],[7,3],[8,4],[9,4],[10,5]]},
+{id:26,type:1,name:"🛡Стойкость",txts:["Дает +","%🛡 (🗡) и +","%🛡 (🔮)"],stats:[[20,20],[23,23],[26,26],[30,30],[33,33]],mana:[150,165,180,195,210],use:[[12,6],[12,6],[12,6],[12,6],[12,6]],times:[[6,3],[7,3],[8,4],[9,4],[10,5]]}
+];
+
+// waifus - данные вайфу (полные, с деревьями)
+const waifus = [
+    {
+        id:1,
+        name:"Мандарин-тян",
+        icon:"🍊",
+        tree:[
+    {"id":1,"type":0,"stats":[],"points":0,"lvl":1,"next":[2,3,4,5]},
+    {"id":2,"type":2,"stats":[2],"points":3,"lvl":1,"next":[6]},
+    {"id":3,"type":1,"stats":[12,200],"points":2,"lvl":1,"next":[7]},
+    {"id":4,"type":1,"stats":[15,7],"points":2,"lvl":1,"next":[7,8]},
+    {"id":5,"type":1,"stats":[1,2],"points":2,"lvl":1,"next":[8,9]},
+    {"id":6,"type":3,"stats":[5],"points":5,"lvl":1,"next":[49,10]},
+    {"id":7,"type":3,"stats":[6],"points":5,"lvl":1,"next":[10,11]},
+    {"id":8,"type":3,"stats":[7],"points":5,"lvl":1,"next":[11,12]},
+    {"id":9,"type":3,"stats":[8],"points":5,"lvl":1,"next":[]},
+    {"id":49,"type":1,"stats":[12,250],"points":2,"lvl":1,"next":[]},
+    {"id":10,"type":1,"stats":[13,5],"points":2,"lvl":1,"next":[13]},
+    {"id":11,"type":1,"stats":[16,1],"points":2,"lvl":1,"next":[14,15]},
+    {"id":12,"type":1,"stats":[8,7],"points":2,"lvl":1,"next":[16]},
+    {"id":13,"type":1,"stats":[12,300],"points":4,"lvl":2,"next":[17,18]},
+    {"id":14,"type":1,"stats":[14,30],"points":4,"lvl":2,"next":[18]},
+    {"id":15,"type":1,"stats":[15,11],"points":4,"lvl":2,"next":[19]},
+    {"id":16,"type":1,"stats":[16,3],"points":4,"lvl":2,"next":[19,20]},
+    {"id":17,"type":1,"stats":[13,6],"points":4,"lvl":2,"next":[]},
+    {"id":18,"type":3,"stats":[6],"points":7,"lvl":2,"next":[21,22]},
+    {"id":19,"type":3,"stats":[7],"points":7,"lvl":2,"next":[22,23]},
+    {"id":20,"type":1,"stats":[8,10],"points":4,"lvl":2,"next":[]},
+    {"id":21,"type":3,"stats":[5],"points":7,"lvl":2,"next":[]},
+    {"id":22,"type":2,"stats":[2],"points":4,"lvl":2,"next":[24,25]},
+    {"id":23,"type":3,"stats":[8],"points":7,"lvl":2,"next":[]},
+    {"id":24,"type":1,"stats":[13,7],"points":4,"lvl":2,"next":[26]},
+    {"id":25,"type":1,"stats":[1,3],"points":4,"lvl":2,"next":[26]},
+    {"id":26,"type":1,"stats":[1,3],"points":6,"lvl":3,"next":[27,28]},
+    {"id":27,"type":3,"stats":[5],"points":9,"lvl":3,"next":[30,31]},
+    {"id":28,"type":3,"stats":[6],"points":9,"lvl":3,"next":[32,33]},
+    {"id":29,"type":1,"stats":[8,13],"points":6,"lvl":3,"next":[]},
+    {"id":30,"type":3,"stats":[7],"points":9,"lvl":3,"next":[35]},
+    {"id":31,"type":1,"stats":[12,350],"points":6,"lvl":3,"next":[35]},
+    {"id":32,"type":1,"stats":[14,30],"points":6,"lvl":3,"next":[36]},
+    {"id":33,"type":3,"stats":[8],"points":9,"lvl":3,"next":[36,34]},
+    {"id":34,"type":1,"stats":[16,3],"points":6,"lvl":3,"next":[]},
+    {"id":35,"type":2,"stats":[3],"points":6,"lvl":3,"next":[37]},
+    {"id":36,"type":1,"stats":[13,10],"points":6,"lvl":3,"next":[38]},
+    {"id":37,"type":1,"stats":[1,3],"points":8,"lvl":4,"next":[39,40]},
+    {"id":38,"type":1,"stats":[15,17],"points":8,"lvl":4,"next":[41,42]},
+    {"id":39,"type":3,"stats":[5],"points":11,"lvl":4,"next":[43]},
+    {"id":40,"type":3,"stats":[6],"points":11,"lvl":4,"next":[43]},
+    {"id":41,"type":3,"stats":[7],"points":11,"lvl":4,"next":[44]},
+    {"id":42,"type":3,"stats":[8],"points":11,"lvl":4,"next":[44]},
+    {"id":43,"type":1,"stats":[13,12],"points":8,"lvl":4,"next":[45,46]},
+    {"id":44,"type":2,"stats":[3],"points":8,"lvl":4,"next":[47,48]},
+    {"id":45,"type":3,"stats":[5],"points":11,"lvl":5,"next":[]},
+    {"id":46,"type":3,"stats":[6],"points":11,"lvl":5,"next":[]},
+    {"id":47,"type":3,"stats":[7],"points":11,"lvl":5,"next":[]},
+    {"id":48,"type":3,"stats":[8],"points":12,"lvl":5,"next":[]}
+]
+    },
+    {
+        id:2,
+        name:"Черри-тян",
+        icon:"🍒",
+        tree:[
+    {"id":1,"type":0,"stats":[],"points":0,"lvl":1,"next":[2,3,4]},
+    {"id":2,"type":2,"stats":[5],"points":3,"lvl":1,"next":[5]},
+    {"id":3,"type":1,"stats":[12,150],"points":2,"lvl":1,"next":[6,7]},
+    {"id":4,"type":1,"stats":[14,20],"points":2,"lvl":1,"next":[8]},
+    {"id":5,"type":3,"stats":[9],"points":5,"lvl":1,"next":[9]},
+    {"id":6,"type":3,"stats":[10],"points":5,"lvl":1,"next":[9]},
+    {"id":7,"type":3,"stats":[11],"points":5,"lvl":1,"next":[11]},
+    {"id":8,"type":3,"stats":[12],"points":5,"lvl":1,"next":[11]},
+    {"id":9,"type":1,"stats":[13,7],"points":2,"lvl":1,"next":[12,13]},
+    {"id":11,"type":1,"stats":[7,3],"points":2,"lvl":1,"next":[14,15]},
+    {"id":12,"type":1,"stats":[15,15],"points":4,"lvl":2,"next":[16,17]},
+    {"id":13,"type":1,"stats":[13,10],"points":4,"lvl":2,"next":[10,17]},
+    {"id":14,"type":2,"stats":[8],"points":4,"lvl":2,"next":[18,10]},
+    {"id":10,"type":1,"stats":[1,3],"points":4,"lvl":2,"next":[]},
+    {"id":15,"type":1,"stats":[12,250],"points":4,"lvl":2,"next":[18,19]},
+    {"id":16,"type":3,"stats":[9],"points":7,"lvl":2,"next":[20]},
+    {"id":17,"type":3,"stats":[10],"points":7,"lvl":2,"next":[21]},
+    {"id":18,"type":3,"stats":[11],"points":7,"lvl":2,"next":[22]},
+    {"id":19,"type":3,"stats":[12],"points":7,"lvl":2,"next":[23]},
+    {"id":20,"type":1,"stats":[7,3],"points":4,"lvl":2,"next":[24]},
+    {"id":21,"type":1,"stats":[14,25],"points":4,"lvl":2,"next":[25]},
+    {"id":22,"type":1,"stats":[16,2],"points":4,"lvl":2,"next":[26]},
+    {"id":23,"type":1,"stats":[1,3],"points":4,"lvl":2,"next":[27]},
+    {"id":24,"type":1,"stats":[16,3],"points":6,"lvl":3,"next":[]},
+    {"id":25,"type":1,"stats":[12,350],"points":6,"lvl":3,"next":[28,29]},
+    {"id":26,"type":2,"stats":[12],"points":6,"lvl":3,"next":[30,31]},
+    {"id":27,"type":1,"stats":[7,4],"points":6,"lvl":3,"next":[]},
+    {"id":28,"type":3,"stats":[9],"points":9,"lvl":3,"next":[32,33]},
+    {"id":29,"type":3,"stats":[10],"points":9,"lvl":3,"next":[33]},
+    {"id":30,"type":3,"stats":[11],"points":9,"lvl":3,"next":[34]},
+    {"id":31,"type":3,"stats":[12],"points":9,"lvl":3,"next":[34]},
+    {"id":32,"type":1,"stats":[14,30],"points":6,"lvl":3,"next":[]},
+    {"id":33,"type":1,"stats":[15,25],"points":6,"lvl":3,"next":[35,36]},
+    {"id":34,"type":1,"stats":[1,4],"points":6,"lvl":3,"next":[37,38]},
+    {"id":35,"type":3,"stats":[9],"points":10,"lvl":4,"next":[39,40]},
+    {"id":36,"type":3,"stats":[10],"points":10,"lvl":4,"next":[40,48]},
+    {"id":37,"type":3,"stats":[11],"points":10,"lvl":4,"next":[41,48]},
+    {"id":38,"type":3,"stats":[12],"points":10,"lvl":4,"next":[41,42]},
+    {"id":39,"type":1,"stats":[7,5],"points":8,"lvl":4,"next":[43]},
+    {"id":40,"type":1,"stats":[16,4],"points":8,"lvl":4,"next":[44]},
+    {"id":48,"type":1,"stats":[14,35],"points":8,"lvl":4,"next":[]},
+    {"id":41,"type":2,"stats":[15],"points":8,"lvl":4,"next":[45]},
+    {"id":42,"type":1,"stats":[13,13],"points":8,"lvl":4,"next":[46]},
+    {"id":43,"type":3,"stats":[9],"points":11,"lvl":5,"next":[]},
+    {"id":44,"type":3,"stats":[10],"points":11,"lvl":5,"next":[]},
+    {"id":45,"type":3,"stats":[11],"points":11,"lvl":5,"next":[]},
+    {"id":46,"type":3,"stats":[12],"points":12,"lvl":5,"next":[]}
+]
+    },
+    {
+        id:3,
+        name:"Киви-тян",
+        icon:"🥝",
+        tree:[
+    {"id":1,"type":0,"stats":[],"points":0,"lvl":1,"next":[3,4]},
+    {"id":2,"type":1,"stats":[14,25],"points":2,"lvl":1,"next":[6,7]},
+    {"id":3,"type":1,"stats":[12,100],"points":2,"lvl":1,"next":[2,8]},
+    {"id":4,"type":2,"stats":[4],"points":3,"lvl":1,"next":[9,5]},
+    {"id":5,"type":1,"stats":[7,1],"points":2,"lvl":1,"next":[10,11]},
+    {"id":6,"type":1,"stats":[16,2],"points":2,"lvl":1,"next":[]},
+    {"id":7,"type":3,"stats":[13],"points":5,"lvl":1,"next":[12]},
+    {"id":8,"type":3,"stats":[14],"points":5,"lvl":1,"next":[13]},
+    {"id":9,"type":3,"stats":[15],"points":5,"lvl":1,"next":[13]},
+    {"id":10,"type":3,"stats":[16],"points":5,"lvl":1,"next":[14]},
+    {"id":11,"type":1,"stats":[6,2],"points":2,"lvl":1,"next":[]},
+    {"id":12,"type":1,"stats":[15,10],"points":2,"lvl":1,"next":[15]},
+    {"id":13,"type":1,"stats":[14,30],"points":2,"lvl":1,"next":[16]},
+    {"id":14,"type":1,"stats":[13,5],"points":2,"lvl":1,"next":[17]},
+    {"id":15,"type":1,"stats":[12,150],"points":4,"lvl":2,"next":[18,19]},
+    {"id":16,"type":1,"stats":[6,2],"points":4,"lvl":2,"next":[19,20]},
+    {"id":17,"type":1,"stats":[7,2],"points":4,"lvl":2,"next":[20,21]},
+    {"id":18,"type":3,"stats":[13],"points":7,"lvl":2,"next":[22,23]},
+    {"id":19,"type":3,"stats":[14],"points":7,"lvl":2,"next":[24]},
+    {"id":20,"type":3,"stats":[15],"points":7,"lvl":2,"next":[25]},
+    {"id":21,"type":3,"stats":[16],"points":7,"lvl":2,"next":[26,27]},
+    {"id":22,"type":1,"stats":[16,4],"points":4,"lvl":2,"next":[28]},
+    {"id":23,"type":1,"stats":[15,15],"points":4,"lvl":2,"next":[28]},
+    {"id":24,"type":1,"stats":[14,35],"points":4,"lvl":2,"next":[29,30]},
+    {"id":25,"type":1,"stats":[13,7],"points":4,"lvl":2,"next":[30,31]},
+    {"id":26,"type":1,"stats":[12,150],"points":4,"lvl":2,"next":[32]},
+    {"id":27,"type":2,"stats":[5],"points":4,"lvl":2,"next":[32]},
+    {"id":28,"type":1,"stats":[14,40],"points":6,"lvl":3,"next":[33]},
+    {"id":29,"type":1,"stats":[13,10],"points":6,"lvl":3,"next":[33]},
+    {"id":30,"type":1,"stats":[12,200],"points":6,"lvl":3,"next":[34,35]},
+    {"id":31,"type":2,"stats":[5],"points":6,"lvl":3,"next":[36]},
+    {"id":32,"type":1,"stats":[7,2],"points":6,"lvl":3,"next":[36]},
+    {"id":33,"type":3,"stats":[13],"points":9,"lvl":3,"next":[37]},
+    {"id":34,"type":3,"stats":[14],"points":9,"lvl":3,"next":[37]},
+    {"id":35,"type":3,"stats":[15],"points":9,"lvl":3,"next":[38]},
+    {"id":36,"type":3,"stats":[16],"points":9,"lvl":3,"next":[38]},
+    {"id":37,"type":2,"stats":[6],"points":6,"lvl":3,"next":[39,40]},
+    {"id":38,"type":1,"stats":[6,3],"points":6,"lvl":3,"next":[41,42]},
+    {"id":39,"type":3,"stats":[13],"points":10,"lvl":4,"next":[43]},
+    {"id":40,"type":3,"stats":[14],"points":10,"lvl":4,"next":[44]},
+    {"id":41,"type":3,"stats":[15],"points":10,"lvl":4,"next":[45]},
+    {"id":42,"type":3,"stats":[16],"points":10,"lvl":4,"next":[46]},
+    {"id":43,"type":1,"stats":[16,5],"points":8,"lvl":4,"next":[47]},
+    {"id":44,"type":1,"stats":[15,15],"points":8,"lvl":4,"next":[48]},
+    {"id":45,"type":1,"stats":[7,3],"points":8,"lvl":4,"next":[49]},
+    {"id":46,"type":1,"stats":[6,3],"points":8,"lvl":4,"next":[50]},
+    {"id":47,"type":3,"stats":[13],"points":11,"lvl":5,"next":[]},
+    {"id":48,"type":3,"stats":[14],"points":11,"lvl":5,"next":[]},
+    {"id":49,"type":3,"stats":[15],"points":11,"lvl":5,"next":[]},
+    {"id":50,"type":3,"stats":[16],"points":12,"lvl":5,"next":[]}
+]
+    },
+    {
+        id:4,
+        name:"Лемон-тян",
+        icon:"🍋",
+        tree:[
+    {"id":1,"type":0,"stats":[],"points":0,"lvl":1,"next":[2,3,4,5]},
+    {"id":2,"type":2,"stats":[4],"points":3,"lvl":1,"next":[6]},
+    {"id":3,"type":1,"stats":[12,200],"points":2,"lvl":1,"next":[7]},
+    {"id":4,"type":1,"stats":[15,5],"points":2,"lvl":1,"next":[7,8]},
+    {"id":5,"type":1,"stats":[9,3],"points":2,"lvl":1,"next":[8,9]},
+    {"id":6,"type":3,"stats":[17],"points":5,"lvl":1,"next":[49,10]},
+    {"id":7,"type":3,"stats":[18],"points":5,"lvl":1,"next":[10,11]},
+    {"id":8,"type":3,"stats":[19],"points":5,"lvl":1,"next":[11,12]},
+    {"id":9,"type":3,"stats":[20],"points":5,"lvl":1,"next":[]},
+    {"id":49,"type":1,"stats":[12,200],"points":2,"lvl":1,"next":[]},
+    {"id":10,"type":1,"stats":[13,6],"points":2,"lvl":1,"next":[13]},
+    {"id":11,"type":1,"stats":[16,1],"points":2,"lvl":1,"next":[14,15]},
+    {"id":12,"type":1,"stats":[8,7],"points":2,"lvl":1,"next":[16]},
+    {"id":13,"type":1,"stats":[12,350],"points":4,"lvl":2,"next":[17,18]},
+    {"id":14,"type":1,"stats":[14,20],"points":4,"lvl":2,"next":[18]},
+    {"id":15,"type":1,"stats":[15,7],"points":4,"lvl":2,"next":[19]},
+    {"id":16,"type":1,"stats":[16,2],"points":4,"lvl":2,"next":[19,20]},
+    {"id":17,"type":1,"stats":[13,7],"points":4,"lvl":2,"next":[]},
+    {"id":18,"type":3,"stats":[18],"points":7,"lvl":2,"next":[21,22]},
+    {"id":19,"type":3,"stats":[19],"points":7,"lvl":2,"next":[22,23]},
+    {"id":20,"type":1,"stats":[8,10],"points":4,"lvl":2,"next":[]},
+    {"id":21,"type":3,"stats":[17],"points":7,"lvl":2,"next":[]},
+    {"id":22,"type":2,"stats":[4],"points":4,"lvl":2,"next":[24,25]},
+    {"id":23,"type":3,"stats":[20],"points":7,"lvl":2,"next":[]},
+    {"id":24,"type":1,"stats":[13,8],"points":4,"lvl":2,"next":[26]},
+    {"id":25,"type":1,"stats":[9,3],"points":4,"lvl":2,"next":[26]},
+    {"id":26,"type":1,"stats":[9,4],"points":6,"lvl":3,"next":[27,28]},
+    {"id":27,"type":3,"stats":[17],"points":9,"lvl":3,"next":[30,31]},
+    {"id":28,"type":3,"stats":[18],"points":9,"lvl":3,"next":[32,33]},
+    {"id":29,"type":1,"stats":[8,13],"points":6,"lvl":3,"next":[]},
+    {"id":30,"type":3,"stats":[19],"points":9,"lvl":3,"next":[35]},
+    {"id":31,"type":1,"stats":[12,400],"points":6,"lvl":3,"next":[35]},
+    {"id":32,"type":1,"stats":[14,30],"points":6,"lvl":3,"next":[36]},
+    {"id":33,"type":3,"stats":[20],"points":9,"lvl":3,"next":[36,34]},
+    {"id":34,"type":1,"stats":[16,3],"points":6,"lvl":3,"next":[]},
+    {"id":35,"type":2,"stats":[6],"points":6,"lvl":3,"next":[37]},
+    {"id":36,"type":1,"stats":[13,10],"points":6,"lvl":3,"next":[38]},
+    {"id":37,"type":1,"stats":[9,4],"points":8,"lvl":4,"next":[39,40]},
+    {"id":38,"type":1,"stats":[15,12],"points":8,"lvl":4,"next":[41,42]},
+    {"id":39,"type":3,"stats":[17],"points":10,"lvl":4,"next":[43]},
+    {"id":40,"type":3,"stats":[18],"points":10,"lvl":4,"next":[43]},
+    {"id":41,"type":3,"stats":[19],"points":10,"lvl":4,"next":[44]},
+    {"id":42,"type":3,"stats":[20],"points":10,"lvl":4,"next":[44]},
+    {"id":43,"type":1,"stats":[13,12],"points":8,"lvl":4,"next":[45,46]},
+    {"id":44,"type":2,"stats":[6],"points":8,"lvl":4,"next":[47,48]},
+    {"id":45,"type":3,"stats":[17],"points":12,"lvl":5,"next":[]},
+    {"id":46,"type":3,"stats":[18],"points":12,"lvl":5,"next":[]},
+    {"id":47,"type":3,"stats":[19],"points":12,"lvl":5,"next":[]},
+    {"id":48,"type":3,"stats":[20],"points":13,"lvl":5,"next":[]}
+]
+    }
+];
+
+/* ============================================================
+   ФУНКЦИИ
+   ============================================================ */
+
+// Имена для type:1
+function getFightBoostName(type, nm) {
+    let num = (nm >= 10) ? Math.floor(nm) : Math.floor(nm * 10)/10;
+    return (type == 1) ? num+"%💥" : (type == 2) ? "-"+num+"%🛡 (🗡⚔)" : (type == 3) ? "-"+num+"%🛡 (🔮⚔)" : (type == 4) ? num + "🛡 (🗡)" : (type == 5) ? num + "🛡 (🔮)" : (type == 6) ? num+"%💨" : (type == 7) ? num+"%💢" : 
+    (type == 8) ? num+"%💥 (💢)" : (type == 9) ? num+"%💥 (🔮)" : (type == 10) ? num+"💥" : (type == 11) ? num+"%🎯" : (type == 12) ? num+"♥️" : (type == 13) ? num+"%♥️" : (type == 14) ? num+"💙" : 
+    (type == 15) ? num+"%💙" : (type == 16) ? num+"💙/ч" : (type == 17) ? "%🛡 (🗡)" : (type == 18) ? "%🛡 (🔮)" :  "";
+}
+
+// Получить описание ноды
+function getNodeInfo(node, treeType, waifuId = 0) {
+    let name = "Неизвестно";
+    let desc = "";
+    let stats = [];
+    let price = "";
+    let priceIcon = "";
+
+    if (node.type === 1) {
+        name = "Усиление";
+        for (let i = 0; i < node.stats.length; i += 2) {
+            const type = node.stats[i];
+            const num = node.stats[i+1];
+            stats.push(getFightBoostName(type, num));
+        }
+        desc = "Постоянное улучшение характеристик";
+        price = node.points;
+        priceIcon = treeType === 'st' ? '🎖' : '🩷';
+    } else if (node.type === 2) {
+        name = "Бонус вайфу";
+        const bonusId = node.stats[0];
+        const bonusNames = ["⏳Время роста ","🍉Макс. съесть +","🥜Семена и 🥝 с разлущения +","🍋Шанс и 🍊 с 🍋 +"]
+        name = bonusNames[waifuId-1]+node.stats[0]+"%" || `Бонус #${bonusId}`;
+        desc = "Увеличивает бонус вайфу";
+        price = node.points;
+        priceIcon = treeType === 'st' ? '🎖' : '🩷';
+    } else if (node.type === 3) {
+        const skillId = node.stats[0];
+        const skill = waifuSkills.find(s => s.id === skillId);
+        if (skill) {
+            name = skill.name;
+            desc = skill.txts ? skill.txts.join('') : "Боевой навык";
+            const lvlIdx = node.stats[0] - 1;
+
+        } else {
+            name = `Скилл #${skillId}`;
+            desc = "Боевой навык";
+        }
+        price = node.points;
+        priceIcon = treeType === 'st' ? '🎖' : '🩷';
+    } else if (node.type === 0) {
+        name = "Корень";
+        desc = "Начало дерева";
+        price = node.points || 0;
+        priceIcon = '';
+    }
+
+    return { name, desc, stats, price, priceIcon };
+}
+
+/* ============================================================
+   ПЕРЕМЕННЫЕ СОСТОЯНИЯ
+   ============================================================ */
+let currentTree = 'st';
+const treesData = {
+    'st': { name: 'Пустой отряд', icon: '❌', tree: stTree, type: 'st', desc: 'Стандартное дерево талантов для отряда', priceIcon: '🎖' },
+    'waifu1': { name: 'Мандарин-тян', icon: '🍊', waifuId:1, tree: waifus[0].tree, type: 'waifu', desc: 'Дерево талантов Мандарин-тян', priceIcon: '🩷' },
+    'waifu2': { name: 'Черри-тян', icon: '🍒', waifuId:2,tree: waifus[1].tree, type: 'waifu', desc: 'Дерево талантов Черри-тян', priceIcon: '🩷' },
+    'waifu3': { name: 'Киви-тян', icon: '🥝', waifuId:3,tree: waifus[2].tree, type: 'waifu', desc: 'Дерево талантов Киви-тян', priceIcon: '🩷' },
+    'waifu4': { name: 'Лемон-тян', icon: '🍋', waifuId:4,tree: waifus[3].tree, type: 'waifu', desc: 'Дерево талантов Лемон-тян', priceIcon: '🩷' }
+};
+
+let nodePositions = {};
+
+/* ============================================================
+   ВЫЧИСЛЕНИЕ ПОЗИЦИЙ (УЛУЧШЕННОЕ)
+   ============================================================ */
+function computeTreePositions(tree) {
+    const nodes = {};
+    tree.forEach(n => { nodes[n.id] = n; });
+    
+    const root = tree.find(n => n.type === 0);
+    if (!root) return {};
+    
+    // BFS: уровни и родители
+    const levels = {};
+    const parent = {};
+    const queue = [{ id: root.id, level: 0, parentId: null }];
+    const visited = new Set();
+    levels[root.id] = 0;
+    parent[root.id] = null;
+    
+    while (queue.length > 0) {
+        const { id, level, parentId } = queue.shift();
+        if (visited.has(id)) continue;
+        visited.add(id);
+        levels[id] = level;
+        parent[id] = parentId;
+        
+        const node = nodes[id];
+        if (!node) continue;
+        
+        (node.next || []).forEach(nextId => {
+            if (!visited.has(nextId)) {
+                queue.push({ id: nextId, level: level + 1, parentId: id });
+            }
+        });
+    }
+    
+    // Группируем по уровням
+    const levelGroups = {};
+    Object.entries(levels).forEach(([id, lvl]) => {
+        if (!levelGroups[lvl]) levelGroups[lvl] = [];
+        levelGroups[lvl].push(Number(id));
+    });
+    
+    Object.values(levelGroups).forEach(g => g.sort((a, b) => a - b));
+    
+    // === НОВЫЙ АЛГОРИТМ: узлы размещаются под своими родителями ===
+    // Для каждого узла вычисляем его желаемую X-координату
+    // как среднее X родителей. Если у узла один родитель - он под ним.
+    // Если несколько - по центру между ними.
+    
+    const positions = {};
+    const H_SPACING = 200;
+    const V_SPACING = 180;
+    const X_OFFSET = 1000;
+    const Y_OFFSET = 150;
+    
+    // Начинаем с корня
+    positions[root.id] = { x: X_OFFSET, y: Y_OFFSET };
+    
+    // Идём по уровням сверху вниз
+    const maxLevel = Math.max(...Object.keys(levelGroups).map(Number), 0);
+    
+    for (let lvl = 1; lvl <= maxLevel; lvl++) {
+        const ids = levelGroups[lvl] || [];
+        
+        // Вычисляем желаемую X для каждого узла на основе родителей
+        const desiredX = {};
+        ids.forEach(id => {
+            const p = parent[id];
+            if (p !== null && positions[p]) {
+                desiredX[id] = positions[p].x;
+            } else {
+                desiredX[id] = X_OFFSET;
+            }
+        });
+        
+        // Сортируем по желаемой X
+        ids.sort((a, b) => (desiredX[a] || 0) - (desiredX[b] || 0));
+        
+        // Распределяем узлы, минимизируя перекрытия
+        // Жадный алгоритм: идём слева направо, ставим каждый узел
+        // не левее, чем его желаемая X, и не левее предыдущего + H_SPACING
+        
+        let prevX = -Infinity;
+        ids.forEach(id => {
+            let x = desiredX[id] || X_OFFSET;
+            
+            // Если узел слишком близко к предыдущему, сдвигаем
+            if (x < prevX + H_SPACING) {
+                x = prevX + H_SPACING;
+            }
+            
+            positions[id] = { x: x, y: Y_OFFSET + lvl * V_SPACING };
+            prevX = x;
+        });
+        
+        // Центрируем группу относительно родителей
+        // Находим среднюю желаемую X и среднюю фактическую X
+        if (ids.length > 0) {
+            const avgDesired = ids.reduce((s, id) => s + (desiredX[id] || X_OFFSET), 0) / ids.length;
+            const avgActual = ids.reduce((s, id) => s + positions[id].x, 0) / ids.length;
+            const shift = avgDesired - avgActual;
+            
+            ids.forEach(id => {
+                positions[id].x += shift;
+            });
+        }
+    }
+    
+    // Финальная нормализация: сдвигаем так, чтобы минимальная X была 0
+    let minX = Infinity;
+    Object.values(positions).forEach(p => { minX = Math.min(minX, p.x); });
+    Object.keys(positions).forEach(id => {
+        positions[id].x -= minX - 100;
+    });
+    
+    return positions;
+}
+
+/* ============================================================
+   ОТРИСОВКА
+   ============================================================ */
+const treeStage = document.getElementById('treeStage');
+const treeSvg = document.getElementById('treeSvg');
+const treeViewport = document.getElementById('treeViewport');
+const infoIcon = document.getElementById('infoIcon');
+const infoName = document.getElementById('infoName');
+const infoDesc = document.getElementById('infoDesc');
+const infoStats = document.getElementById('infoStats');
+const tabsContainer = document.getElementById('tabs');
+const tooltip = document.createElement('div');
+tooltip.className = 'tooltip';
+document.body.appendChild(tooltip);
+
+let currentScale = 1;
+let currentTx = 0, currentTy = 0;
+let isPanning = false;
+let panMoved = false;
+let panStart = null;
+let activePointer = null;
+
+function renderTree(treeKey) {
+    const data = treesData[treeKey];
+    if (!data) return;
+    
+    const tree = data.tree;
+    const treeType = data.type;
+    const priceIcon = data.priceIcon;
+    
+    // Обновляем инфо-панель
+    infoIcon.textContent = data.icon;
+    infoName.textContent = data.name;
+    infoDesc.textContent = data.desc;
+    
+    const totalNodes = tree.length;
+    const maxLvl = Math.max(...tree.map(n => n.lvl || 1));
+    const totalPoints = tree.reduce((sum, n) => sum + (n.points || 0), 0);
+    infoStats.innerHTML = `
+        <span class="stat-chip">📊 Узлов: <span class="val">${totalNodes}</span></span>
+        <span class="stat-chip">📈 Макс. Lv: <span class="val">${maxLvl}</span></span>
+        <span class="stat-chip">${priceIcon} Очков: <span class="val">${totalPoints}</span></span>
+    `;
+    
+    // Вычисляем позиции
+    const positions = computeTreePositions(tree);
+    nodePositions = positions;
+    
+    // Очищаем
+    treeStage.querySelectorAll('.tree-node').forEach(n => n.remove());
+    treeStage.querySelectorAll('.level-line, .level-label').forEach(n => n.remove());
+    treeSvg.innerHTML = '';
+    
+    // Находим границы
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    Object.values(positions).forEach(p => {
+        minX = Math.min(minX, p.x);
+        minY = Math.min(minY, p.y);
+        maxX = Math.max(maxX, p.x);
+        maxY = Math.max(maxY, p.y);
+    });
+    
+    const PAD = 250;
+    const stageW = maxX - minX + PAD * 2;
+    const stageH = maxY - minY + PAD * 2;
+    
+    // Сдвигаем позиции
+    const normPos = {};
+    Object.entries(positions).forEach(([id, p]) => {
+        normPos[id] = {
+            x: p.x - minX + PAD,
+            y: p.y - minY + PAD
+        };
+    });
+    
+    treeStage.style.width = stageW + 'px';
+    treeStage.style.height = stageH + 'px';
+    treeSvg.setAttribute('viewBox', `0 0 ${stageW} ${stageH}`);
+    
+        // === РИСУЕМ ЛИНИИ УРОВНЕЙ ===
+    // Группируем узлы по уровню (по lvl из данных)
+    const LEVEL_LABEL_LEFT = 20;
+    const lvlGroups = {};
+    tree.forEach(node => {
+        const lvl = node.lvl || 1;
+        if (!lvlGroups[lvl]) lvlGroups[lvl] = [];
+        lvlGroups[lvl].push(node);
+    });
+    
+    // Сортируем ключи уровней
+    const lvlKeys = Object.keys(lvlGroups).map(Number).sort((a, b) => a - b);
+    
+    // Высота блока + запас, чтобы линия гарантированно была НАД узлом
+    const isMobile = window.innerWidth < 560;
+    const NODE_HEIGHT = isMobile ? 85 : 100;   // высота узла (см. CSS)
+    const NODE_HALF = NODE_HEIGHT / 2;          // половина, т.к. узел центрирован
+    const LINE_GAP = isMobile ? 32 : 40;        // зазор между линией и верхом блока
+    const LINE_OFFSET = NODE_HALF + LINE_GAP;   // итоговое смещение вверх
+    
+    // Рисуем линии перед каждым уровнем, кроме 1-го (корень)
+    for (let i = 1; i < lvlKeys.length; i++) {
+        const lvl = lvlKeys[i];
+        const nodes = lvlGroups[lvl];
+        
+        // Находим САМЫЙ ВЕРХНИЙ узел уровня (минимальный Y)
+        let topY = Infinity;
+        nodes.forEach(n => {
+            const p = normPos[n.id];
+            if (p && p.y < topY) topY = p.y;
+        });
+        if (!isFinite(topY)) continue;
+        
+        // Линия идёт ВЫШЕ самого верхнего узла уровня
+        const y = topY - LINE_OFFSET;
+        
+        const line = document.createElement('div');
+        line.className = 'level-line';
+        line.style.top = y + 'px';
+        line.style.width = '100%';
+        line.style.left = '0';
+        treeStage.appendChild(line);
+        
+        const label = document.createElement('div');
+        label.className = 'level-label';
+        label.style.top = (y - 14) + 'px';
+        label.style.left = LEVEL_LABEL_LEFT + 'px';
+        label.innerHTML = `🔥 Уровень <span class="lvl-num">${lvl}</span>`;
+        treeStage.appendChild(label);
+    } 
+    
+    // === РИСУЕМ СВЯЗИ (в SVG, под узлами) ===
+    const edgeSet = new Set();
+    tree.forEach(node => {
+        (node.next || []).forEach(nextId => {
+            const key = node.id < nextId ? `${node.id}-${nextId}` : `${nextId}-${node.id}`;
+            if (edgeSet.has(key)) return;
+            edgeSet.add(key);
+            
+            const a = normPos[node.id];
+            const b = normPos[nextId];
+            if (!a || !b) return;
+            
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', a.x);
+            line.setAttribute('y1', a.y);
+            line.setAttribute('x2', b.x);
+            line.setAttribute('y2', b.y);
+            line.setAttribute('class', 'tree-edge');
+            line.dataset.a = node.id;
+            line.dataset.b = nextId;
+            treeSvg.appendChild(line);
+        });
+    });
+    
+    // === РИСУЕМ УЗЛЫ (поверх линий) ===
+    tree.forEach(node => {
+        const pos = normPos[node.id];
+        if (!pos) return;
+        const info = getNodeInfo(node, treeType, data.waifuId ?? 0);
+        
+        const el = document.createElement('div');
+        el.className = 'tree-node';
+        if (node.type === 3) el.classList.add('skill');
+        if (node.type === 1) el.classList.add('buff');
+        
+        el.dataset.id = node.id;
+        el.dataset.type = node.type;
+        el.dataset.lvl = node.lvl || 1;
+        el.style.left = pos.x + 'px';
+        el.style.top = pos.y + 'px';
+        
+        let icon = '🔹';
+        if (node.type === 1) icon = '💪';
+        if (node.type === 2) icon = '💖';
+        if (node.type === 3) icon = '⚔️';
+        if (node.type === 0) icon = '🌟';
+        
+        el.innerHTML = `
+            <span class="node-icon">${icon}</span>
+            <span class="node-name">${info.name}</span>
+            ${info.stats.length ? `<div class="node-stats">${info.stats.map(s => `<span class="node-stat">${s}</span>`).join('')}</div>` : ''}
+            ${info.price ? `<div class="node-price"><span class="price-ico">${info.priceIcon}</span>${info.price}</div>` : ''}
+        `;
+        
+        el.addEventListener('mouseenter', (e) => showTooltip(e, info, node, priceIcon));
+        el.addEventListener('mouseleave', hideTooltip);
+        el.addEventListener('touchstart', (e) => showTooltip(e.touches[0], info, node, priceIcon));
+        el.addEventListener('touchend', () => setTimeout(hideTooltip, 2000));
+        
+        treeStage.appendChild(el);
+    });
+    
+    // Сброс трансформации
+    currentScale = 1;
+    currentTx = 0;
+    currentTy = 0;
+    applyTransform();
+    
+    requestAnimationFrame(() => {
+        centerOnRoot();
+    });
+}
+
+function showTooltip(e, info, node, priceIcon) {
+    let x = e.clientX + 15;
+    let y = e.clientY + 15;
+    
+    if (x + 300 > window.innerWidth) x = e.clientX - 310;
+    if (y + 200 > window.innerHeight) y = e.clientY - 210;
+    
+    const lvlInfo = node.lvl > 1 ? `<div class="tooltip-row"><span class="label">Требуется Lv</span><span class="value" style="color:var(--lock-text)">${node.lvl}</span></div>` : '';
+    
+    tooltip.innerHTML = `
+        <div class="tooltip-title">${info.name}</div>
+        <div class="tooltip-row"><span class="label">Тип</span><span class="value">${
+            node.type === 0 ? 'Корень' :
+            node.type === 1 ? 'Бафф' :
+            node.type === 2 ? 'Бонус вайфу' :
+            node.type === 3 ? 'Скилл' : '???'
+        }</span></div>
+        ${lvlInfo}
+        ${info.price ? `<div class="tooltip-row"><span class="label">Цена</span><span class="value">${priceIcon} ${info.price}</span></div>` : ''}
+        ${info.stats.length ? `<div class="tooltip-row"><span class="label">Эффект</span><span class="value">${info.stats.join(', ')}</span></div>` : ''}
+        <div class="tooltip-desc">${info.desc}</div>
+    `;
+    
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+    tooltip.classList.add('show');
+}
+
+function hideTooltip() {
+    tooltip.classList.remove('show');
+}
+
+/* ============================================================
+   ТРАНСФОРМАЦИИ
+   ============================================================ */
+function applyTransform() {
+    treeStage.style.transform = `translate(${currentTx}px, ${currentTy}px) scale(${currentScale})`;
+}
+
+function clampTransform() {
+    const vw = treeViewport.clientWidth;
+    const vh = treeViewport.clientHeight;
+    const sw = treeStage.offsetWidth * currentScale;
+    const sh = treeStage.offsetHeight * currentScale;
+    if (sw <= vw) currentTx = (vw - sw) / 2;
+    else currentTx = Math.min(0, Math.max(vw - sw, currentTx));
+    if (sh <= vh) currentTy = (vh - sh) / 2;
+    else currentTy = Math.min(0, Math.max(vh - sh, currentTy));
+}
+
+function centerOnRoot() {
+    const rootNode = treeStage.querySelector('.tree-node');
+    if (!rootNode) return;
+    
+    const rootX = parseFloat(rootNode.style.left) || 0;
+    const rootY = parseFloat(rootNode.style.top) || 0;
+    
+    const vw = treeViewport.clientWidth;
+    const vh = treeViewport.clientHeight;
+    
+    currentScale = 1;
+    currentTx = vw / 2 - rootX * currentScale;
+    currentTy = vh / 3 - rootY * currentScale;
+    clampTransform();
+    applyTransform();
+}
+
+function zoomAt(px, py, factor) {
+    const newScale = Math.min(2.0, Math.max(0.3, currentScale * factor));
+    if (newScale === currentScale) return;
+    const wx = (px - currentTx) / currentScale;
+    const wy = (py - currentTy) / currentScale;
+    currentScale = newScale;
+    currentTx = px - wx * currentScale;
+    currentTy = py - wy * currentScale;
+    clampTransform();
+    applyTransform();
+}
+
+/* ============================================================
+   УПРАВЛЕНИЕ ПАНОРАМОЙ
+   ============================================================ */
+treeViewport.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.tree-node')) return;
+    isPanning = true;
+    panMoved = false;
+    panStart = { x: e.clientX, y: e.clientY, tx: currentTx, ty: currentTy };
+    activePointer = e.pointerId;
+    try { treeViewport.setPointerCapture(e.pointerId); } catch(_) {}
+    treeViewport.classList.add('grabbing');
+});
+
+treeViewport.addEventListener('pointermove', (e) => {
+    if (!isPanning || e.pointerId !== activePointer) return;
+    const dx = e.clientX - panStart.x;
+    const dy = e.clientY - panStart.y;
+    if (!panMoved && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) panMoved = true;
+    if (panMoved) {
+        currentTx = panStart.tx + dx;
+        currentTy = panStart.ty + dy;
+        clampTransform();
+        applyTransform();
+    }
+});
+
+function endPointer(e) {
+    if (!isPanning || e.pointerId !== activePointer) return;
+    treeViewport.classList.remove('grabbing');
+    try { treeViewport.releasePointerCapture(e.pointerId); } catch(_) {}
+    isPanning = false;
+    activePointer = null;
+    panStart = null;
+}
+treeViewport.addEventListener('pointerup', endPointer);
+treeViewport.addEventListener('pointercancel', endPointer);
+
+treeViewport.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const rect = treeViewport.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    const factor = e.deltaY < 0 ? 1.12 : 1/1.12;
+    zoomAt(px, py, factor);
+}, { passive: false });
+
+window.addEventListener('resize', () => {
+    clampTransform();
+    applyTransform();
+});
+
+/* ============================================================
+   ВКЛАДКИ
+   ============================================================ */
+function renderTabs() {
+    tabsContainer.innerHTML = '';
+    Object.entries(treesData).forEach(([key, data]) => {
+        const tab = document.createElement('button');
+        tab.className = 'tab' + (key === currentTree ? ' active' : '');
+        tab.dataset.key = key;
+        tab.innerHTML = `<span class="tab-ico">${data.icon}</span> ${data.name}`;
+        tab.addEventListener('click', () => {
+            currentTree = key;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            renderTree(key);
+        });
+        tabsContainer.appendChild(tab);
+    });
+}
+
+/* ============================================================
+   СТАРТ
+   ============================================================ */
+renderTabs();
+renderTree('st');
+
+/* ============================================================
+   ТЕМА
+   ============================================================ */
+const themeToggle = document.getElementById('themeToggle');
+const root = document.documentElement;
+const mql = window.matchMedia('(prefers-color-scheme: light)');
+function getStoredTheme() { try { return localStorage.getItem('theme'); } catch(e) { return null; } }
+function storeTheme(t) { try { localStorage.setItem('theme', t); } catch(e) {} }
+function applyTheme(t) {
+    if (t === 'light') {
+        root.classList.add('light'); root.style.colorScheme = 'light';
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#fff8f0');
+    } else {
+        root.classList.remove('light'); root.style.colorScheme = 'dark';
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0d1117');
+    }
+}
+function initTheme() {
+    const s = getStoredTheme();
+    if (s === 'light' || s === 'dark') applyTheme(s);
+    else applyTheme(mql.matches ? 'light' : 'dark');
+}
+function toggleTheme() {
+    const isLight = root.classList.contains('light');
+    applyTheme(isLight ? 'dark' : 'light');
+    storeTheme(isLight ? 'dark' : 'light');
+}
+themeToggle.addEventListener('click', toggleTheme);
+themeToggle.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTheme(); }
+});
+mql.addEventListener('change', (e) => { if (!getStoredTheme()) applyTheme(e.matches ? 'light' : 'dark'); });
+initTheme();
+
+/* ============================================================
+   ПРОГРЕСС-БАР
+   ============================================================ */
+const progressFill = document.getElementById('progressFill');
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    progressFill.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+}, { passive: true });
+
+/* ============================================================
+   ФОН
+   ============================================================ */
+(function() {
+    const bg = document.getElementById('mandarinsBg');
+    const count = window.innerWidth < 600 ? 10 : 16;
+    const emojis = ['🍊','🌳','💖','⚔️','🌟','💪','🔥'];
+    for (let i = 0; i < count; i++) {
+        const m = document.createElement('span');
+        m.className = 'mandarin-float';
+        m.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        m.style.left = Math.random() * 100 + '%';
+        m.style.fontSize = (1 + Math.random() * 1.4) + 'rem';
+        m.style.animationDuration = (18 + Math.random() * 14) + 's';
+        m.style.animationDelay = (Math.random() * 22) + 's';
+        bg.appendChild(m);
+    }
+})();
+
+</script>
+</body>
+</html>
