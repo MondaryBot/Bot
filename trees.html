@@ -427,7 +427,7 @@
   .tooltip {
     position: fixed;
     z-index: 9999;
-    max-width: 300px;
+    /* Убираем фиксированную max-width — теперь ширина будет динамической */
     padding: 14px 16px;
     background: var(--tooltip-bg);
     border: 1px solid var(--tooltip-border);
@@ -439,6 +439,7 @@
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.15s ease;
+    word-break: break-word;
   }
   .tooltip.show { opacity: 1; }
   .tooltip-title {
@@ -1289,9 +1290,13 @@ function showTooltipForNode(nodeEl, info, node, priceIcon) {
     /* позиционируем тултип рядом с самим блоком, а не с курсором */
     const rect = nodeEl.getBoundingClientRect();
     
-    /* ширина тултипа ограничена CSS max-width: 300px, но нам нужны реальные размеры */
+    /* Ширина тултипа будет адаптивной, но не больше ширины блока + запас */
+    const nodeWidth = nodeEl.offsetWidth;
+    const tooltipMaxWidth = Math.max(180, Math.min(340, nodeWidth + 60));
+    
     tooltip.style.visibility = 'hidden';
     tooltip.classList.add('show');
+    tooltip.style.maxWidth = tooltipMaxWidth + 'px';
     
     const lvlInfo = node.lvl > 1 ? `<div class="tooltip-row"><span class="label">Требуется Lv</span><span class="value" style="color:var(--lock-text)">${node.lvl}</span></div>` : '';
     
@@ -1312,7 +1317,7 @@ function showTooltipForNode(nodeEl, info, node, priceIcon) {
     tooltip.dataset.nodeId = node.id;
     
     /* После отрисовки контента измеряем тултип */
-    const tw = tooltip.offsetWidth || 300;
+    const tw = tooltip.offsetWidth || tooltipMaxWidth;
     const th = tooltip.offsetHeight || 160;
     const margin = 12;
     
@@ -1392,19 +1397,27 @@ function zoomAt(px, py, factor) {
 }
 
 /* ============================================================
-   УПРАВЛЕНИЕ ПАНОРАМОЙ (переделано как в map.html)
+   УПРАВЛЕНИЕ ПАНОРАМОЙ (переделано: теперь и с блоков тоже)
    ============================================================ */
 treeViewport.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('.tree-node')) return;
+    // Не обрабатываем правую кнопку
+    if (e.button !== undefined && e.button !== 0) return;
+
+    // Если нажатие на кнопку зума — игнорируем
     if (e.target.closest('.zoom-btn')) return;
-    
-    /* игнорируем второй палец при мультитаче — им занимается pinch */
+
+    // Запоминаем, что нажатие было на узле (для различения тапа и панорамирования)
+    pointerDownOnNode = e.target.closest('.tree-node');
+
+    // Игнорируем второй палец при мультитаче — им занимается pinch
     if (e.pointerType === 'touch' && e.isPrimary === false) return;
-    
+
     isPanning = true;
     panMoved = false;
     panStart = { x: e.clientX, y: e.clientY, tx: currentTx, ty: currentTy };
     activePointer = e.pointerId;
+
+    // Захватываем указатель на viewport для плавного панорамирования
     try { treeViewport.setPointerCapture(e.pointerId); } catch(_) {}
     treeViewport.classList.add('grabbing');
 });
@@ -1434,7 +1447,60 @@ treeViewport.addEventListener('pointerup', endPointer);
 treeViewport.addEventListener('pointercancel', endPointer);
 
 /* ============================================================
-   ПИНЧ-ЗУМ (тач) — как в map.html
+   ОБРАБОТКА КЛИКОВ ПО УЗЛАМ С УЧЁТОМ ПАНОРАМИРОВАНИЯ
+   ============================================================ */
+treeViewport.addEventListener('click', (e) => {
+    // Если панорамировали — не считаем это кликом
+    if (panMoved) {
+        panMoved = false;
+        pointerDownOnNode = null;
+        return;
+    }
+
+    const nodeEl = e.target.closest('.tree-node');
+
+    // Клик по пустому месту — скрываем тултип на телефоне
+    if (!nodeEl) {
+        if (!hasHover) hideTooltip();
+        pointerDownOnNode = null;
+        return;
+    }
+
+    // Клик по узлу
+    e.stopPropagation();
+
+    // На ПК ховер уже показывает тултип — клик не нужен
+    if (hasHover) {
+        pointerDownOnNode = null;
+        return;
+    }
+
+    // На телефоне — переключаем тултип
+    const nodeId = nodeEl.dataset.id;
+    if (tooltip.dataset.nodeId === nodeId && tooltip.classList.contains('show')) {
+        hideTooltip();
+    } else {
+        const node = findNodeById(currentTree, nodeId);
+        if (node) {
+            const info = getNodeInfo(node, treesData[currentTree].type, treesData[currentTree].waifuId ?? 0);
+            const priceIcon = treesData[currentTree].priceIcon;
+            showTooltipForNode(nodeEl, info, node, priceIcon);
+        }
+    }
+
+    pointerDownOnNode = null;
+});
+
+/* Вспомогательная функция поиска узла по id в текущем дереве */
+function findNodeById(treeKey, nodeId) {
+    const data = treesData[treeKey];
+    if (!data) return null;
+    const numId = Number(nodeId);
+    return data.tree.find(n => n.id === numId) || null;
+}
+
+/* ============================================================
+   ПИНЧ-ЗУМ (тач)
    ============================================================ */
 let pinchStart = null;
 
@@ -1489,13 +1555,6 @@ treeViewport.addEventListener('wheel', (e) => {
     const factor = e.deltaY < 0 ? 1.12 : 1/1.12;
     zoomAt(px, py, factor);
 }, { passive: false });
-
-/* Закрыть тултип при клике по пустому месту (телефон) */
-treeViewport.addEventListener('click', (e) => {
-    if (!hasHover && !e.target.closest('.tree-node')) {
-        hideTooltip();
-    }
-});
 
 window.addEventListener('resize', () => {
     clampTransform();
