@@ -1129,16 +1129,18 @@ function renderTree(treeKey) {
         maxY = Math.max(maxY, p.y);
     });
     
-    const PAD = 250;
-    const stageW = maxX - minX + PAD * 2;
-    const stageH = maxY - minY + PAD * 2;
+     const PAD_X = 250;      // по бокам — оставляем много
+    const PAD_TOP = 80;     // сверху — поменьше
+    const PAD_BOTTOM = 250; // снизу — оставляем как было
+    const stageW = maxX - minX + PAD_X * 2;
+    const stageH = maxY - minY + PAD_TOP + PAD_BOTTOM;
     
-    // Сдвигаем позиции
+        // Сдвигаем позиции (разные отступы по X и Y)
     const normPos = {};
     Object.entries(positions).forEach(([id, p]) => {
         normPos[id] = {
-            x: p.x - minX + PAD,
-            y: p.y - minY + PAD
+            x: p.x - minX + PAD_X,
+            y: p.y - minY + PAD_TOP
         };
     });
     
