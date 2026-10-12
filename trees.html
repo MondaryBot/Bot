@@ -345,7 +345,7 @@
     border-radius: 14px;
     text-align: center;
     cursor: pointer;
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
     box-shadow: 0 4px 14px var(--shadow);
     z-index: 2;
     display: flex;
@@ -353,7 +353,10 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
+    /* Ключевое: разрешаем touch-action для pointer events */
     touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
   .tree-node:hover {
     box-shadow: 0 8px 24px var(--shadow), 0 0 20px var(--accent-glow);
@@ -384,6 +387,7 @@
     font-size: 1.6rem;
     line-height: 1;
     display: block;
+    pointer-events: none;
   }
   .node-name {
     font-size: 0.72rem;
@@ -391,6 +395,7 @@
     color: var(--text);
     line-height: 1.2;
     overflow-wrap: anywhere;
+    pointer-events: none;
   }
   .node-stats {
     display: flex;
@@ -398,6 +403,7 @@
     justify-content: center;
     gap: 3px;
     margin-top: 2px;
+    pointer-events: none;
   }
   .node-stat {
     font-size: 0.65rem;
@@ -420,6 +426,7 @@
     font-size: 0.7rem;
     font-weight: 800;
     color: var(--price-text);
+    pointer-events: none;
   }
   .node-price .price-ico { font-size: 0.8rem; }
 
@@ -427,7 +434,6 @@
   .tooltip {
     position: fixed;
     z-index: 9999;
-    /* Убираем фиксированную max-width — теперь ширина будет динамической */
     padding: 14px 16px;
     background: var(--tooltip-bg);
     border: 1px solid var(--tooltip-border);
@@ -438,10 +444,14 @@
     color: var(--text);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity 0.15s ease, transform 0.15s ease;
     word-break: break-word;
+    transform: scale(0.96);
   }
-  .tooltip.show { opacity: 1; }
+  .tooltip.show { 
+    opacity: 1; 
+    transform: scale(1);
+  }
   .tooltip-title {
     font-weight: 800;
     font-size: 0.9rem;
@@ -462,6 +472,44 @@
     border-top: 1px dashed var(--divider);
     font-size: 0.78rem;
     color: var(--text-dim);
+  }
+  /* Стрелка тултипа */
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--tooltip-bg);
+    border: 1px solid var(--tooltip-border);
+    transform: rotate(45deg);
+  }
+  .tooltip[data-arrow="right"]::after {
+    left: -6px;
+    top: 50%;
+    margin-top: -5px;
+    border-right: none;
+    border-top: none;
+  }
+  .tooltip[data-arrow="left"]::after {
+    right: -6px;
+    top: 50%;
+    margin-top: -5px;
+    border-left: none;
+    border-bottom: none;
+  }
+  .tooltip[data-arrow="bottom"]::after {
+    top: -6px;
+    left: 50%;
+    margin-left: -5px;
+    border-right: none;
+    border-bottom: none;
+  }
+  .tooltip[data-arrow="top"]::after {
+    bottom: -6px;
+    left: 50%;
+    margin-left: -5px;
+    border-left: none;
+    border-top: none;
   }
 
   /* ===== ФУТЕР ===== */
@@ -568,7 +616,7 @@
 
 <script>
 /* ============================================================
-   ДАННЫЕ (взяты из data.js)
+   ДАННЫЕ
    ============================================================ */
 
 const stTree = [{id:1,type:0,lvl:1,stats:[],next:[2,3,4,5]},
@@ -943,8 +991,6 @@ const treesData = {
     'waifu4': { name: 'Лемон-тян', icon: '🍋', waifuId:4,tree: waifus[3].tree, type: 'waifu', desc: 'Дерево талантов Лемон-тян', priceIcon: '🩷' }
 };
 
-let nodePositions = {};
-
 /* ============================================================
    ВЫЧИСЛЕНИЕ ПОЗИЦИЙ
    ============================================================ */
@@ -1065,7 +1111,6 @@ let isPanning = false;
 let panMoved = false;
 let panStart = null;
 let activePointer = null;
-let pointerDownOnNode = null;
 
 /* есть ли ховер (не тач) */
 const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -1092,7 +1137,6 @@ function renderTree(treeKey) {
     `;
     
     const positions = computeTreePositions(tree);
-    nodePositions = positions;
     
     treeStage.querySelectorAll('.tree-node').forEach(n => n.remove());
     treeStage.querySelectorAll('.level-line, .level-label').forEach(n => n.remove());
@@ -1220,23 +1264,11 @@ function renderTree(treeKey) {
             ${info.price ? `<div class="node-price"><span class="price-ico">${info.priceIcon}</span>${info.price}</div>` : ''}
         `;
         
-        /* --- ховер только на ПК --- */
+        /* Ховер только на устройствах с мышью */
         if (hasHover) {
             el.addEventListener('mouseenter', () => showTooltipForNode(el, info, node, priceIcon));
             el.addEventListener('mouseleave', hideTooltip);
         }
-        
-        /* --- тап: на телефоне открываем тултип по клику --- */
-        el.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (hasHover) return; // на ПК не мешаем ховеру
-            /* на телефоне: если тултип уже показан для этого узла — скрыть, иначе показать */
-            if (tooltip.dataset.nodeId === String(node.id) && tooltip.classList.contains('show')) {
-                hideTooltip();
-            } else {
-                showTooltipForNode(el, info, node, priceIcon);
-            }
-        });
         
         treeStage.appendChild(el);
     });
@@ -1259,7 +1291,6 @@ function renderTree(treeKey) {
 function autoFitTree() {
     const isPhone = window.matchMedia('(max-width: 560px)').matches
                  || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-    /* антизум только на телефонах */
     if (!isPhone) return;
 
     const vw = treeViewport.clientWidth;
@@ -1268,15 +1299,12 @@ function autoFitTree() {
     const sh = treeStage.offsetHeight;
     if (!sw || !sh) return;
 
-    /* мягко: только если реально не влезает, и не сильнее 0.75 */
     const fitW = vw / sw;
     const fitH = vh / sh;
     let fitScale = Math.min(fitW, fitH);
 
-    /* если и так влезает — не трогаем */
     if (fitScale >= 1) return;
 
-    /* ограничиваем снизу, чтобы не было «слишком мелко» */
     fitScale = Math.max(0.75, fitScale);
 
     currentScale = fitScale;
@@ -1284,13 +1312,12 @@ function autoFitTree() {
 }
 
 /* ============================================================
-   ТУЛТИП
+   ТУЛТИП — УМНОЕ ПОЗИЦИОНИРОВАНИЕ
    ============================================================ */
 function showTooltipForNode(nodeEl, info, node, priceIcon) {
-    /* позиционируем тултип рядом с самим блоком, а не с курсором */
     const rect = nodeEl.getBoundingClientRect();
     
-    /* Ширина тултипа будет адаптивной, но не больше ширины блока + запас */
+    /* Адаптивная ширина тултипа */
     const nodeWidth = nodeEl.offsetWidth;
     const tooltipMaxWidth = Math.max(180, Math.min(340, nodeWidth + 60));
     
@@ -1298,7 +1325,7 @@ function showTooltipForNode(nodeEl, info, node, priceIcon) {
     tooltip.classList.add('show');
     tooltip.style.maxWidth = tooltipMaxWidth + 'px';
     
-    const lvlInfo = node.lvl > 1 ? `<div class="tooltip-row"><span class="label">Требуется Lv</span><span class="value" style="color:var(--lock-text)">${node.lvl}</span></div>` : '';
+    const lvlInfo = node.lvl > 1 ? `<div class="tooltip-row"><span class="label">Требуется Lv</span><span class="value">${node.lvl}</span></div>` : '';
     
     tooltip.innerHTML = `
         <div class="tooltip-title">${info.name}</div>
@@ -1316,32 +1343,55 @@ function showTooltipForNode(nodeEl, info, node, priceIcon) {
     
     tooltip.dataset.nodeId = node.id;
     
-    /* После отрисовки контента измеряем тултип */
+    /* Измеряем тултип после установки контента */
     const tw = tooltip.offsetWidth || tooltipMaxWidth;
     const th = tooltip.offsetHeight || 160;
-    const margin = 12;
+    const margin = 14;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
     
-    let x = rect.right + margin;
-    let y = rect.top;
+    /* Пробуем позиции в порядке приоритета: справа, слева, снизу, сверху */
+    let x, y, arrow;
     
-    /* Если не влезает справа — ставим слева */
-    if (x + tw > window.innerWidth - 8) {
+    const spaceRight = vw - rect.right - margin;
+    const spaceLeft = rect.left - margin;
+    const spaceBottom = vh - rect.bottom - margin;
+    const spaceTop = rect.top - margin;
+    
+    if (spaceRight >= tw) {
+        /* Справа от блока */
+        x = rect.right + margin;
+        y = rect.top + rect.height / 2 - th / 2;
+        arrow = 'right';
+    } else if (spaceLeft >= tw) {
+        /* Слева от блока */
         x = rect.left - tw - margin;
+        y = rect.top + rect.height / 2 - th / 2;
+        arrow = 'left';
+    } else if (spaceBottom >= th) {
+        /* Снизу от блока — по центру */
+        x = rect.left + rect.width / 2 - tw / 2;
+        y = rect.bottom + margin;
+        arrow = 'bottom';
+    } else if (spaceTop >= th) {
+        /* Сверху от блока — по центру */
+        x = rect.left + rect.width / 2 - tw / 2;
+        y = rect.top - th - margin;
+        arrow = 'top';
+    } else {
+        /* Fallback: снизу с максимальным местом */
+        x = rect.left + rect.width / 2 - tw / 2;
+        y = Math.min(rect.bottom + margin, vh - th - 8);
+        arrow = 'bottom';
     }
     
-    /* Если не влезает слева — ставим по центру над/под */
-    if (x < 8) {
-        x = Math.max(8, Math.min(window.innerWidth - tw - 8, rect.left + rect.width / 2 - tw / 2));
-    }
-    
-    /* Корректируем по вертикали, чтобы не вылезал */
-    if (y + th > window.innerHeight - 8) {
-        y = window.innerHeight - th - 8;
-    }
-    if (y < 8) y = 8;
+    /* Финальные корректировки по краям экрана */
+    x = Math.max(8, Math.min(vw - tw - 8, x));
+    y = Math.max(8, Math.min(vh - th - 8, y));
     
     tooltip.style.left = x + 'px';
     tooltip.style.top = y + 'px';
+    tooltip.dataset.arrow = arrow;
     tooltip.style.visibility = 'visible';
 }
 
@@ -1397,19 +1447,13 @@ function zoomAt(px, py, factor) {
 }
 
 /* ============================================================
-   УПРАВЛЕНИЕ ПАНОРАМОЙ (переделано: теперь и с блоков тоже)
+   УПРАВЛЕНИЕ ПАНОРАМОЙ — РАБОТАЕТ С БЛОКОВ
    ============================================================ */
-treeViewport.addEventListener('pointerdown', (e) => {
-    // Не обрабатываем правую кнопку
-    if (e.button !== undefined && e.button !== 0) return;
-
-    // Если нажатие на кнопку зума — игнорируем
+function handlePointerDown(e) {
+    if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
     if (e.target.closest('.zoom-btn')) return;
 
-    // Запоминаем, что нажатие было на узле (для различения тапа и панорамирования)
-    pointerDownOnNode = e.target.closest('.tree-node');
-
-    // Игнорируем второй палец при мультитаче — им занимается pinch
+    /* Игнорируем второй палец при мультитаче */
     if (e.pointerType === 'touch' && e.isPrimary === false) return;
 
     isPanning = true;
@@ -1417,23 +1461,31 @@ treeViewport.addEventListener('pointerdown', (e) => {
     panStart = { x: e.clientX, y: e.clientY, tx: currentTx, ty: currentTy };
     activePointer = e.pointerId;
 
-    // Захватываем указатель на viewport для плавного панорамирования
     try { treeViewport.setPointerCapture(e.pointerId); } catch(_) {}
     treeViewport.classList.add('grabbing');
-});
+}
+
+treeViewport.addEventListener('pointerdown', handlePointerDown);
 
 treeViewport.addEventListener('pointermove', (e) => {
     if (!isPanning || e.pointerId !== activePointer) return;
     const dx = e.clientX - panStart.x;
     const dy = e.clientY - panStart.y;
-    if (!panMoved && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) panMoved = true;
+    
+    /* Порог 4px для более отзывчивого определения панорамирования */
+    if (!panMoved && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
+        panMoved = true;
+        hideTooltip();
+    }
+    
     if (panMoved) {
         currentTx = panStart.tx + dx;
         currentTy = panStart.ty + dy;
         clampTransform();
         applyTransform();
+        e.preventDefault();
     }
-});
+}, { passive: false });
 
 function endPointer(e) {
     if (!isPanning || e.pointerId !== activePointer) return;
@@ -1447,36 +1499,30 @@ treeViewport.addEventListener('pointerup', endPointer);
 treeViewport.addEventListener('pointercancel', endPointer);
 
 /* ============================================================
-   ОБРАБОТКА КЛИКОВ ПО УЗЛАМ С УЧЁТОМ ПАНОРАМИРОВАНИЯ
+   ОБРАБОТКА КЛИКОВ ПО УЗЛАМ
    ============================================================ */
 treeViewport.addEventListener('click', (e) => {
-    // Если панорамировали — не считаем это кликом
+    /* Если панорамировали — не считаем это кликом */
     if (panMoved) {
         panMoved = false;
-        pointerDownOnNode = null;
         return;
     }
 
     const nodeEl = e.target.closest('.tree-node');
 
-    // Клик по пустому месту — скрываем тултип на телефоне
+    /* Клик по пустому месту — скрываем тултип на телефоне */
     if (!nodeEl) {
         if (!hasHover) hideTooltip();
-        pointerDownOnNode = null;
         return;
     }
 
-    // Клик по узлу
+    /* На ПК ховер уже показывает тултип — клик не нужен */
+    if (hasHover) return;
+
+    /* На телефоне — переключаем тултип */
     e.stopPropagation();
-
-    // На ПК ховер уже показывает тултип — клик не нужен
-    if (hasHover) {
-        pointerDownOnNode = null;
-        return;
-    }
-
-    // На телефоне — переключаем тултип
     const nodeId = nodeEl.dataset.id;
+    
     if (tooltip.dataset.nodeId === nodeId && tooltip.classList.contains('show')) {
         hideTooltip();
     } else {
@@ -1487,8 +1533,6 @@ treeViewport.addEventListener('click', (e) => {
             showTooltipForNode(nodeEl, info, node, priceIcon);
         }
     }
-
-    pointerDownOnNode = null;
 });
 
 /* Вспомогательная функция поиска узла по id в текущем дереве */
@@ -1517,6 +1561,8 @@ treeViewport.addEventListener('touchstart', (e) => {
         };
         isPanning = false;
         activePointer = null;
+        panMoved = true; /* Блокируем клик после пинча */
+        hideTooltip();
     }
 }, { passive: true });
 
@@ -1544,7 +1590,12 @@ treeViewport.addEventListener('touchmove', (e) => {
 }, { passive: false });
 
 treeViewport.addEventListener('touchend', (e) => {
-    if (e.touches.length < 2) pinchStart = null;
+    if (e.touches.length < 2) {
+        pinchStart = null;
+        /* Сбрасываем panMoved после завершения пинча, но с задержкой,
+           чтобы click не сработал */
+        setTimeout(() => { panMoved = false; }, 50);
+    }
 });
 
 treeViewport.addEventListener('wheel', (e) => {
@@ -1560,6 +1611,11 @@ window.addEventListener('resize', () => {
     clampTransform();
     applyTransform();
 });
+
+/* Скрываем тултип при скролле страницы */
+window.addEventListener('scroll', () => {
+    if (tooltip.classList.contains('show')) hideTooltip();
+}, { passive: true });
 
 /* ============================================================
    ВКЛАДКИ
@@ -1645,7 +1701,7 @@ window.addEventListener('scroll', () => {
         m.style.left = Math.random() * 100 + '%';
         m.style.fontSize = (1 + Math.random() * 1.4) + 'rem';
         m.style.animationDuration = (18 + Math.random() * 14) + 's';
-        m.style.animationDelay = (Math.random() * 22) + 's';
+        m.style.animationDelay = (Math.random() * 22 + 22) + 's';
         bg.appendChild(m);
     }
 })();
