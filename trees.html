@@ -246,6 +246,14 @@
   align-items: center;
   gap: 6px;
 }
+.bonus-totals {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--divider);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 .bonus-list {
   display: flex;
   flex-wrap: wrap;
@@ -660,7 +668,8 @@
    ДАННЫЕ
    ============================================================ */
 
-const stTree = [{id:1,type:0,lvl:1,stats:[],next:[2,3,4,5]},
+const stTree = [
+  {id:1,type:0,lvl:1,stats:[],next:[2,3,4,5]},
 {id:2,type:1,lvl:1,points:1,stats:[12,400],next:[6]},
 {id:3,type:1,lvl:1,points:1,stats:[13,10],next:[7]},
 {id:4,type:1,lvl:1,points:1,stats:[14,15],next:[8]},
@@ -1658,17 +1667,14 @@ function renderBonusPanel(treeKey) {
   const totalMana = Math.round((baseMana + flatMana) * (1 + pctMana / 100));
   const totalRes  = baseRes + flatRes;
 
-  const totals = `
-    <div class="bonus-list" style="margin-top:10px">
-      <span class="bonus-chip">${totalHp}❤️</span>
-      <span class="bonus-chip">${totalMana}💙</span>
-      <span class="bonus-chip">${totalRes}💙/ч</span>
-    </div>`;
-
   panel.innerHTML = `
     <div class="bonus-title">📊 Суммарные бонусы</div>
     ${chips.length ? `<div class="bonus-list">${chips.join('')}</div>` : `<div class="bonus-empty">0</div>`}
-    ${totals}
+    <div class="bonus-totals">
+      <span class="bonus-chip">${totalHp}❤️</span>
+      <span class="bonus-chip">${totalMana}💙</span>
+      <span class="bonus-chip">${totalRes}💙/ч</span>
+    </div>
   `;
 }
     
