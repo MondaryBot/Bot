@@ -1405,11 +1405,65 @@ function getNodeInfo(node, treeType, waifuId = 0) {
    ============================================================ */
 let currentTree = 'st';
 const treesData = {
-    'st': { name: 'Пустой отряд', icon: '❌', tree: stTree, type: 'st', desc: 'Стандартное дерево талантов для отряда', priceIcon: '🎖' },
-    'waifu1': { name: 'Мандарин-тян', icon: '🍊', waifuId:1, tree: waifus[0].tree, type: 'waifu', desc: 'Дерево талантов Мандарин-тян', priceIcon: '🩷' },
-    'waifu2': { name: 'Черри-тян', icon: '🍒', waifuId:2,tree: waifus[1].tree, type: 'waifu', desc: 'Дерево талантов Черри-тян', priceIcon: '🩷' },
-    'waifu3': { name: 'Киви-тян', icon: '🥝', waifuId:3,tree: waifus[2].tree, type: 'waifu', desc: 'Дерево талантов Киви-тян', priceIcon: '🩷' },
-    'waifu4': { name: 'Лемон-тян', icon: '🍋', waifuId:4,tree: waifus[3].tree, type: 'waifu', desc: 'Дерево талантов Лемон-тян', priceIcon: '🩷' }
+    'st': {
+        name: 'Пустой отряд',
+        icon: '❌',
+        tree: stTree,
+        type: 'st',
+        desc: 'Стандартное дерево талантов для отряда',
+        priceIcon: '🎖',
+        hp: 2000,
+        mana: 200,
+        manaRes: 10
+    },
+    'waifu1': {
+        name: 'Мандарин-тян',
+        icon: '🍊',
+        waifuId: 1,
+        tree: waifus[0].tree,
+        type: 'waifu',
+        desc: 'Дерево талантов Мандарин-тян',
+        priceIcon: '🩷',
+        hp: waifus[0].hp,
+        mana: waifus[0].mana,
+        manaRes: waifus[0].manaRes
+    },
+    'waifu2': {
+        name: 'Черри-тян',
+        icon: '🍒',
+        waifuId: 2,
+        tree: waifus[1].tree,
+        type: 'waifu',
+        desc: 'Дерево талантов Черри-тян',
+        priceIcon: '🩷',
+        hp: waifus[1].hp,
+        mana: waifus[1].mana,
+        manaRes: waifus[1].manaRes
+    },
+    'waifu3': {
+        name: 'Киви-тян',
+        icon: '🥝',
+        waifuId: 3,
+        tree: waifus[2].tree,
+        type: 'waifu',
+        desc: 'Дерево талантов Киви-тян',
+        priceIcon: '🩷',
+        hp: waifus[2].hp,
+        mana: waifus[2].mana,
+        manaRes: waifus[2].manaRes
+    },
+    'waifu4': {
+        name: 'Лемон-тян',
+        icon: '🍋',
+        waifuId: 4,
+        tree: waifus[3].tree,
+        type: 'waifu',
+        desc: 'Дерево талантов Лемон-тян',
+        priceIcon: '🩷',
+        hp: waifus[3].hp,
+        mana: waifus[3].mana,
+        manaRes: waifus[3].manaRes
+    }
 };
 
 /* ============================================================
@@ -1589,9 +1643,33 @@ function renderBonusPanel(treeKey) {
     `<span class="bonus-chip">${getFightBoostName(t, v)}</span>`
   );
 
-  panel.innerHTML = chips.length
-    ? `<div class="bonus-title">📊 Суммарные бонусы</div><div class="bonus-list">${chips.join('')}</div>`
-    : `<div class="bonus-title">📊 Суммарные бонусы</div><div class="bonus-empty">0</div>`;
+  /* Итоговые статы */
+  const baseHp   = data.hp   ?? 2000;
+  const baseMana = data.mana ?? 200;
+  const baseRes  = data.manaRes ?? 10;
+
+  const flatHp   = sum[12] || 0;
+  const pctHp    = sum[13] || 0;
+  const flatMana = sum[14] || 0;
+  const pctMana  = sum[15] || 0;
+  const flatRes  = sum[16] || 0;
+
+  const totalHp   = Math.round((baseHp   + flatHp)   * (1 + pctHp   / 100));
+  const totalMana = Math.round((baseMana + flatMana) * (1 + pctMana / 100));
+  const totalRes  = baseRes + flatRes;
+
+  const totals = `
+    <div class="bonus-list" style="margin-top:10px">
+      <span class="bonus-chip">${totalHp}❤️</span>
+      <span class="bonus-chip">${totalMana}💙</span>
+      <span class="bonus-chip">${totalRes}💙/ч</span>
+    </div>`;
+
+  panel.innerHTML = `
+    <div class="bonus-title">📊 Суммарные бонусы</div>
+    ${chips.length ? `<div class="bonus-list">${chips.join('')}</div>` : `<div class="bonus-empty">0</div>`}
+    ${totals}
+  `;
 }
     
     const positions = computeTreePositions(tree);
